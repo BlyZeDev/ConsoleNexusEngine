@@ -5,7 +5,7 @@ using System;
 /// <summary>
 /// Represents a RGB color
 /// </summary>
-public readonly partial record struct Color : ISpanParsable<Color>, IParsable<Color>, IEquatable<Color>
+public readonly partial record struct Color : ISpanParsable<Color>, IParsable<Color>
 {
     private readonly uint _color;
 
