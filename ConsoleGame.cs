@@ -1,6 +1,7 @@
 ﻿namespace ConsoleNexusEngine;
 
 using ConsoleNexusEngine.Common;
+using System;
 using System.Threading;
 
 /// <summary>
@@ -9,6 +10,7 @@ using System.Threading;
 public abstract class ConsoleGame
 {
     private readonly Thread _game;
+    private float uncorrectedSleepDuration => 1000f / TargetFramerate;
 
     /// <summary>
     /// <see langword="true"/> if the game is running, otherwise <see langword="false"/>
@@ -22,21 +24,34 @@ public abstract class ConsoleGame
 
     protected ConsoleGame(int windowHeight, int windowWidth, Framerate targetFramerate)
     {
-        _game = new Thread(targetFramerate.IsUnlimited ? GameLoopUnlimited : GameLoopCapped);
+        _game = new Thread(GameLoop) { Priority = ThreadPriority.Highest };
 
         TargetFramerate = targetFramerate;
 
         IsRunning = false;
     }
 
-    private void GameLoopCapped()
+    private void GameLoop()
     {
+        DateTime lastTime;
 
-    }
+        while (IsRunning)
+        {
+            if (TargetFramerate.IsUnlimited)
+            {
+                Update();
+                Render();
+                continue;
+            }
 
-    private void GameLoopUnlimited()
-    {
+            lastTime = DateTime.UtcNow;
 
+            Update();
+            Render();
+
+            var sleepDuration = (int)(uncorrectedSleepDuration - (DateTime.UtcNow - lastTime).TotalMilliseconds);
+            if (sleepDuration > 0) Thread.Sleep(sleepDuration);
+        }
     }
 
     /// <summary>
@@ -49,8 +64,6 @@ public abstract class ConsoleGame
         IsRunning = true;
 
         _game.Start();
-
-        while (IsRunning) { }
     }
 
     /// <summary>

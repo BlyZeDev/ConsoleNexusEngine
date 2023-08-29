@@ -46,6 +46,10 @@ public readonly partial record struct Color : ISpanParsable<Color>, IParsable<Co
     public double GetLuminance()
         => 0.299 * R + 0.587 * G + 0.114 * B;
 
+    /// <summary>
+    /// Format: "[R={<see cref="R"/>},G={<see cref="G"/>},B={<see cref="B"/>}]"
+    /// </summary>
+    /// <returns><see cref="string"/></returns>
     public override string ToString()
         => $"[R={R},G={G},B={B}]";
 }
