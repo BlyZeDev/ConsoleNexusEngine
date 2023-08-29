@@ -22,12 +22,42 @@ public abstract class ConsoleGame
 
     protected ConsoleGame(int windowHeight, int windowWidth, Framerate targetFramerate)
     {
-        _game = new Thread(GameLoop);
+        _game = new Thread(targetFramerate.IsUnlimited ? GameLoopUnlimited : GameLoopCapped);
 
         TargetFramerate = targetFramerate;
 
         IsRunning = false;
     }
+
+    private void GameLoopCapped()
+    {
+
+    }
+
+    private void GameLoopUnlimited()
+    {
+
+    }
+
+    /// <summary>
+    /// Starts the game
+    /// </summary>
+    public void Start()
+    {
+        Load();
+
+        IsRunning = true;
+
+        _game.Start();
+
+        while (IsRunning) { }
+    }
+
+    /// <summary>
+    /// Stops the game
+    /// </summary>
+    public void Stop()
+        => IsRunning = false;
 
     /// <summary>
     /// Called once before the start of the game.<br/>
@@ -46,21 +76,4 @@ public abstract class ConsoleGame
     /// Render your graphics here.
     /// </summary>
     public abstract void Render();
-
-    private void GameLoop()
-    {
-
-    }
-
-    public void Start()
-    {
-        IsRunning = true;
-
-        _game.Start();
-
-        while (IsRunning) { }
-    }
-
-    public void Stop()
-        => IsRunning = false;
 }
