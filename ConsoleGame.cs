@@ -10,7 +10,6 @@ using System.Threading;
 public abstract class ConsoleGame
 {
     private readonly Thread _game;
-    private float uncorrectedSleepDuration => 1000f / TargetFramerate;
 
     /// <summary>
     /// <see langword="true"/> if the game is running, otherwise <see langword="false"/>
@@ -20,37 +19,48 @@ public abstract class ConsoleGame
     /// <summary>
     /// The Frames per second the game tries to run at
     /// </summary>
-    public Framerate TargetFramerate { get; set; }
+    public Framerate TargetFramerate { get; }
 
-    protected ConsoleGame(int windowHeight, int windowWidth, Framerate targetFramerate)
+    protected ConsoleGame(Framerate targetFramerate)
     {
-        _game = new Thread(GameLoop) { Priority = ThreadPriority.Highest };
-
         TargetFramerate = targetFramerate;
-
         IsRunning = false;
+
+        _game = new Thread(TargetFramerate.IsUnlimited ? GameLoopUnlimited : GameLoopCapped)
+        {
+            Priority = ThreadPriority.Highest
+        };
     }
 
-    private void GameLoop()
+    private void GameLoopCapped() //genauer machen
     {
-        DateTime lastTime;
+        double delayBetweenFrames = 1d / TargetFramerate;
+        DateTime processingTime;
 
         while (IsRunning)
         {
-            if (TargetFramerate.IsUnlimited)
-            {
-                Update();
-                Render();
-                continue;
-            }
-
-            lastTime = DateTime.UtcNow;
+            processingTime = DateTime.UtcNow;
 
             Update();
             Render();
 
-            var sleepDuration = (int)(uncorrectedSleepDuration - (DateTime.UtcNow - lastTime).TotalMilliseconds);
-            if (sleepDuration > 0) Thread.Sleep(sleepDuration);
+            var delay = (DateTime.UtcNow - processingTime).TotalSeconds;
+
+            if (delay < delayBetweenFrames)
+            {
+                var millisecondsToWait = (int)(1000 * (delayBetweenFrames - delay));
+
+                if (millisecondsToWait > 0) Thread.Sleep(millisecondsToWait);
+            }
+        }
+    }
+
+    private void GameLoopUnlimited()
+    {
+        while (IsRunning)
+        {
+            Update();
+            Render();
         }
     }
 
