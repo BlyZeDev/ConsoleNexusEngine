@@ -53,13 +53,13 @@ internal static partial class Native
     public static string ResetColor(string text)
         => $"{RESET}{text}";
 
-    public static string Bold(string text)
+    public static string BoldText(string text)
         => $"{BOLD}{text}";
 
-    public static string Italic(string text)
+    public static string ItalicText(string text)
         => $"{ITALIC}{text}";
 
-    public static string Underline(string text)
+    public static string UnderlineText(string text)
         => $"{UNDERLINE}{text}";
 
     public static double GetHighResolutionTimestamp()

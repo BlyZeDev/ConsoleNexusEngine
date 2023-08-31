@@ -2,12 +2,13 @@
 
 using ConsoleNexusEngine.Common;
 using ConsoleNexusEngine.Internal;
+using System;
 using System.Threading;
 
 /// <summary>
 /// Provides methods for your Console game
 /// </summary>
-public abstract class ConsoleGame
+public abstract partial class ConsoleGame
 {
     private readonly Thread _game;
     private readonly ConsoleGameConfig _config;
@@ -56,6 +57,7 @@ public abstract class ConsoleGame
     public void Stop()
     {
         IsRunning = false;
+
         _game.Join();
     }
 
@@ -69,7 +71,7 @@ public abstract class ConsoleGame
     /// Called before every frame.<br/>
     /// Do math and other logic here.
     /// </summary>
-    public abstract void Update();
+    public abstract void Update(in ReadOnlySpan<GameInputKey> pressedKeys);
 
     /// <summary>
     /// Called after every frame.<br/>
@@ -94,7 +96,7 @@ public abstract class ConsoleGame
 
             while (accumulator >= targetFrameTime)
             {
-                Update();
+                Update(GetPressedKeys());
                 Render();
                 accumulator -= targetFrameTime;
             }
@@ -113,7 +115,7 @@ public abstract class ConsoleGame
     {
         while (IsRunning)
         {
-            Update();
+            Update(GetPressedKeys());
             Render();
         }
     }
