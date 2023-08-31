@@ -54,7 +54,10 @@ public abstract class ConsoleGame
     /// Stops the game
     /// </summary>
     public void Stop()
-        => IsRunning = false;
+    {
+        IsRunning = false;
+        _game.Join();
+    }
 
     /// <summary>
     /// Called once before the start of the game.<br/>
