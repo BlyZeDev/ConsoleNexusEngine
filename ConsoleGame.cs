@@ -1,7 +1,7 @@
 ﻿namespace ConsoleNexusEngine;
 
 using ConsoleNexusEngine.Common;
-using System;
+using ConsoleNexusEngine.Internal;
 using System.Threading;
 
 /// <summary>
@@ -10,6 +10,7 @@ using System.Threading;
 public abstract class ConsoleGame
 {
     private readonly Thread _game;
+    private readonly ConsoleGameConfig _config;
 
     /// <summary>
     /// <see langword="true"/> if the game is running, otherwise <see langword="false"/>
@@ -19,49 +20,22 @@ public abstract class ConsoleGame
     /// <summary>
     /// The Frames per second the game tries to run at
     /// </summary>
-    public Framerate TargetFramerate { get; }
+    public Framerate TargetFramerate => _config.TargetFramerate;
 
-    protected ConsoleGame(Framerate targetFramerate)
+    /// <summary>
+    /// Initializes the <see cref="ConsoleGame"/>
+    /// </summary>
+    /// <param name="config">The configuration for the console game</param>
+    protected ConsoleGame(ConsoleGameConfig config)
     {
-        TargetFramerate = targetFramerate;
         IsRunning = false;
+
+        _config = config;
 
         _game = new Thread(TargetFramerate.IsUnlimited ? GameLoopUnlimited : GameLoopCapped)
         {
             Priority = ThreadPriority.Highest
         };
-    }
-
-    private void GameLoopCapped() //genauer machen
-    {
-        double delayBetweenFrames = 1d / TargetFramerate;
-        DateTime processingTime;
-
-        while (IsRunning)
-        {
-            processingTime = DateTime.UtcNow;
-
-            Update();
-            Render();
-
-            var delay = (DateTime.UtcNow - processingTime).TotalSeconds;
-
-            if (delay < delayBetweenFrames)
-            {
-                var millisecondsToWait = (int)(1000 * (delayBetweenFrames - delay));
-
-                if (millisecondsToWait > 0) Thread.Sleep(millisecondsToWait);
-            }
-        }
-    }
-
-    private void GameLoopUnlimited()
-    {
-        while (IsRunning)
-        {
-            Update();
-            Render();
-        }
     }
 
     /// <summary>
@@ -99,4 +73,45 @@ public abstract class ConsoleGame
     /// Render your graphics here.
     /// </summary>
     public abstract void Render();
+
+    private void GameLoopCapped()
+    {
+        var targetFrameTime = 1d / TargetFramerate;
+
+        var currentTime = Native.GetHighResolutionTimestamp();
+        var accumulator = 0d;
+
+        while (IsRunning)
+        {
+            var newTime = Native.GetHighResolutionTimestamp();
+            var frameTime = newTime - currentTime;
+            currentTime = newTime;
+
+            accumulator += frameTime;
+
+            while (accumulator >= targetFrameTime)
+            {
+                Update();
+                Render();
+                accumulator -= targetFrameTime;
+            }
+
+            var sleepTime = targetFrameTime - accumulator;
+
+            if (sleepTime > 0)
+            {
+                int sleepMilliseconds = (int)(sleepTime * 1000);
+                Thread.Sleep(sleepMilliseconds);
+            }
+        }
+    }
+
+    private void GameLoopUnlimited()
+    {
+        while (IsRunning)
+        {
+            Update();
+            Render();
+        }
+    }
 }

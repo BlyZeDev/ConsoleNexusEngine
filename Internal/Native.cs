@@ -17,6 +17,14 @@ internal static partial class Native
     private const string DEFAULTFORE = "\x1B[39m";
     private const string DEFAULTBACK = "\x1B[49m";
 
+    [LibraryImport("kernel32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool QueryPerformanceCounter(out long lpPerformanceCount);
+
+    [LibraryImport("kernel32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool QueryPerformanceFrequency(out long lpFrequency);
+
     [LibraryImport("kernel32.dll", SetLastError = true)]
     private static partial nint GetStdHandle(int nStdHandle);
 
@@ -53,4 +61,13 @@ internal static partial class Native
 
     public static string Underline(string text)
         => $"{UNDERLINE}{text}";
+
+    public static double GetHighResolutionTimestamp()
+    {
+        QueryPerformanceCounter(out long timestamp);
+
+        QueryPerformanceFrequency(out long frequency);
+
+        return (double)timestamp / frequency;
+    }
 }
