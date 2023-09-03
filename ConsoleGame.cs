@@ -14,9 +14,19 @@ public abstract partial class ConsoleGame
     private readonly ConsoleGameConfig _config;
 
     /// <summary>
+    /// The Core of the Console Game
+    /// </summary>
+    public ConsoleEngine Engine { get; }
+
+    /// <summary>
     /// <see langword="true"/> if the game is running, otherwise <see langword="false"/>
     /// </summary>
     public bool IsRunning { get; private set; }
+
+    /// <summary>
+    /// The total amount of rendered frames
+    /// </summary>
+    public int TotalFrameCount { get; private set; }
 
     /// <summary>
     /// The Frames per second the game tries to run at
@@ -30,6 +40,8 @@ public abstract partial class ConsoleGame
     protected ConsoleGame(ConsoleGameConfig config)
     {
         IsRunning = false;
+
+        Engine = new();
 
         _config = config;
 
@@ -97,6 +109,7 @@ public abstract partial class ConsoleGame
             while (accumulator >= targetFrameTime)
             {
                 Update(GetPressedKeys());
+                unchecked { TotalFrameCount++; }
                 Render();
                 accumulator -= targetFrameTime;
             }
@@ -116,6 +129,7 @@ public abstract partial class ConsoleGame
         while (IsRunning)
         {
             Update(GetPressedKeys());
+            unchecked { TotalFrameCount++; }
             Render();
         }
     }
