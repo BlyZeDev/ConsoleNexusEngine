@@ -5,31 +5,34 @@ using System;
 /// <summary>
 /// Represents a RGB color
 /// </summary>
-public readonly partial record struct GameColor : ISpanParsable<GameColor>, IParsable<GameColor>
+public readonly partial record struct NexusColor : ISpanParsable<NexusColor>, IParsable<NexusColor>
 {
-    private readonly uint _color;
+    /// <summary>
+    /// The color formatted as RRGGBB
+    /// </summary>
+    public uint Color { get; }
 
     /// <summary>
     /// Red component of the color
     /// </summary>
-    public byte R => (byte)((_color >> 16) & 0xFF);
+    public byte R => (byte)((Color >> 16) & 0xFF);
 
     /// <summary>
     /// Green component of the color
     /// </summary>
-    public byte G => (byte)((_color >> 8) & 0xFF);
+    public byte G => (byte)((Color >> 8) & 0xFF);
     
     /// <summary>
     /// Blue component of the color
     /// </summary>
-    public byte B => (byte)(_color & 0xFF);
+    public byte B => (byte)(Color & 0xFF);
 
-    private GameColor(in uint color) => _color = color;
+    private NexusColor(in uint color) => Color = color;
 
     /// <summary>
     /// Initializes a black color
     /// </summary>
-    public GameColor() : this(0x000000) { }
+    public NexusColor() : this(0x000000) { }
 
     /// <summary>
     /// Initializes a color from RGB
@@ -37,7 +40,7 @@ public readonly partial record struct GameColor : ISpanParsable<GameColor>, IPar
     /// <param name="r">Red component</param>
     /// <param name="g">Green component</param>
     /// <param name="b">Blue component</param>
-    public GameColor(in byte r, in byte g, in byte b) : this(FromRgb(r, g, b)) { }
+    public NexusColor(in byte r, in byte g, in byte b) : this(FromRgb(r, g, b)) { }
 
     /// <summary>
     /// 1.0 is <see cref="White"/>, 0.0 is <see cref="Black"/>

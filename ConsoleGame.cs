@@ -41,7 +41,7 @@ public abstract partial class ConsoleGame
     {
         IsRunning = false;
 
-        Engine = new();
+        Engine = new(config.ConsoleWidth, config.ConsoleHeight);
 
         _config = config;
 

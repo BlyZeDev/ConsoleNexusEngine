@@ -2,6 +2,8 @@
 
 using ConsoleNexusEngine.Common;
 using ConsoleNexusEngine.Internal.Models;
+using Microsoft.Win32.SafeHandles;
+using System.IO;
 using System.Runtime.InteropServices;
 
 internal static partial class Native
@@ -9,8 +11,17 @@ internal static partial class Native
     [LibraryImport("kernel32.dll", SetLastError = true)]
     private static partial nint GetStdHandle(int nStdHandle);
 
+    [LibraryImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool SetForegroundWindow(nint hWnd);
+
     [LibraryImport("kernel32.dll", SetLastError = true)]
-    private static partial nint GetConsoleWindow();
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool SetConsoleScreenBufferSize(nint hConsoleOutput, COORD dwSize);
+
+    [LibraryImport("kernel32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool SetConsoleWindowInfo(nint hConsoleOutput, [MarshalAs(UnmanagedType.Bool)] bool bAbsolute, in SMALL_RECT lpConsoleWindow);
 
     [LibraryImport("kernel32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
@@ -21,22 +32,67 @@ internal static partial class Native
     private static partial bool SetConsoleMode(nint hConsoleHandle, uint dwMode);
 
     [LibraryImport("kernel32.dll", SetLastError = true)]
-    private static partial int GetCurrentConsoleFontEx(nint hConsoleOutput, [MarshalAs(UnmanagedType.Bool)] bool bMaximumWindow, ref CONSOLE_FONT_INFO_EX lpConsoleCurrentFont);
-
-    [LibraryImport("kernel32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     private static partial bool SetCurrentConsoleFontEx(nint hConsoleOutput, [MarshalAs(UnmanagedType.Bool)] bool bMaximumWindow, ref CONSOLE_FONT_INFO_EX lpConsoleCurrentFont);
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    private static extern bool WriteConsoleOutputW(
+            SafeFileHandle hConsoleOutput,
+            CharInfo[] lpBuffer,
+            COORD dwBufferSize,
+            COORD dwBufferCoord,
+            ref SMALL_RECT lpWriteRegion);
+
+    [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+    private static extern SafeFileHandle CreateFile(
+            string fileName,
+            [MarshalAs(UnmanagedType.U4)] uint fileAccess,
+            [MarshalAs(UnmanagedType.U4)] uint fileShare,
+            nint securityAttributes,
+            [MarshalAs(UnmanagedType.U4)] FileMode creationDisposition,
+            [MarshalAs(UnmanagedType.U4)] int flags,
+            nint template);
+
+    public static nint GetConsoleStdInput()
+        => GetStdHandle(-10);
 
     public static nint GetConsoleStdOutput()
         => GetStdHandle(-11);
 
+    public static void FocusConsoleWindow(nint consoleHandle)
+        => SetForegroundWindow(consoleHandle);
+
+    public static void ResizeConsole(nint consoleHandle, nint stdOutput, int width, int height)
+    {
+        SetConsoleScreenBufferSize(stdOutput, new COORD { X = (short)width, Y = (short)height });
+
+        var rect = new SMALL_RECT
+        {
+            Left = 0,
+            Top = 0,
+            Right = (short)(width - 1),
+            Bottom = (short)(height - 1)
+        };
+
+        SetConsoleWindowInfo(consoleHandle, true, in rect);
+    }
+
+    public static void WriteToConsoleBuffer(SafeFileHandle output, CharInfo[] chars, COORD bufferSize, ref SMALL_RECT rect)
+        => WriteConsoleOutputW(output, chars, bufferSize, new COORD { X = 0, Y = 0 }, ref rect);
+
+    public static SafeFileHandle CreateConOutFile()
+        => CreateFile("CONOUT$", 0x40000000, 2, nint.Zero, FileMode.Open, 0, nint.Zero);
+
+    public static void SetConsoleMode(nint inputHandle, in uint mode)
+        => SetConsoleMode(inputHandle, mode);
+
     public static bool SetConsoleFont(nint hConsoleOutput, ref CONSOLE_FONT_INFO_EX fontInfo)
         => SetCurrentConsoleFontEx(hConsoleOutput, false, ref fontInfo);
 
-    public static string ForeColor(string text, GameColor color)
+    public static string ForeColor(string text, NexusColor color)
         => $"\x1B[38;2;{color.R};{color.G};{color.B}m{text}";
 
-    public static string BackColor(string text, GameColor color)
+    public static string BackColor(string text, NexusColor color)
         => $"\x1B[48;2;{color.R};{color.G};{color.B}m{text}";
 
     public static string ResetColor(string text)
