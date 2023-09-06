@@ -1,31 +1,21 @@
 ﻿namespace ConsoleNexusEngine.Internal;
 
 using System;
-using System.Diagnostics;
 
-internal sealed class CmdConsole
+internal readonly struct CmdConsole
 {
-    public Process Process { get; }
+    public nint Handle { get; }
     public nint StandardInput { get; }
     public nint StandardOutput { get; }
     public ConsoleBuffer Buffer { get; }
 
-    public nint Handle => Process.Handle;
+    public CmdConsole() => throw new InvalidOperationException();
 
-    public CmdConsole(int height, int width)
+    public CmdConsole(int width, int height)
     {
-        Process = Process.Start(new ProcessStartInfo
-        {
-            FileName = "cmd.exe",
-            UseShellExecute = true
-        }) ?? throw new NullReferenceException("Couldn't create a new Console Window");
-
-        Native.FocusConsoleWindow(Handle);
-
+        Handle = Native.GetConsoleHandle();
         StandardInput = Native.GetConsoleStdInput();
         StandardOutput = Native.GetConsoleStdOutput();
-
-        Native.ResizeConsole(Handle, StandardOutput, width, height);
 
         Buffer = new ConsoleBuffer(width, height);
     }

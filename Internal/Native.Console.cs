@@ -11,17 +11,12 @@ internal static partial class Native
     [LibraryImport("kernel32.dll", SetLastError = true)]
     private static partial nint GetStdHandle(int nStdHandle);
 
+    [LibraryImport("kernel32.dll")]
+    private static partial nint GetConsoleWindow();
+
     [LibraryImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
     private static partial bool SetForegroundWindow(nint hWnd);
-
-    [LibraryImport("kernel32.dll", SetLastError = true)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool SetConsoleScreenBufferSize(nint hConsoleOutput, COORD dwSize);
-
-    [LibraryImport("kernel32.dll", SetLastError = true)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool SetConsoleWindowInfo(nint hConsoleOutput, [MarshalAs(UnmanagedType.Bool)] bool bAbsolute, in SMALL_RECT lpConsoleWindow);
 
     [LibraryImport("kernel32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
@@ -53,29 +48,17 @@ internal static partial class Native
             [MarshalAs(UnmanagedType.U4)] int flags,
             nint template);
 
+    public static nint GetConsoleHandle()
+        => GetConsoleWindow();
+
     public static nint GetConsoleStdInput()
         => GetStdHandle(-10);
 
     public static nint GetConsoleStdOutput()
         => GetStdHandle(-11);
-
+    
     public static void FocusConsoleWindow(nint consoleHandle)
         => SetForegroundWindow(consoleHandle);
-
-    public static void ResizeConsole(nint consoleHandle, nint stdOutput, int width, int height)
-    {
-        SetConsoleScreenBufferSize(stdOutput, new COORD { X = (short)width, Y = (short)height });
-
-        var rect = new SMALL_RECT
-        {
-            Left = 0,
-            Top = 0,
-            Right = (short)(width - 1),
-            Bottom = (short)(height - 1)
-        };
-
-        SetConsoleWindowInfo(consoleHandle, true, in rect);
-    }
 
     public static void WriteToConsoleBuffer(SafeFileHandle output, CharInfo[] chars, COORD bufferSize, ref SMALL_RECT rect)
         => WriteConsoleOutputW(output, chars, bufferSize, new COORD { X = 0, Y = 0 }, ref rect);
