@@ -20,37 +20,11 @@ public sealed class ConsoleEngine
     /// </summary>
     public NexusColor Background { get; set; }
 
-    internal ConsoleEngine(int width, int height)
+    internal ConsoleEngine(int fontWidth, int fontHeight)
     {
-        _console = new CmdConsole(width, height);
+        _console = new CmdConsole(fontWidth, fontHeight);
 
-        glyphBuffer = new Glyph[width, height];
-
-        Native.SetConsoleMode(_console.StandardInput, 0x0080);
-    }
-
-    /// <summary>
-    /// Set the font of the Console
-    /// </summary>
-    /// <param name="font">The font to set</param>
-    public unsafe void SetFont(GameFont font)
-    {
-        var fontInfo = new CONSOLE_FONT_INFO_EX
-        {
-            cbSize = Marshal.SizeOf<CONSOLE_FONT_INFO_EX>(),
-            nFont = 0,
-            FontWidth = 0,
-            FontHeight = (short)font.Size,
-            FontWeight = font.Weight
-        };
-
-        var name = font.Name.AsSpan();
-        for (int i = 0; i < name.Length; i++)
-        {
-            fontInfo.FaceName[i] = name[i];
-        }
-
-        Native.SetConsoleFont(_console.StandardOutput, ref fontInfo);
+        glyphBuffer = new Glyph[_console.Width, _console.Height];
     }
 
     public void SetPixel(Coord coordinate, char pixel)

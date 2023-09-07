@@ -6,14 +6,13 @@
 public sealed class ConsoleGameConfig
 {
     /// <summary>
-    /// The width of the Console
+    /// The Font Width of the console window
     /// </summary>
-    public required int ConsoleWidth { get; init; }
-
+    public required int FontWidth { get; init; }
     /// <summary>
-    /// The height of the Console
+    /// The Font Height of the console window
     /// </summary>
-    public required int ConsoleHeight { get; init; }
+    public required int FontHeight { get; init; }
 
     /// <summary>
     /// The Framerate the Console game tries to run at
