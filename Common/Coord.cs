@@ -1,5 +1,6 @@
 ﻿namespace ConsoleNexusEngine.Common;
 
+using System;
 using System.Numerics;
 
 /// <summary>
@@ -16,17 +17,17 @@ public readonly record struct Coord : IAdditionOperators<Coord, Coord, Coord>, I
     /// <summary>
     /// The X coordinate
     /// </summary>
-    public uint X { get; }
+    public int X { get; }
 
     /// <summary>
     /// The Y coordinate
     /// </summary>
-    public uint Y { get; }
+    public int Y { get; }
 
     static Coord()
     {
         MinValue = new Coord(0, 0);
-        MaxValue = new Coord(uint.MaxValue, uint.MaxValue);
+        MaxValue = new Coord(int.MaxValue, int.MaxValue);
     }
 
     /// <summary>
@@ -39,10 +40,10 @@ public readonly record struct Coord : IAdditionOperators<Coord, Coord, Coord>, I
     /// </summary>
     /// <param name="x">The X coordinate</param>
     /// <param name="y">The Y coordinate</param>
-    public Coord(uint x, uint y)
+    public Coord(int x, int y)
     {
-        X = x;
-        Y = y;
+        X = Math.Clamp(x, 0, int.MaxValue);
+        Y = Math.Clamp(y, 0, int.MaxValue);
     }
 
     /// <inheritdoc/>

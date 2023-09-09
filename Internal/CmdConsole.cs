@@ -1,5 +1,6 @@
 ﻿namespace ConsoleNexusEngine.Internal;
 
+using ConsoleNexusEngine.Common;
 using System;
 
 internal readonly struct CmdConsole
@@ -12,13 +13,19 @@ internal readonly struct CmdConsole
     public int Width { get; }
     public int Height { get; }
 
-    public CmdConsole(int fontWidth, int fontHeight)
+    public ColorPalette ColorPalette { get; }
+
+    public CmdConsole(int fontWidth, int fontHeight, ColorPalette colorPalette)
     {
         Handle = Native.GetConsoleHandle();
         StandardInput = Native.GetConsoleStdInput();
         StandardOutput = Native.GetConsoleStdOutput();
 
         Console.CursorVisible = false;
+
+        Native.SetColorPalette(StandardOutput, colorPalette);
+
+        ColorPalette = colorPalette;
 
         Native.SetConsoleFont(StandardOutput, fontWidth, fontHeight);
         (Width, Height) = Native.SetConsoleBorderless(Handle, StandardOutput, fontWidth, fontHeight);
@@ -27,6 +34,5 @@ internal readonly struct CmdConsole
         Buffer = new ConsoleBuffer(Width, Height);
 
         Native.SetConsoleMode(StandardInput, 0x0080);
-        Native.SetConsoleMode(StandardInput, Native.GetConsoleMode(StandardInput) | 0x4);
     }
 }

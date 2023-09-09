@@ -26,7 +26,7 @@ internal sealed class ConsoleBuffer
         charInfoBuffer = new CHAR_INFO[_width * _height];
     }
 
-    public void SetBuffer(NexusChar[,] charBuffer, NexusColor consoleBg)
+    public void SetBuffer(NexusChar[,] charBuffer, int consoleBackground)
     {
         int index;
 
@@ -37,15 +37,15 @@ internal sealed class ConsoleBuffer
                 index = (y * _width) + x;
 
                 if (charBuffer[x, y].Value == 0)
-                    charBuffer[x, y].Background = consoleBg;
+                    charBuffer[x, y].backgroundColorIndex = consoleBackground;
 
-                //charInfoBuffer[index].Attributes = ???
+                charInfoBuffer[index].Attributes = (short)(charBuffer[x, y].foregroundColorIndex | charBuffer[x, y].backgroundColorIndex << 4);
                 charInfoBuffer[index].UnicodeChar = charBuffer[x, y].Value;
             }
         }
     }
 
-    public void Blit()
+    public void RenderBuffer()
     {
         var rect = new SMALL_RECT
         {

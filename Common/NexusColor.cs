@@ -7,27 +7,24 @@ using System;
 /// </summary>
 public readonly partial record struct NexusColor : ISpanParsable<NexusColor>, IParsable<NexusColor>
 {
-    /// <summary>
-    /// The color formatted as RRGGBB
-    /// </summary>
-    public uint Value { get; }
+    private readonly uint _value;
 
     /// <summary>
     /// Red component of the color
     /// </summary>
-    public byte R => (byte)((Value >> 16) & 0xFF);
+    public byte R => (byte)((_value >> 16) & 0xFF);
 
     /// <summary>
     /// Green component of the color
     /// </summary>
-    public byte G => (byte)((Value >> 8) & 0xFF);
+    public byte G => (byte)((_value >> 8) & 0xFF);
     
     /// <summary>
     /// Blue component of the color
     /// </summary>
-    public byte B => (byte)(Value & 0xFF);
+    public byte B => (byte)(_value & 0xFF);
 
-    private NexusColor(in uint color) => Value = color;
+    internal NexusColor(in uint color) => _value = color;
 
     /// <summary>
     /// Initializes a black color

@@ -18,4 +18,9 @@ public sealed class ConsoleGameConfig
     /// The Framerate the Console game tries to run at
     /// </summary>
     public required Framerate TargetFramerate { get; init; }
+
+    /// <summary>
+    /// The Color Palette of the Console
+    /// </summary>
+    public required ColorPalette ColorPalette { get; init; }
 }

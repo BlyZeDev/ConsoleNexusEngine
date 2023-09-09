@@ -3,6 +3,7 @@
 using ConsoleNexusEngine.Common;
 using ConsoleNexusEngine.Internal.Models;
 using Microsoft.Win32.SafeHandles;
+using System;
 using System.IO;
 using System.Runtime.InteropServices;
 
@@ -21,6 +22,12 @@ internal static partial class Native
     [LibraryImport("kernel32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     private static partial bool SetConsoleScreenBufferSize(nint hConsoleOutput, COORD dwSize);
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    private static extern bool GetConsoleScreenBufferInfoEx(nint hConsoleOutput, ref CONSOLE_SCREEN_BUFFER_INFO_EX csbe);
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    private static extern bool SetConsoleScreenBufferInfoEx(nint hConsoleOutput, ref CONSOLE_SCREEN_BUFFER_INFO_EX csbe);
 
     [LibraryImport("user32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
@@ -55,16 +62,8 @@ internal static partial class Native
     [return: MarshalAs(UnmanagedType.Bool)]
     private static extern bool SetCurrentConsoleFontEx(nint hConsoleOutput, [MarshalAs(UnmanagedType.Bool)] bool bMaximumWindow, ref CONSOLE_FONT_INFO_EX lpConsoleCurrentFont);
 
-    [DllImport("kernel32.dll", SetLastError = true)]
-    private static extern bool WriteConsoleOutputW(
-            SafeFileHandle hConsoleOutput,
-            CHAR_INFO[] lpBuffer,
-            COORD dwBufferSize,
-            COORD dwBufferCoord,
-            ref SMALL_RECT lpWriteRegion);
-
     [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-    private static extern SafeFileHandle CreateFile(
+    public static extern SafeFileHandle CreateFile(
             string fileName,
             [MarshalAs(UnmanagedType.U4)] uint fileAccess,
             [MarshalAs(UnmanagedType.U4)] uint fileShare,
@@ -72,6 +71,14 @@ internal static partial class Native
             [MarshalAs(UnmanagedType.U4)] FileMode creationDisposition,
             [MarshalAs(UnmanagedType.U4)] int flags,
             nint template);
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    public static extern bool WriteConsoleOutputW(
+        SafeFileHandle hConsoleOutput,
+        CHAR_INFO[] lpBuffer,
+        COORD dwBufferSize,
+        COORD dwBufferCoord,
+        ref SMALL_RECT lpWriteRegion);
 
     public static nint GetConsoleHandle()
         => GetConsoleWindow();
@@ -121,12 +128,6 @@ internal static partial class Native
     public static void FocusConsoleWindow(nint consoleHandle)
         => SetForegroundWindow(consoleHandle);
 
-    public static void WriteToConsoleBuffer(SafeFileHandle output, CHAR_INFO[] chars, COORD bufferSize, ref SMALL_RECT rect)
-        => WriteConsoleOutputW(output, chars, bufferSize, new COORD { X = 0, Y = 0 }, ref rect);
-
-    public static SafeFileHandle CreateConOutFile()
-        => CreateFile("CONOUT$", 0x40000000, 2, nint.Zero, FileMode.Open, 0, nint.Zero);
-
     public static uint GetConsoleMode(nint inputHandle)
     {
         GetConsoleMode(inputHandle, out var mode);
@@ -151,5 +152,47 @@ internal static partial class Native
         font.FaceName = sizeX < 4 || sizeY < 4 ? "Consolas" : "Terminal";
 
         SetCurrentConsoleFontEx(stdOutput, false, ref font);
+    }
+
+    public static SafeFileHandle CreateConOutFile()
+        => CreateFile("CONOUT$", 0x40000000, 2, nint.Zero, FileMode.Open, 0, nint.Zero);
+
+    public static void WriteToConsoleBuffer(SafeFileHandle handle, CHAR_INFO[] charBuffer, COORD consoleSize, ref SMALL_RECT region)
+        => WriteConsoleOutputW(handle, charBuffer, consoleSize, new COORD { X = 0, Y = 0 }, ref region);
+
+    public static void SetColorPalette(nint stdOutput, ColorPalette colorPalette)
+    {
+        var csbe = new CONSOLE_SCREEN_BUFFER_INFO_EX();
+        csbe.cbSize = Marshal.SizeOf(csbe);
+
+        GetConsoleScreenBufferInfoEx(stdOutput, ref csbe);
+
+        foreach (var color in colorPalette.Colors)
+        {
+            switch (color.Key)
+            {
+                case ConsoleColor.Black: csbe.black = new COLORREF(color.Value); break;
+                case ConsoleColor.DarkBlue: csbe.darkBlue = new COLORREF(color.Value); break;
+                case ConsoleColor.DarkGreen: csbe.darkGreen = new COLORREF(color.Value); break;
+                case ConsoleColor.DarkCyan: csbe.darkCyan = new COLORREF(color.Value); break;
+                case ConsoleColor.DarkRed: csbe.darkRed = new COLORREF(color.Value); break;
+                case ConsoleColor.DarkMagenta: csbe.darkMagenta = new COLORREF(color.Value); break;
+                case ConsoleColor.DarkYellow: csbe.darkYellow = new COLORREF(color.Value); break;
+                case ConsoleColor.Gray: csbe.gray = new COLORREF(color.Value); break;
+                case ConsoleColor.DarkGray: csbe.darkGray = new COLORREF(color.Value); break;
+                case ConsoleColor.Blue: csbe.blue = new COLORREF(color.Value); break;
+                case ConsoleColor.Green: csbe.green = new COLORREF(color.Value); break;
+                case ConsoleColor.Cyan: csbe.cyan = new COLORREF(color.Value); break;
+                case ConsoleColor.Red: csbe.red = new COLORREF(color.Value); break;
+                case ConsoleColor.Magenta: csbe.magenta = new COLORREF(color.Value); break;
+                case ConsoleColor.Yellow: csbe.yellow = new COLORREF(color.Value); break;
+                case ConsoleColor.White: csbe.white = new COLORREF(color.Value); break;
+            }
+        }
+
+        ++csbe.srWindow.Bottom;
+        ++csbe.srWindow.Right;
+
+        SetConsoleScreenBufferInfoEx(stdOutput, ref csbe);
     }
 }

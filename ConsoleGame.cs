@@ -19,6 +19,11 @@ public abstract partial class ConsoleGame
     public ConsoleEngine Engine { get; }
 
     /// <summary>
+    /// Useful utility for the Console Game
+    /// </summary>
+    public ConsoleGameUtil Utility { get; }
+
+    /// <summary>
     /// <see langword="true"/> if the game is running, otherwise <see langword="false"/>
     /// </summary>
     public bool IsRunning { get; private set; }
@@ -34,6 +39,26 @@ public abstract partial class ConsoleGame
     public Framerate TargetFramerate => _config.TargetFramerate;
 
     /// <summary>
+    /// The Color Palette of the console
+    /// </summary>
+    public ColorPalette ColorPalette => Engine.ColorPalette;
+
+    /// <summary>
+    /// The width of the console in characters
+    /// </summary>
+    public int Width => Engine.Width;
+
+    /// <summary>
+    /// The height of the console in characters
+    /// </summary>
+    public int Height => Engine.Height;
+
+    /// <summary>
+    /// The background color of the whole console
+    /// </summary>
+    public NexusColor Background => ColorPalette[Engine.Background];
+
+    /// <summary>
     /// Initializes the <see cref="ConsoleGame"/>
     /// </summary>
     /// <param name="config">The configuration for the console game</param>
@@ -41,7 +66,8 @@ public abstract partial class ConsoleGame
     {
         IsRunning = false;
 
-        Engine = new(config.FontWidth, config.FontHeight);
+        Engine = new(config.FontWidth, config.FontHeight, config.ColorPalette);
+        Utility = new();
 
         _config = config;
 
