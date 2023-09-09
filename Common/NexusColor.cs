@@ -10,24 +10,24 @@ public readonly partial record struct NexusColor : ISpanParsable<NexusColor>, IP
     /// <summary>
     /// The color formatted as RRGGBB
     /// </summary>
-    public uint Color { get; }
+    public uint Value { get; }
 
     /// <summary>
     /// Red component of the color
     /// </summary>
-    public byte R => (byte)((Color >> 16) & 0xFF);
+    public byte R => (byte)((Value >> 16) & 0xFF);
 
     /// <summary>
     /// Green component of the color
     /// </summary>
-    public byte G => (byte)((Color >> 8) & 0xFF);
+    public byte G => (byte)((Value >> 8) & 0xFF);
     
     /// <summary>
     /// Blue component of the color
     /// </summary>
-    public byte B => (byte)(Color & 0xFF);
+    public byte B => (byte)(Value & 0xFF);
 
-    private NexusColor(in uint color) => Color = color;
+    private NexusColor(in uint color) => Value = color;
 
     /// <summary>
     /// Initializes a black color

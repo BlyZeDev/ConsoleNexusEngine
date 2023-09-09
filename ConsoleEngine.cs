@@ -2,9 +2,7 @@
 
 using ConsoleNexusEngine.Common;
 using ConsoleNexusEngine.Internal;
-using ConsoleNexusEngine.Internal.Models;
 using System;
-using System.Runtime.InteropServices;
 
 /// <summary>
 /// The core engine of the <see cref="ConsoleGame"/>
@@ -13,7 +11,7 @@ public sealed class ConsoleEngine
 {
     private readonly CmdConsole _console;
 
-    private Glyph[,] glyphBuffer;
+    private NexusChar[,] charBuffer;
 
     /// <summary>
     /// The background color of the whole Console Window
@@ -24,19 +22,19 @@ public sealed class ConsoleEngine
     {
         _console = new CmdConsole(fontWidth, fontHeight);
 
-        glyphBuffer = new Glyph[_console.Width, _console.Height];
+        charBuffer = new NexusChar[_console.Width, _console.Height];
     }
 
-    public void SetPixel(Coord coordinate, char pixel)
+    public void SetPixel(Coord coordinate, NexusChar character)
     {
-        SetGlyph(coordinate, new Glyph(pixel, NexusColor.Red, NexusColor.Green));
+        SetNexusChar(coordinate, character);
     }
 
     /// <summary>
     /// Clears the current content of the console
     /// </summary>
     public void Clear()
-        => Array.Clear(glyphBuffer);
+        => Array.Clear(charBuffer);
 
     /// <summary>
     /// Renders changes to the console<br/>
@@ -44,10 +42,10 @@ public sealed class ConsoleEngine
     /// </summary>
     public void Render()
     {
-        _console.Buffer.SetBuffer(glyphBuffer, Background);
+        _console.Buffer.SetBuffer(charBuffer, Background);
         _console.Buffer.Blit();
     }
 
-    private void SetGlyph(Coord coord, Glyph glyph)
-        => glyphBuffer[coord.X, coord.Y] = glyph;
+    private void SetNexusChar(Coord coord, NexusChar glyph)
+        => charBuffer[coord.X, coord.Y] = glyph;
 }

@@ -11,7 +11,7 @@ internal sealed class ConsoleBuffer
     private readonly int _height;
     private readonly SafeFileHandle _file;
 
-    private CharInfo[] charInfoBuffer;
+    private CHAR_INFO[] charInfoBuffer;
 
     public ConsoleBuffer(int width, int height)
     {
@@ -23,10 +23,10 @@ internal sealed class ConsoleBuffer
         if (_file.IsInvalid)
             throw new ExternalException("The SafeFileHandle for the Console Buffer was invalid");
         
-        charInfoBuffer = new CharInfo[_width * _height];
+        charInfoBuffer = new CHAR_INFO[_width * _height];
     }
 
-    public void SetBuffer(Glyph[,] GlyphBuffer, NexusColor background)
+    public void SetBuffer(NexusChar[,] charBuffer, NexusColor consoleBg)
     {
         int index;
 
@@ -36,11 +36,11 @@ internal sealed class ConsoleBuffer
             {
                 index = (y * _width) + x;
 
-                if (GlyphBuffer[x, y].Value == 0)
-                    GlyphBuffer[x, y].Background = background;
+                if (charBuffer[x, y].Value == 0)
+                    charBuffer[x, y].Background = consoleBg;
 
-                charInfoBuffer[index].Attributes = (short)(GlyphBuffer[x, y].Foreground.Color | (GlyphBuffer[x, y].Background.Color << 4));
-                charInfoBuffer[index].UnicodeChar = GlyphBuffer[x, y].Value;
+                //charInfoBuffer[index].Attributes = ???
+                charInfoBuffer[index].UnicodeChar = charBuffer[x, y].Value;
             }
         }
     }

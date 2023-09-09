@@ -3,7 +3,6 @@
 using ConsoleNexusEngine.Common;
 using ConsoleNexusEngine.Internal.Models;
 using Microsoft.Win32.SafeHandles;
-using System;
 using System.IO;
 using System.Runtime.InteropServices;
 
@@ -18,6 +17,10 @@ internal static partial class Native
     [LibraryImport("user32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     private static partial bool SetWindowPos(nint hWnd, nint hWndInsertAfter, int x, int y, int cx, int cy, uint uFlags);
+
+    [LibraryImport("kernel32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool SetConsoleScreenBufferSize(nint hConsoleOutput, COORD dwSize);
 
     [LibraryImport("user32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
@@ -55,7 +58,7 @@ internal static partial class Native
     [DllImport("kernel32.dll", SetLastError = true)]
     private static extern bool WriteConsoleOutputW(
             SafeFileHandle hConsoleOutput,
-            CharInfo[] lpBuffer,
+            CHAR_INFO[] lpBuffer,
             COORD dwBufferSize,
             COORD dwBufferCoord,
             ref SMALL_RECT lpWriteRegion);
@@ -79,7 +82,7 @@ internal static partial class Native
     public static nint GetConsoleStdOutput()
         => GetStdHandle(-11);
 
-    public static (int width, int height) SetConsoleBorderless(nint consoleHandle, int fontWidth, int fontHeight)
+    public static (int width, int height) SetConsoleBorderless(nint consoleHandle, nint stdOutput, in int fontWidth, in int fontHeight)
     {
         var consoleRect = new RECT();
         var desktopRect = new RECT();
@@ -89,42 +92,58 @@ internal static partial class Native
         _ = MapWindowPoints(desktopHandle, consoleHandle, ref consoleRect, 2);
         GetWindowRect(desktopHandle, ref desktopRect);
 
+        _ = SetWindowLong(consoleHandle, -16, 0x00080000);
+
+        var windowWidth = desktopRect.Right - desktopRect.Left;
+        var windowHeight = desktopRect.Bottom - desktopRect.Top;
+
+        SetConsoleScreenBufferSize(
+            stdOutput,
+            new COORD
+            {
+                X = (short)(windowWidth / fontWidth),
+                Y = (short)(windowHeight / fontHeight)
+            });
+
         SetWindowPos(
             consoleHandle,
             nint.Zero,
             0, 0,
-            desktopRect.Left - desktopRect.Right,
-            desktopRect.Bottom - desktopRect.Top,
+            windowWidth,
+            windowHeight,
             0x0040);
 
-        _ = SetWindowLong(consoleHandle, -16, 0x00080000);
         DrawMenuBar(consoleHandle);
 
-        GetWindowRect(consoleHandle, ref consoleRect);
-
-        return (consoleRect.Right - consoleRect.Left, consoleRect.Bottom - consoleRect.Top);
+        return (windowWidth, windowHeight);
     }
 
     public static void FocusConsoleWindow(nint consoleHandle)
         => SetForegroundWindow(consoleHandle);
 
-    public static void WriteToConsoleBuffer(SafeFileHandle output, CharInfo[] chars, COORD bufferSize, ref SMALL_RECT rect)
+    public static void WriteToConsoleBuffer(SafeFileHandle output, CHAR_INFO[] chars, COORD bufferSize, ref SMALL_RECT rect)
         => WriteConsoleOutputW(output, chars, bufferSize, new COORD { X = 0, Y = 0 }, ref rect);
 
     public static SafeFileHandle CreateConOutFile()
         => CreateFile("CONOUT$", 0x40000000, 2, nint.Zero, FileMode.Open, 0, nint.Zero);
 
+    public static uint GetConsoleMode(nint inputHandle)
+    {
+        GetConsoleMode(inputHandle, out var mode);
+        return mode;
+    }
+
     public static void SetConsoleMode(nint inputHandle, in uint mode)
         => SetConsoleMode(inputHandle, mode);
 
-    public static void SetConsoleFont(nint stdOutput, int fontWidth, int fontHeight)
+    public static void SetConsoleFont(nint stdOutput, in int fontWidth, in int fontHeight)
     {
         var font = new CONSOLE_FONT_INFO_EX();
         font.cbSize = (uint)Marshal.SizeOf(font);
         font.nFont = 0;
 
-        var sizeX = (short)fontHeight;
-        var sizeY = (short)fontWidth;
+        var sizeX = (short)fontWidth;
+        var sizeY = (short)fontHeight;
 
         font.dwFontSize.X = sizeX;
         font.dwFontSize.Y = sizeY;
@@ -133,22 +152,4 @@ internal static partial class Native
 
         SetCurrentConsoleFontEx(stdOutput, false, ref font);
     }
-
-    public static string ForeColor(string text, NexusColor color)
-        => $"\x1B[38;2;{color.R};{color.G};{color.B}m{text}";
-
-    public static string BackColor(string text, NexusColor color)
-        => $"\x1B[48;2;{color.R};{color.G};{color.B}m{text}";
-
-    public static string ResetColor(string text)
-        => $"\u001b[0m{text}";
-
-    public static string BoldText(string text)
-        => $"\u001b[1m{text}";
-
-    public static string ItalicText(string text)
-        => $"\u001b[3m{text}";
-
-    public static string UnderlineText(string text)
-        => $"\x1B[4m{text}";
 }
