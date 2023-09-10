@@ -26,6 +26,29 @@ public sealed partial record ColorPalette
     /// </summary>
     public static ColorPalette MSX { get; }
 
+    /// <summary>
+    /// A grayscale color palette
+    /// </summary>
+    public static ColorPalette Grayscale { get; }
+
+    /// <summary>
+    /// The color palette of the Pico-8<br/>
+    /// <see href="https://de.wikipedia.org/wiki/Pico-8"/>
+    /// </summary>
+    public static ColorPalette Pico8 { get; }
+
+    /// <summary>
+    /// The color palette of the old Windows<br/>
+    /// <see href="https://de.wikipedia.org/wiki/Microsoft_Windows_1.0"/>
+    /// </summary>
+    public static ColorPalette Windows { get; }
+
+    /// <summary>
+    /// The color palette of the Commodore 64<br/>
+    /// <see href="https://de.wikipedia.org/wiki/Commodore_64"/>
+    /// </summary>
+    public static ColorPalette Commodore64 { get; }
+
     static ColorPalette()
     {
         CGA = new(stackalloc NexusColor[]
@@ -106,6 +129,86 @@ public sealed partial record ColorPalette
             new(0x64DAEE),
             new(0xB565B3),
             new()
+        });
+
+        Grayscale = new(stackalloc NexusColor[]
+        {
+            new(0x000000),
+            new(0x181818),
+            new(0x282828),
+            new(0x383838),
+            new(0x474747),
+            new(0x565656),
+            new(0x646464),
+            new(0x717171),
+            new(0x7E7E7E),
+            new(0x8C8C8C),
+            new(0x9B9B9B),
+            new(0xABABAB),
+            new(0xBDBDBD),
+            new(0xD1D1D1),
+            new(0xE7E7E7),
+            new(0xFFFFFF)
+        });
+
+        Pico8 = new(stackalloc NexusColor[]
+        {
+            new(0x000000),
+            new(0x1D2B53),
+            new(0x7E2553),
+            new(0x008751),
+            new(0xAB5236),
+            new(0x5F574F),
+            new(0xC2C3C7),
+            new(0xFFF1E8),
+            new(0xFF004D),
+            new(0xFFA300),
+            new(0xFFEC27),
+            new(0x00E436),
+            new(0x29ADFF),
+            new(0x83769C),
+            new(0xFF77A8),
+            new(0xFFCCAA)
+        });
+
+        Windows = new(stackalloc NexusColor[]
+        {
+            new(0x000000),
+            new(0x7E7E7E),
+            new(0xBEBEBE),
+            new(0xFFFFFF),
+            new(0x7E0000),
+            new(0xFE0000),
+            new(0x047E00),
+            new(0x06FF04),
+            new(0x7E7E00),
+            new(0xFFFF04),
+            new(0x00007E),
+            new(0x0000FF),
+            new(0x7E007E),
+            new(0xFE00FF),
+            new(0x047E7E),
+            new(0x06FFFF)
+        });
+
+        Commodore64 = new(stackalloc NexusColor[]
+        {
+            new(0x000000),
+            new(0x626262),
+            new(0x898989),
+            new(0xADADAD),
+            new(0xFFFFFF),
+            new(0x9F4E44),
+            new(0xCB7E75),
+            new(0x6D5412),
+            new(0xA1683C),
+            new(0xC9D487),
+            new(0x9AE29B),
+            new(0x5CAB5E),
+            new(0x6ABFC6),
+            new(0x887ECB),
+            new(0x50459B),
+            new(0xA057A3)
         });
     }
 }

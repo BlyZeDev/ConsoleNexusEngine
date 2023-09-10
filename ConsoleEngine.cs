@@ -2,6 +2,7 @@
 
 using ConsoleNexusEngine.Common;
 using ConsoleNexusEngine.Internal;
+using ConsoleNexusEngine.Internal.Models;
 using System;
 
 /// <summary>
@@ -11,7 +12,7 @@ public sealed class ConsoleEngine
 {
     private readonly CmdConsole _console;
 
-    private NexusChar[,] charBuffer;
+    private Glyph[,] glyphBuffer;
 
     internal ColorPalette ColorPalette => _console.ColorPalette;
     internal int Width => _console.Width;
@@ -23,7 +24,7 @@ public sealed class ConsoleEngine
     {
         _console = new CmdConsole(fontWidth, fontHeight, colorPalette);
 
-        charBuffer = new NexusChar[_console.Width, _console.Height];
+        glyphBuffer = new Glyph[_console.Width, _console.Height];
 
         Background = 0;
     }
@@ -37,16 +38,16 @@ public sealed class ConsoleEngine
     /// <exception cref="ArgumentOutOfRangeException"></exception>
     public void SetPixel(Coord coordinate, NexusChar character)
     {
-        character.foregroundColorIndex = GetColorIndex(character.Foreground);
-        character.backgroundColorIndex = GetColorIndex(character.Background);
+        var foregroundColorIndex = GetColorIndex(character.Foreground);
+        var backgroundColorIndex = GetColorIndex(character.Background);
 
-        if (character.foregroundColorIndex is -1 || character.backgroundColorIndex is - 1)
+        if (foregroundColorIndex is -1 || backgroundColorIndex is - 1)
             throw new ArgumentException("The color is not in the color palette", nameof(character));
 
-        if (!charBuffer.IsInRange(coordinate))
+        if (!glyphBuffer.IsInRange(coordinate))
             throw new ArgumentOutOfRangeException(nameof(coordinate), "The coordinate is not in bounds of the console buffer");
 
-        SetNexusChar(coordinate, character);
+        SetGlyph(coordinate, new Glyph(character.Value, foregroundColorIndex, backgroundColorIndex));
     }
 
     /// <summary>
@@ -65,10 +66,11 @@ public sealed class ConsoleEngine
     }
 
     /// <summary>
-    /// Clears the current content of the console
+    /// Clears the current content of the console<br/>
+    /// Remember to call <see cref="ConsoleGame.Render"/>
     /// </summary>
     public void Clear()
-        => Array.Clear(charBuffer);
+        => Array.Clear(glyphBuffer);
 
     /// <summary>
     /// Renders changes to the console<br/>
@@ -76,13 +78,13 @@ public sealed class ConsoleEngine
     /// </summary>
     public void Render()
     {
-        _console.Buffer.SetBuffer(charBuffer, Background);
+        _console.Buffer.SetBuffer(glyphBuffer, Background);
         _console.Buffer.RenderBuffer();
     }
 
-    private void SetNexusChar(Coord coord, NexusChar nexusChar)
-        => charBuffer[coord.X, coord.Y] = nexusChar;
+    private void SetGlyph(in Coord coord, in Glyph glyph)
+        => glyphBuffer[coord.X, coord.Y] = glyph;
 
-    private int GetColorIndex(NexusColor color)
+    private int GetColorIndex(in NexusColor color)
         => ColorPalette.Colors.GetKey(color);
 }

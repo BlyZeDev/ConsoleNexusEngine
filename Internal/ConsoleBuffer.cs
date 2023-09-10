@@ -13,7 +13,7 @@ internal sealed class ConsoleBuffer
 
     private CHAR_INFO[] charInfoBuffer;
 
-    public ConsoleBuffer(int width, int height)
+    public ConsoleBuffer(in int width, in int height)
     {
         _width = width;
         _height = height;
@@ -26,21 +26,24 @@ internal sealed class ConsoleBuffer
         charInfoBuffer = new CHAR_INFO[_width * _height];
     }
 
-    public void SetBuffer(NexusChar[,] charBuffer, int consoleBackground)
+    public unsafe void SetBuffer(Glyph[,] glyphBuffer, in int consoleBackground)
     {
-        int index;
+        Glyph current;
 
-        for (int x = 0; x < _width; x++)
+        fixed (CHAR_INFO* charInfoPtr = charInfoBuffer)
         {
-            for (int y = 0; y < _height; y++)
+            for (int x = 0; x < _width; x++)
             {
-                index = (y * _width) + x;
+                for (int y = 0; y < _height; y++)
+                {
+                    int index = (y * _width) + x;
+                    current = glyphBuffer[x, y];
 
-                if (charBuffer[x, y].Value == 0)
-                    charBuffer[x, y].backgroundColorIndex = consoleBackground;
+                    charInfoPtr[index].Attributes =
+                        (short)(current.ForegroundIndex | (current.Value == 0 ? consoleBackground : current.BackgroundIndex << 4));
 
-                charInfoBuffer[index].Attributes = (short)(charBuffer[x, y].foregroundColorIndex | charBuffer[x, y].backgroundColorIndex << 4);
-                charInfoBuffer[index].UnicodeChar = charBuffer[x, y].Value;
+                    charInfoPtr[index].UnicodeChar = current.Value;
+                }
             }
         }
     }
@@ -55,7 +58,6 @@ internal sealed class ConsoleBuffer
             Bottom = (short)_height
         };
 
-        Native.WriteToConsoleBuffer(
-            _file, charInfoBuffer, new COORD { X = (short)_width, Y = (short)_height }, ref rect);
+        Native.WriteToConsoleBuffer(_file, charInfoBuffer, new COORD { X = (short)_width, Y = (short)_height }, ref rect);
     }
 }
