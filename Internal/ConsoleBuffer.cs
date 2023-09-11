@@ -26,26 +26,47 @@ internal sealed class ConsoleBuffer
         charInfoBuffer = new CHAR_INFO[_width * _height];
     }
 
-    public unsafe void SetBuffer(Glyph[,] glyphBuffer, in int consoleBackground)
+    public void ClearBuffer(in int background)
     {
-        Glyph current;
+        int index;
 
-        fixed (CHAR_INFO* charInfoPtr = charInfoBuffer)
+        for (int x = 0; x < _width; x++)
         {
-            for (int x = 0; x < _width; x++)
+            for (int y = 0; y < _height; y++)
             {
-                for (int y = 0; y < _height; y++)
-                {
-                    int index = (y * _width) + x;
-                    current = glyphBuffer[x, y];
+                index = y * _width + x;
 
-                    charInfoPtr[index].Attributes =
-                        (short)(current.ForegroundIndex | (current.Value == 0 ? consoleBackground : current.BackgroundIndex << 4));
-
-                    charInfoPtr[index].UnicodeChar = current.Value;
-                }
+                charInfoBuffer[index].Attributes = (short)(background | background << 4);
+                charInfoBuffer[index].UnicodeChar = (char)0;
             }
         }
+    }
+
+    public void SetBackgroundBuffer(ref Glyph[,] glyphBuffer, in int background)
+    {
+        Glyph current;
+        int index;
+
+        for (int x = 0; x < _width; x++)
+        {
+            for (int y = 0; y < _height; y++)
+            {
+                index = y * _width + x;
+                current = glyphBuffer[x, y];
+
+                charInfoBuffer[index].Attributes =
+                    (short)(current.ForegroundIndex | (current.Value == 0 ? background << 4 : current.BackgroundIndex << 4));
+                charInfoBuffer[index].UnicodeChar = current.Value;
+            }
+        }
+    }
+
+    public void SetBuffer(in Coord coord, in Glyph glyph)
+    {
+        var index = coord.Y * _width + coord.X;
+
+        charInfoBuffer[index].Attributes = (short)(glyph.ForegroundIndex | glyph.BackgroundIndex << 4);
+        charInfoBuffer[index].UnicodeChar = glyph.Value;
     }
 
     public void RenderBuffer()

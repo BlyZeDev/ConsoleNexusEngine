@@ -19,10 +19,6 @@ internal static partial class Native
     [return: MarshalAs(UnmanagedType.Bool)]
     private static partial bool SetWindowPos(nint hWnd, nint hWndInsertAfter, int x, int y, int cx, int cy, uint uFlags);
 
-    [LibraryImport("kernel32.dll", SetLastError = true)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    private static partial bool SetConsoleScreenBufferSize(nint hConsoleOutput, COORD dwSize);
-
     [DllImport("kernel32.dll", SetLastError = true)]
     private static extern bool GetConsoleScreenBufferInfoEx(nint hConsoleOutput, ref CONSOLE_SCREEN_BUFFER_INFO_EX csbe);
 
@@ -32,9 +28,9 @@ internal static partial class Native
     [LibraryImport("user32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     private static partial bool GetWindowRect(nint hWnd, ref RECT lpRect);
-    
+
     [LibraryImport("user32.dll")]
-    private static partial nint GetDesktopWindow();
+    private static partial int GetSystemMetrics(int nIndex);
 
     [DllImport("user32.dll", SetLastError = true)]
     private static extern int SetWindowLong(nint hWnd, int nIndex, int dwNewLong);
@@ -42,9 +38,6 @@ internal static partial class Native
     [LibraryImport("user32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     private static partial bool DrawMenuBar(nint hWnd);
-
-    [DllImport("user32.dll", SetLastError = true)]
-    private static extern int MapWindowPoints(nint hWndFrom, nint hWndTo, [In, Out] ref RECT rect, [MarshalAs(UnmanagedType.U4)] int cPoints);
 
     [LibraryImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
@@ -63,7 +56,7 @@ internal static partial class Native
     private static extern bool SetCurrentConsoleFontEx(nint hConsoleOutput, [MarshalAs(UnmanagedType.Bool)] bool bMaximumWindow, ref CONSOLE_FONT_INFO_EX lpConsoleCurrentFont);
 
     [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-    public static extern SafeFileHandle CreateFile(
+    private static extern SafeFileHandle CreateFile(
             string fileName,
             [MarshalAs(UnmanagedType.U4)] uint fileAccess,
             [MarshalAs(UnmanagedType.U4)] uint fileShare,
@@ -73,7 +66,7 @@ internal static partial class Native
             nint template);
 
     [DllImport("kernel32.dll", SetLastError = true)]
-    public static extern bool WriteConsoleOutputW(
+    private static extern bool WriteConsoleOutputW(
         SafeFileHandle hConsoleOutput,
         CHAR_INFO[] lpBuffer,
         COORD dwBufferSize,
@@ -89,28 +82,25 @@ internal static partial class Native
     public static nint GetConsoleStdOutput()
         => GetStdHandle(-11);
 
-    public static (int width, int height) SetConsoleBorderless(nint consoleHandle, nint stdOutput, in int fontWidth, in int fontHeight)
+    public static void SetConsoleBorderless(nint consoleHandle, nint stdOutput, in int fontWidth, in int fontHeight)
     {
         var consoleRect = new RECT();
-        var desktopRect = new RECT();
-
         GetWindowRect(consoleHandle, ref consoleRect);
-        var desktopHandle = GetDesktopWindow();
-        _ = MapWindowPoints(desktopHandle, consoleHandle, ref consoleRect, 2);
-        GetWindowRect(desktopHandle, ref desktopRect);
+
+        var windowWidth = GetSystemMetrics(0);
+        var windowHeight = GetSystemMetrics(1);
 
         _ = SetWindowLong(consoleHandle, -16, 0x00080000);
 
-        var windowWidth = desktopRect.Right - desktopRect.Left;
-        var windowHeight = desktopRect.Bottom - desktopRect.Top;
+        var csbe = new CONSOLE_SCREEN_BUFFER_INFO_EX();
+        csbe.cbSize = Marshal.SizeOf(csbe);
 
-        SetConsoleScreenBufferSize(
-            stdOutput,
-            new COORD
-            {
-                X = (short)(windowWidth / fontWidth),
-                Y = (short)(windowHeight / fontHeight)
-            });
+        GetConsoleScreenBufferInfoEx(stdOutput, ref csbe);
+
+        csbe.dwSize.X = (short)(windowWidth / fontWidth);
+        csbe.dwSize.Y = (short)(windowHeight / fontHeight);
+
+        SetConsoleScreenBufferInfoEx(stdOutput, ref csbe);
 
         SetWindowPos(
             consoleHandle,
@@ -121,8 +111,16 @@ internal static partial class Native
             0x0040);
 
         DrawMenuBar(consoleHandle);
+    }
 
-        return (windowWidth, windowHeight);
+    public static Coord GetConsoleBufferSize(nint stdOutput)
+    {
+        var csbe = new CONSOLE_SCREEN_BUFFER_INFO_EX();
+        csbe.cbSize = Marshal.SizeOf(csbe);
+
+        GetConsoleScreenBufferInfoEx(stdOutput, ref csbe);
+
+        return new(csbe.dwSize.X, csbe.dwSize.Y);
     }
 
     public static void FocusConsoleWindow(nint consoleHandle)

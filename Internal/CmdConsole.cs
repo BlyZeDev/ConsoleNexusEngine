@@ -28,7 +28,12 @@ internal readonly struct CmdConsole
         ColorPalette = colorPalette;
 
         Native.SetConsoleFont(StandardOutput, fontWidth, fontHeight);
-        (Width, Height) = Native.SetConsoleBorderless(Handle, StandardOutput, fontWidth, fontHeight);
+        Native.SetConsoleBorderless(Handle, StandardOutput, fontWidth, fontHeight);
+
+        var bufferSize = Native.GetConsoleBufferSize(StandardOutput);
+        Width = bufferSize.X;
+        Height = bufferSize.Y;
+
         Native.FocusConsoleWindow(Handle);
 
         Buffer = new ConsoleBuffer(Width, Height);
