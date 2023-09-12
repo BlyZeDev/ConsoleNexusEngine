@@ -109,7 +109,7 @@ public abstract partial class ConsoleGame
     /// Called before every frame.<br/>
     /// Do math and other logic here.
     /// </summary>
-    public abstract void Update(in ReadOnlySpan<GameInputKey> pressedKeys);
+    public abstract void Update(in ReadOnlySpan<NexusKey> pressedKeys);
 
     /// <summary>
     /// Called after every frame.<br/>

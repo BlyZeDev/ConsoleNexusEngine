@@ -6,16 +6,16 @@ using System;
 
 public abstract partial class ConsoleGame
 {
-    private static readonly GameInputKey[] _keys;
+    private static readonly NexusKey[] _keys;
 
     static ConsoleGame()
     {
-        _keys = (GameInputKey[])Enum.GetValues(typeof(GameInputKey));
+        _keys = (NexusKey[])Enum.GetValues(typeof(NexusKey));
     }
 
-    private static ReadOnlySpan<GameInputKey> GetPressedKeys()
+    private static ReadOnlySpan<NexusKey> GetPressedKeys()
     {
-        var currentlyPressedKeys = new SpanBuilder<GameInputKey>();
+        var currentlyPressedKeys = new SpanBuilder<NexusKey>();
 
         foreach (var key in _keys)
         {

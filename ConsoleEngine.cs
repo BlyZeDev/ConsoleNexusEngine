@@ -30,6 +30,21 @@ public sealed class ConsoleEngine
     }
 
     /// <summary>
+    /// Get a pixel in the console at a specific position
+    /// </summary>
+    /// <param name="coordinate">The coordinates where the character should be placed</param>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
+    /// <returns><see cref="NexusChar"/></returns>
+    public NexusChar GetPixel(Coord coordinate)
+    {
+        ThrowIfOutOfBounds(coordinate);
+
+        var glyph = glyphBuffer[coordinate.X, coordinate.Y];
+
+        return new(glyph.Value, ColorPalette[glyph.ForegroundIndex], ColorPalette[glyph.BackgroundIndex]);
+    }
+
+    /// <summary>
     /// Set a pixel in the console at a specific position
     /// </summary>
     /// <param name="coordinate">The coordinates where the character should be placed</param>
@@ -38,15 +53,14 @@ public sealed class ConsoleEngine
     /// <exception cref="ArgumentOutOfRangeException"></exception>
     public void SetPixel(Coord coordinate, NexusChar character)
     {
+        ThrowIfOutOfBounds(coordinate);
+
         var foregroundColorIndex = GetColorIndex(character.Foreground);
         var backgroundColorIndex = character.Background is null
             ? Background : GetColorIndex(character.Background.Value);
 
         if (foregroundColorIndex is -1 || backgroundColorIndex is -1)
             throw new ArgumentException("The color is not in the color palette", nameof(character));
-
-        if (!glyphBuffer.IsInRange(coordinate))
-            throw new ArgumentOutOfRangeException(nameof(coordinate), "The coordinate is not in bounds of the console buffer");
 
         SetGlyph(coordinate, new Glyph(character.Value, foregroundColorIndex, backgroundColorIndex));
     }
@@ -60,21 +74,24 @@ public sealed class ConsoleEngine
     /// <exception cref="ArgumentOutOfRangeException"></exception>
     public void SetText(Coord coordinate, NexusText text)
     {
+        var isHorizontal = text.FlowDirection is TextDirection.Horizontal;
+        ThrowIfOutOfBounds(coordinate + (isHorizontal ? new Coord(text.Value.Length - 1, 0) : new Coord(0, text.Value.Length - 1)));
+
         var foregroundColorIndex = GetColorIndex(text.Foreground);
         var backgroundColorIndex = text.Background is null
             ? Background : GetColorIndex(text.Background.Value);
-
+        
         if (foregroundColorIndex is -1 || backgroundColorIndex is -1)
             throw new ArgumentException("The color is not in the color palette", nameof(text));
 
-        if (!glyphBuffer.IsInRange(coordinate + new Coord(text.Value.Length, 0)))
-            throw new ArgumentOutOfRangeException(nameof(coordinate), "The coordinate is not in bounds of the console buffer");
-
-        int pos = -1;
+        var posX = -1;
+        var posY = -1;
         foreach (var letter in text.Value)
         {
-            pos++;
-            SetGlyph(coordinate + new Coord(pos, 0), new Glyph(letter, foregroundColorIndex, backgroundColorIndex));
+            if (isHorizontal) posX++;
+            else posY++;
+
+            SetGlyph(coordinate + new Coord(posX, posY), new Glyph(letter, foregroundColorIndex, backgroundColorIndex));
         }
     }
 
@@ -120,4 +137,10 @@ public sealed class ConsoleEngine
 
     private int GetColorIndex(in NexusColor color)
         => ColorPalette.Colors.GetKey(color);
+
+    private void ThrowIfOutOfBounds(Coord coord)
+    {
+        if (!glyphBuffer.IsInRange(coord))
+            throw new ArgumentOutOfRangeException(nameof(coord), "The coordinate is not in bounds of the console buffer");
+    }
 }

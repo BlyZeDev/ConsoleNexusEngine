@@ -3,7 +3,7 @@
 /// <summary>
 /// Virtual key codes for keyboard and mouse buttons.
 /// </summary>
-public enum GameInputKey
+public enum NexusKey
 {
     /// <summary>Left mouse button</summary>
     MouseLeft = 0x01,

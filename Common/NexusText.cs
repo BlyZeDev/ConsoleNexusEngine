@@ -21,15 +21,22 @@ public record struct NexusText
     public NexusColor? Background { get; set; }
 
     /// <summary>
+    /// The flow direction of the text
+    /// </summary>
+    public TextDirection FlowDirection { get; set; }
+
+    /// <summary>
     /// Initializes a new console text
     /// </summary>
     /// <param name="value">The text itself</param>
     /// <param name="foreground">The foreground color of the text</param>
     /// <param name="background">The background color of the text, <see langword="null"/> if the console background color should be used</param>
-    public NexusText(string value, NexusColor foreground, NexusColor? background)
+    /// <param name="flowDirection">The flow direction of the text</param>
+    public NexusText(string value, NexusColor foreground, NexusColor? background, TextDirection flowDirection = TextDirection.Horizontal)
     {
         Value = value;
         Foreground = foreground;
         Background = background;
+        FlowDirection = flowDirection;
     }
 }
