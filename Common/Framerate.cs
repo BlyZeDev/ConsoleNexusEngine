@@ -8,6 +8,11 @@ using System;
 public readonly record struct Framerate
 {
     /// <summary>
+    /// <see cref="Value"/> set to -1 which means unlimited
+    /// </summary>
+    public static Framerate Unlimited { get; }
+
+    /// <summary>
     /// Frames per second
     /// </summary>
     public int Value { get; }
@@ -16,11 +21,6 @@ public readonly record struct Framerate
     /// <see langword="true"/> if <see cref="Value"/> is -1, otherwise <see langword="false"/>
     /// </summary>
     public bool IsUnlimited => Value is -1;
-
-    /// <summary>
-    /// <see cref="Value"/> set to -1 which means unlimited
-    /// </summary>
-    public static Framerate Unlimited { get; }
 
     static Framerate() => Unlimited = new(-1);
 

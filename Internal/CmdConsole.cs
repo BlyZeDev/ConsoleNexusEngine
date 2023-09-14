@@ -3,7 +3,7 @@
 using ConsoleNexusEngine.Common;
 using System;
 
-internal readonly struct CmdConsole
+internal readonly record struct CmdConsole
 {
     public nint Handle { get; }
     public nint StandardInput { get; }
@@ -12,6 +12,9 @@ internal readonly struct CmdConsole
 
     public int Width { get; }
     public int Height { get; }
+
+    public int FontWidth { get; }
+    public int FontHeight { get; }
 
     public ColorPalette ColorPalette { get; }
 
@@ -23,21 +26,20 @@ internal readonly struct CmdConsole
 
         Console.CursorVisible = false;
 
-        Native.SetColorPalette(StandardOutput, colorPalette);
-
         ColorPalette = colorPalette;
 
-        Native.SetConsoleFont(StandardOutput, fontWidth, fontHeight);
-        Native.SetConsoleBorderless(Handle, StandardOutput, fontWidth, fontHeight);
+        FontWidth = fontWidth;
+        FontHeight = fontHeight;
 
-        var bufferSize = Native.GetConsoleBufferSize(StandardOutput);
-        Width = bufferSize.X;
-        Height = bufferSize.Y;
+        Native.SetConsoleFont(StandardOutput, fontWidth, fontHeight);
+        Native.SetConsoleMode(StandardInput, 0x0080);
+
+        var size = Native.InitializeConsole(Handle, StandardOutput, fontWidth, fontHeight, colorPalette);
+        Width = size.X;
+        Height = size.Y;
 
         Native.FocusConsoleWindow(Handle);
 
         Buffer = new ConsoleBuffer(Width, Height);
-
-        Native.SetConsoleMode(StandardInput, 0x0080);
     }
 }

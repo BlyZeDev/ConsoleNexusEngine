@@ -54,6 +54,16 @@ public abstract partial class ConsoleGame
     public int Height => Engine.Height;
 
     /// <summary>
+    /// The width of the font
+    /// </summary>
+    public int FontWidth => Engine.FontWidth;
+
+    /// <summary>
+    /// The height of the font
+    /// </summary>
+    public int FontHeight => Engine.FontHeight;
+
+    /// <summary>
     /// The background color of the whole console
     /// </summary>
     public NexusColor Background => ColorPalette[Engine.Background];

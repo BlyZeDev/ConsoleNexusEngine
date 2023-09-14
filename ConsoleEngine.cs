@@ -17,6 +17,8 @@ public sealed class ConsoleEngine
     internal ColorPalette ColorPalette => _console.ColorPalette;
     internal int Width => _console.Width;
     internal int Height => _console.Height;
+    internal int FontWidth => _console.FontWidth;
+    internal int FontHeight => _console.FontHeight;
 
     internal int Background { get; private set; }
 
@@ -74,7 +76,7 @@ public sealed class ConsoleEngine
     /// <exception cref="ArgumentOutOfRangeException"></exception>
     public void SetText(Coord coordinate, NexusText text)
     {
-        var isHorizontal = text.FlowDirection is TextDirection.Horizontal;
+        var isHorizontal = text.TextDirection is TextDirection.Horizontal;
         ThrowIfOutOfBounds(coordinate + (isHorizontal ? new Coord(text.Value.Length - 1, 0) : new Coord(0, text.Value.Length - 1)));
 
         var foregroundColorIndex = GetColorIndex(text.Foreground);

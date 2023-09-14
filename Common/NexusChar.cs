@@ -26,7 +26,7 @@ public record struct NexusChar
     /// <param name="value">The character itself</param>
     /// <param name="foreground">The foreground color of the character</param>
     /// <param name="background">The background color of the character, <see langword="null"/> if the console background color should be used</param>
-    public NexusChar(char value, NexusColor foreground, NexusColor? background)
+    public NexusChar(char value, NexusColor foreground, NexusColor? background = null)
     {
         Value = value;
         Foreground = foreground;

@@ -82,60 +82,19 @@ internal static partial class Native
     public static nint GetConsoleStdOutput()
         => GetStdHandle(-11);
 
-    public static void SetConsoleBorderless(nint consoleHandle, nint stdOutput, in int fontWidth, in int fontHeight)
-    {
-        var consoleRect = new RECT();
-        GetWindowRect(consoleHandle, ref consoleRect);
-
-        var windowWidth = GetSystemMetrics(0);
-        var windowHeight = GetSystemMetrics(1);
-
-        _ = SetWindowLong(consoleHandle, -16, 0x00080000);
-
-        var csbe = new CONSOLE_SCREEN_BUFFER_INFO_EX();
-        csbe.cbSize = Marshal.SizeOf(csbe);
-
-        GetConsoleScreenBufferInfoEx(stdOutput, ref csbe);
-
-        csbe.dwSize.X = (short)(windowWidth / fontWidth);
-        csbe.dwSize.Y = (short)(windowHeight / fontHeight);
-
-        SetConsoleScreenBufferInfoEx(stdOutput, ref csbe);
-
-        SetWindowPos(
-            consoleHandle,
-            nint.Zero,
-            0, 0,
-            windowWidth,
-            windowHeight,
-            0x0040);
-
-        DrawMenuBar(consoleHandle);
-    }
-
-    public static Coord GetConsoleBufferSize(nint stdOutput)
-    {
-        var csbe = new CONSOLE_SCREEN_BUFFER_INFO_EX();
-        csbe.cbSize = Marshal.SizeOf(csbe);
-
-        GetConsoleScreenBufferInfoEx(stdOutput, ref csbe);
-
-        return new(csbe.dwSize.X, csbe.dwSize.Y);
-    }
-
-    public static void FocusConsoleWindow(nint consoleHandle)
+    public static void FocusConsoleWindow(in nint consoleHandle)
         => SetForegroundWindow(consoleHandle);
 
-    public static uint GetConsoleMode(nint inputHandle)
+    public static uint GetConsoleMode(in nint inputHandle)
     {
         GetConsoleMode(inputHandle, out var mode);
         return mode;
     }
 
-    public static void SetConsoleMode(nint inputHandle, in uint mode)
+    public static void SetConsoleMode(in nint inputHandle, in uint mode)
         => SetConsoleMode(inputHandle, mode);
 
-    public static void SetConsoleFont(nint stdOutput, in int fontWidth, in int fontHeight)
+    public static void SetConsoleFont(in nint stdOutput, in int fontWidth, in int fontHeight)
     {
         var font = new CONSOLE_FONT_INFO_EX();
         font.cbSize = (uint)Marshal.SizeOf(font);
@@ -158,13 +117,47 @@ internal static partial class Native
     public static void WriteToConsoleBuffer(SafeFileHandle handle, CHAR_INFO[] charBuffer, COORD consoleSize, ref SMALL_RECT region)
         => WriteConsoleOutputW(handle, charBuffer, consoleSize, new COORD { X = 0, Y = 0 }, ref region);
 
-    public static void SetColorPalette(nint stdOutput, ColorPalette colorPalette)
+    public static Coord InitializeConsole(in nint consoleHandle, in nint stdOutput, in int fontWidth, in int fontHeight, ColorPalette colorPalette)
     {
+        var consoleRect = new RECT();
+        GetWindowRect(consoleHandle, ref consoleRect);
+
+        var desktopWidth = GetSystemMetrics(0);
+        var desktopHeight = GetSystemMetrics(1);
+
+        _ = SetWindowLong(consoleHandle, -16, 0x00080000);
+
         var csbe = new CONSOLE_SCREEN_BUFFER_INFO_EX();
         csbe.cbSize = Marshal.SizeOf(csbe);
 
         GetConsoleScreenBufferInfoEx(stdOutput, ref csbe);
 
+        SetColorPalette(stdOutput, colorPalette, ref csbe);
+
+        csbe.dwSize.X = (short)(desktopWidth / fontWidth);
+        csbe.dwSize.Y = (short)(desktopHeight / fontHeight);
+        ++csbe.srWindow.Bottom;
+        ++csbe.srWindow.Right;
+
+        SetConsoleScreenBufferInfoEx(stdOutput, ref csbe);
+
+        SetWindowPos(
+            consoleHandle,
+            nint.Zero,
+            0, 0,
+            desktopWidth,
+            desktopHeight,
+            0x0040);
+        
+        DrawMenuBar(consoleHandle);
+
+        GetConsoleScreenBufferInfoEx(stdOutput, ref csbe);
+
+        return new(csbe.dwSize.X, csbe.dwSize.Y);
+    }
+
+    private static void SetColorPalette(in nint stdOutput, ColorPalette colorPalette, ref CONSOLE_SCREEN_BUFFER_INFO_EX csbe)
+    {
         foreach (var color in colorPalette.Colors)
         {
             switch (color.Key)
@@ -187,10 +180,5 @@ internal static partial class Native
                 case ConsoleColor.White: csbe.white = new COLORREF(color.Value); break;
             }
         }
-
-        ++csbe.srWindow.Bottom;
-        ++csbe.srWindow.Right;
-
-        SetConsoleScreenBufferInfoEx(stdOutput, ref csbe);
     }
 }
