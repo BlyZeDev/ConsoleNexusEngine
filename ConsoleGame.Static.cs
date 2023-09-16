@@ -13,6 +13,9 @@ public abstract partial class ConsoleGame
         _keys = (NexusKey[])Enum.GetValues(typeof(NexusKey));
     }
 
+    private static bool IsKeyPressed(NexusKey key)
+        => Native.IsKeyPressed(key);
+
     private static ReadOnlySpan<NexusKey> GetPressedKeys()
     {
         var currentlyPressedKeys = new SpanBuilder<NexusKey>();

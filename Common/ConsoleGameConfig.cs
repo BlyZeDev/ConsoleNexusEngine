@@ -23,4 +23,9 @@ public sealed class ConsoleGameConfig
     /// The Color Palette of the Console
     /// </summary>
     public required ColorPalette ColorPalette { get; init; }
+
+    /// <summary>
+    /// The key that stops the game if pressed
+    /// </summary>
+    public required NexusKey StopGameKey { get; init; }
 }

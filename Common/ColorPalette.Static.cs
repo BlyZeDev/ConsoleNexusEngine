@@ -3,6 +3,11 @@
 public sealed partial record ColorPalette
 {
     /// <summary>
+    /// The default windows console color palette<br/>
+    /// </summary>
+    public static ColorPalette Default { get; }
+
+    /// <summary>
     /// The color palette of IBM's original Color Graphics Adapter<br/>
     /// <see href="https://en.wikipedia.org/wiki/Color_Graphics_Adapter"/>
     /// </summary>
@@ -51,6 +56,26 @@ public sealed partial record ColorPalette
 
     static ColorPalette()
     {
+        Default = new(stackalloc NexusColor[]
+        {
+            new(0x000000),
+            new(0x000080),
+            new(0x008000),
+            new(0x800000),
+            new(0x008080),
+            new(0x800080),
+            new(0x808000),
+            new(0xC0C0C0),
+            new(0x808080),
+            new(0x0000FF),
+            new(0x00FF00),
+            new(0xFF0000),
+            new(0x00FFFF),
+            new(0xFF00FF),
+            new(0xFFFF00),
+            new(0xFFFFFF)
+        });
+
         CGA = new(stackalloc NexusColor[]
         {
             new(0x000000),

@@ -98,6 +98,39 @@ public sealed class ConsoleEngine
     }
 
     /// <summary>
+    /// Set a pixel in the console at a specific position
+    /// </summary>
+    /// <param name="coordinate">The coordinates where the text should start</param>
+    /// <param name="text">The text itself</param>
+    /// <exception cref="ArgumentException"></exception>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
+    public void SetText(Coord coordinate, NexusFiggleText text)
+    {
+        ThrowIfOutOfBounds(coordinate + new Coord(text._longestStringLength, text.Value.Length - 1));
+
+        var foregroundColorIndex = GetColorIndex(text.Foreground);
+        var backgroundColorIndex = text.Background is null
+            ? Background : GetColorIndex(text.Background.Value);
+
+        if (foregroundColorIndex is -1 || backgroundColorIndex is -1)
+            throw new ArgumentException("The color is not in the color palette", nameof(text));
+
+        var posX = -1;
+        var posY = -1;
+        foreach (var letters in text.Value)
+        {
+            posY++;
+            foreach (var letter in letters)
+            {
+                posX++;
+                SetGlyph(coordinate + new Coord(posX, posY), new Glyph(letter, foregroundColorIndex, backgroundColorIndex));
+            }
+
+            posX = -1;
+        }
+    }
+
+    /// <summary>
     /// Set the background of the whole console to a specific color
     /// </summary>
     /// <param name="color">The color to set as background</param>
@@ -137,12 +170,12 @@ public sealed class ConsoleEngine
         _console.Buffer.SetBuffer(coord, glyph);
     }
 
-    private int GetColorIndex(in NexusColor color)
-        => ColorPalette.Colors.GetKey(color);
-
-    private void ThrowIfOutOfBounds(Coord coord)
+    private void ThrowIfOutOfBounds(in Coord coord)
     {
         if (!glyphBuffer.IsInRange(coord))
             throw new ArgumentOutOfRangeException(nameof(coord), "The coordinate is not in bounds of the console buffer");
     }
+
+    private int GetColorIndex(in NexusColor color)
+        => ColorPalette.Colors.GetKey(color);
 }

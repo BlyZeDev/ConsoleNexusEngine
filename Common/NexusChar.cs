@@ -1,24 +1,22 @@
 ﻿namespace ConsoleNexusEngine.Common;
 
+using ConsoleNexusEngine.Internal;
+
 /// <summary>
 /// Represents a character in the console
 /// </summary>
-public record struct NexusChar
+public readonly record struct NexusChar : INexusColored
 {
     /// <summary>
     /// The character itself
     /// </summary>
-    public char Value { get; set; }
+    public char Value { get; }
 
-    /// <summary>
-    /// The foreground color of the character
-    /// </summary>
-    public NexusColor Foreground { get; set; }
+    /// <inheritdoc/>
+    public NexusColor Foreground { get; }
 
-    /// <summary>
-    /// The background color of the character
-    /// </summary>
-    public NexusColor? Background { get; set; }
+    /// <inheritdoc/>
+    public NexusColor? Background { get; }
 
     /// <summary>
     /// Initializes a new console character
@@ -29,6 +27,19 @@ public record struct NexusChar
     public NexusChar(char value, NexusColor foreground, NexusColor? background = null)
     {
         Value = value;
+        Foreground = foreground;
+        Background = background;
+    }
+
+    /// <summary>
+    /// Initializes a new console character
+    /// </summary>
+    /// <param name="value">The character itself</param>
+    /// <param name="foreground">The foreground color of the character</param>
+    /// <param name="background">The background color of the character, <see langword="null"/> if the console background color should be used</param>
+    public NexusChar(NexusSpecialChar value, NexusColor foreground, NexusColor? background = null)
+    {
+        Value = (char)value;
         Foreground = foreground;
         Background = background;
     }

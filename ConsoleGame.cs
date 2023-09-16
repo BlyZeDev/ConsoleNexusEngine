@@ -4,6 +4,7 @@ using ConsoleNexusEngine.Common;
 using ConsoleNexusEngine.Internal;
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 
 /// <summary>
 /// Provides methods for your Console game
@@ -12,6 +13,9 @@ public abstract partial class ConsoleGame
 {
     private readonly Thread _game;
     private readonly ConsoleGameConfig _config;
+    private readonly CancellationTokenSource _cts;
+
+    private float deltaTime;
 
     /// <summary>
     /// The Core of the Console Game
@@ -34,9 +38,24 @@ public abstract partial class ConsoleGame
     public int TotalFrameCount { get; private set; }
 
     /// <summary>
+    /// Set the speed the frames should be rendered
+    /// </summary>
+    /// <remarks><see cref="DeltaTime"/> only works when the <see cref="TargetFramerate"/> is not <see cref="Framerate.Unlimited"/></remarks>
+    public float DeltaTime
+    {
+        get => deltaTime;
+        set => deltaTime = Math.Clamp(value, 0, 100);
+    }
+
+    /// <summary>
     /// The Frames per second the game tries to run at
     /// </summary>
     public Framerate TargetFramerate => _config.TargetFramerate;
+
+    /// <summary>
+    /// The key that stops the game if pressed
+    /// </summary>
+    public NexusKey StopGameKey => _config.StopGameKey;
 
     /// <summary>
     /// The Color Palette of the console
@@ -78,6 +97,7 @@ public abstract partial class ConsoleGame
 
         Engine = new(config.FontWidth, config.FontHeight, config.ColorPalette);
         Utility = new();
+        _cts = new();
 
         _config = config;
 
@@ -85,6 +105,8 @@ public abstract partial class ConsoleGame
         {
             Priority = ThreadPriority.Highest
         };
+
+        DeltaTime = 1f;
     }
 
     /// <summary>
@@ -100,10 +122,24 @@ public abstract partial class ConsoleGame
     }
 
     /// <summary>
+    /// Pauses the current thread while the game is running until a specific key is pressed
+    /// </summary>
+    public void WaitForStop()
+    {
+        try
+        {
+            Task.Delay(-1, _cts.Token).GetAwaiter().GetResult();
+        }
+        catch (TaskCanceledException) { }
+    }
+
+    /// <summary>
     /// Stops the game
     /// </summary>
     public void Stop()
     {
+        _cts.Cancel();
+
         IsRunning = false;
 
         _game.Join();
@@ -132,18 +168,20 @@ public abstract partial class ConsoleGame
         var targetFrameTime = 1d / TargetFramerate;
 
         var currentTime = Native.GetHighResolutionTimestamp();
+        double newTime;
         var accumulator = 0d;
 
         while (IsRunning)
         {
-            var newTime = Native.GetHighResolutionTimestamp();
-            var frameTime = newTime - currentTime;
+            newTime = Native.GetHighResolutionTimestamp();
+            var frameTime = (newTime - currentTime) * deltaTime;
             currentTime = newTime;
 
             accumulator += frameTime;
 
             while (accumulator >= targetFrameTime)
             {
+                if (IsKeyPressed(StopGameKey)) _cts.Cancel();
                 Update(GetPressedKeys());
                 unchecked { TotalFrameCount++; }
                 Render();
@@ -164,6 +202,7 @@ public abstract partial class ConsoleGame
     {
         while (IsRunning)
         {
+            if (IsKeyPressed(StopGameKey)) _cts.Cancel();
             Update(GetPressedKeys());
             unchecked { TotalFrameCount++; }
             Render();

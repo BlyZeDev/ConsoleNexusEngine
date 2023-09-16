@@ -1,29 +1,27 @@
 ﻿namespace ConsoleNexusEngine.Common;
 
+using ConsoleNexusEngine.Internal;
+
 /// <summary>
-/// Represents a character in the console
+/// Represents a text in the console
 /// </summary>
-public record struct NexusText
+public readonly record struct NexusText : INexusColored
 {
     /// <summary>
     /// The text itself
     /// </summary>
-    public string Value { get; set; }
+    public string Value { get; }
 
-    /// <summary>
-    /// The foreground color of the text
-    /// </summary>
-    public NexusColor Foreground { get; set; }
+    /// <inheritdoc/>
+    public NexusColor Foreground { get; }
 
-    /// <summary>
-    /// The background color of the text
-    /// </summary>
-    public NexusColor? Background { get; set; }
+    /// <inheritdoc/>
+    public NexusColor? Background { get; }
 
     /// <summary>
     /// The flow direction of the text
     /// </summary>
-    public TextDirection TextDirection { get; set; }
+    public TextDirection TextDirection { get; }
 
     /// <summary>
     /// Initializes a new console text
