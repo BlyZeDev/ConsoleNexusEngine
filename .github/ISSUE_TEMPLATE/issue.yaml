@@ -8,8 +8,7 @@ body:
     id: error
     attributes:
       label: Error
-      description: Specify the error if this field is empty or attach the app.log file
-      value: "The log file found in <InstallationFolder>\\app.log or <InstallationFolder>\\app_alt.log"
+      description: Specify the error
     validations:
       required: false
   - type: textarea
@@ -18,16 +17,16 @@ body:
       label: What happened?
       description: Describe as detailed as possible.
       placeholder: Also tell me, what did you expect to happen?
-      value: "Steps to reproduce:\n\n1. Open this...\n2. Then click this...\n3. Error happens!"
+      value: "Steps to reproduce:\n\n1. uSE this...\n2. Then do this...\n3. Error happens!"
     validations:
       required: true
-  - type: dropdown
+  - type: textarea
     id: version
     attributes:
       label: Version
-      description: What version of Linematrix are you using?
-      options:
-        - 1.0.0.0
+      description: What version of the Engine are you using?
+      placeholder: "For example: 1.0.0.0"
+      value: "Steps to reproduce:\n\n1. uSE this...\n2. Then do this...\n3. Error happens!"
     validations:
       required: true
   - type: checkboxes
@@ -40,6 +39,7 @@ body:
         - label: Windows 10
         - label: Windows 8
         - label: Windows 7
+        - label: Older
     validations:
       required: true
   - type: textarea
