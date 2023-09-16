@@ -26,7 +26,7 @@ body:
       label: Version
       description: What version of the Engine are you using?
       placeholder: "For example: 1.0.0.0"
-      value: "Steps to reproduce:\n\n1. uSE this...\n2. Then do this...\n3. Error happens!"
+      value: "Steps to reproduce:\n\n1. Use this...\n2. Then do this...\n3. Error happens!"
     validations:
       required: true
   - type: checkboxes
