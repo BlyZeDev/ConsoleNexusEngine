@@ -20,7 +20,7 @@ body:
       value: "Steps to reproduce:\n\n1. Use this...\n2. Then do this...\n3. Error happens!"
     validations:
       required: true
-- type: textarea
+  - type: textarea
     id: version
     attributes:
       label: Version
