@@ -73,14 +73,9 @@ public abstract partial class ConsoleGame
     public int Height => Engine.Height;
 
     /// <summary>
-    /// The width of the font
+    /// The font the console uses
     /// </summary>
-    public int FontWidth => Engine.FontWidth;
-
-    /// <summary>
-    /// The height of the font
-    /// </summary>
-    public int FontHeight => Engine.FontHeight;
+    public NexusFont Font => Engine.Font;
 
     /// <summary>
     /// The background color of the whole console
@@ -95,7 +90,7 @@ public abstract partial class ConsoleGame
     {
         IsRunning = false;
 
-        Engine = new(config.FontWidth, config.FontHeight, config.ColorPalette);
+        Engine = new(config.Font, config.ColorPalette);
         Utility = new();
         _cts = new();
 

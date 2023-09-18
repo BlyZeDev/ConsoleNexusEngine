@@ -6,13 +6,9 @@
 public sealed class ConsoleGameConfig
 {
     /// <summary>
-    /// The Font Width of the console window
+    /// The font the Console should use
     /// </summary>
-    public required int FontWidth { get; init; }
-    /// <summary>
-    /// The Font Height of the console window
-    /// </summary>
-    public required int FontHeight { get; init; }
+    public required NexusFont Font { get; init; }
 
     /// <summary>
     /// The Framerate the Console game tries to run at

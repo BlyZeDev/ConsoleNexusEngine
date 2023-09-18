@@ -13,12 +13,11 @@ internal readonly record struct CmdConsole
     public int Width { get; }
     public int Height { get; }
 
-    public int FontWidth { get; }
-    public int FontHeight { get; }
+    public NexusFont Font { get; }
 
     public ColorPalette ColorPalette { get; }
 
-    public CmdConsole(int fontWidth, int fontHeight, ColorPalette colorPalette)
+    public CmdConsole(NexusFont font, ColorPalette colorPalette)
     {
         Handle = Native.GetConsoleHandle();
         StandardInput = Native.GetConsoleStdInput();
@@ -28,13 +27,12 @@ internal readonly record struct CmdConsole
 
         ColorPalette = colorPalette;
 
-        FontWidth = fontWidth;
-        FontHeight = fontHeight;
+        Font = font;
 
-        Native.SetConsoleFont(StandardOutput, fontWidth, fontHeight);
+        Native.SetConsoleFont(StandardOutput, font);
         Native.SetConsoleMode(StandardInput, 0x0080);
 
-        var size = Native.InitializeConsole(Handle, StandardOutput, fontWidth, fontHeight, colorPalette);
+        var size = Native.InitializeConsole(Handle, StandardOutput, font.Width, font.Height, colorPalette);
         Width = size.X;
         Height = size.Y;
 

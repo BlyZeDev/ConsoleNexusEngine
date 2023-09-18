@@ -94,21 +94,17 @@ internal static partial class Native
     public static void SetConsoleMode(in nint inputHandle, in uint mode)
         => SetConsoleMode(inputHandle, mode);
 
-    public static void SetConsoleFont(in nint stdOutput, in int fontWidth, in int fontHeight)
+    public static void SetConsoleFont(in nint stdOutput, NexusFont font)
     {
-        var font = new CONSOLE_FONT_INFO_EX();
-        font.cbSize = (uint)Marshal.SizeOf(font);
-        font.nFont = 0;
+        var fontInfo = new CONSOLE_FONT_INFO_EX();
+        fontInfo.cbSize = (uint)Marshal.SizeOf(fontInfo);
+        fontInfo.nFont = 0;
 
-        var sizeX = (short)fontWidth;
-        var sizeY = (short)fontHeight;
+        fontInfo.dwFontSize.X = (short)font.Width;
+        fontInfo.dwFontSize.Y = (short)font.Height;
+        fontInfo.FaceName = font.Name;
 
-        font.dwFontSize.X = sizeX;
-        font.dwFontSize.Y = sizeY;
-
-        font.FaceName = sizeX < 4 || sizeY < 4 ? "Consolas" : "Terminal";
-
-        SetCurrentConsoleFontEx(stdOutput, false, ref font);
+        SetCurrentConsoleFontEx(stdOutput, false, ref fontInfo);
     }
 
     public static SafeFileHandle CreateConOutFile()
