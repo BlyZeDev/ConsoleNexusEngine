@@ -28,6 +28,11 @@ public abstract partial class ConsoleGame
     public ConsoleGameUtil Utility { get; }
 
     /// <summary>
+    /// Plays music and sounds for the Console Game
+    /// </summary>
+    public ConsoleGameMusic MusicPlayer { get; }
+
+    /// <summary>
     /// <see langword="true"/> if the game is running, otherwise <see langword="false"/>
     /// </summary>
     public bool IsRunning { get; private set; }
@@ -92,6 +97,8 @@ public abstract partial class ConsoleGame
 
         Engine = new(config.Font, config.ColorPalette);
         Utility = new();
+        MusicPlayer = new();
+
         _cts = new();
 
         _config = config;

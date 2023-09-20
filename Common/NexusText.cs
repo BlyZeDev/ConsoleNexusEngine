@@ -5,7 +5,7 @@ using ConsoleNexusEngine.Internal;
 /// <summary>
 /// Represents a text in the console
 /// </summary>
-public readonly record struct NexusText : INexusColored
+public sealed record NexusText : INexusColored
 {
     /// <summary>
     /// The text itself

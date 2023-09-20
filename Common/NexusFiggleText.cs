@@ -8,7 +8,7 @@ using System.Linq;
 /// <summary>
 /// Represents a figgle text in the console
 /// </summary>
-public readonly record struct NexusFiggleText : INexusColored
+public sealed record NexusFiggleText : INexusColored
 {
     internal readonly int _longestStringLength;
 
