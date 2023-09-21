@@ -4,7 +4,6 @@ using ConsoleNexusEngine.Common;
 using ConsoleNexusEngine.Internal;
 using NAudio.Wave;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 
 /// <summary>
@@ -28,27 +27,26 @@ public sealed class ConsoleGameMusic
     /// Plays a <see cref="NexusSound"/>
     /// </summary>
     /// <param name="sound">The sound to play</param>
-    public void PlaySound(NexusSound sound) //needs fix for multiple sounds
+    public void PlaySound(NexusSound sound)
     {
         using (var reader = new LoopStream(new AudioFileReader(sound.FilePath)))
         {
             var outputDevice = new WaveOutEvent();
-            var cts = new CancellationTokenSource();
 
             Task.Run(() =>
             {
                 outputDevice.Init(reader);
-                outputDevice.Volume = sound.volume;
+                outputDevice.Volume = sound.Volume._value;
                 outputDevice.Play();
 
-                while (outputDevice.PlaybackState == PlaybackState.Playing)
+                while (outputDevice.PlaybackState is PlaybackState.Playing)
                 {
-                    if (outputDevice.Volume != sound.volume)
-                        outputDevice.Volume = sound.volume;
+                    if (outputDevice.Volume != sound.Volume._value)
+                        outputDevice.Volume = sound.Volume._value;
 
                     reader.EnableLoop = sound.IsLooped;
                 }
-            }).ConfigureAwait(false);
+            });
 
             _playing.Add(sound, outputDevice);
         }

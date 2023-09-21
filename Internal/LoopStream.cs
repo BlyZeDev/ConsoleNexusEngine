@@ -23,7 +23,7 @@ internal sealed class LoopStream : WaveStream
     }
 
     public bool EnableLoop { get; set; }
-
+    
     public override int Read(byte[] buffer, int offset, int count)
     {
         var totalBytesRead = 0;

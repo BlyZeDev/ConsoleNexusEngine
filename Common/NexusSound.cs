@@ -5,10 +5,8 @@ using System;
 /// <summary>
 /// Represents a sound playing in the console
 /// </summary>
-public sealed class NexusSound
+public sealed record NexusSound
 {
-    internal float volume;
-
     /// <summary>
     /// The path to the played file
     /// </summary>
@@ -23,22 +21,15 @@ public sealed class NexusSound
     /// The volume of the sound
     /// </summary>
     /// <remarks>Clamped between 0 and 100</remarks>
-    public int Volume
-    {
-        get => (int)(volume * 100);
-        set
-        {
-            volume = Math.Clamp(value / 100f, 0, 1);
-        }
-    }
+    public Volume Volume { get; set; }
 
     /// <summary>
     /// Initializes a new Nexus Sound
     /// </summary>
     /// <param name="filePath">The path to the file that should be played</param>
-    /// <param name="volume">The volume of the played sound, [0-100]</param>
+    /// <param name="volume">The volume of the played sound</param>
     /// /// <param name="shouldLoop"><see langword="true"/> if the sound should be looped, otherwise <see langword="false"/></param>
-    public NexusSound(string filePath, int volume = 50, bool shouldLoop = false)
+    public NexusSound(string filePath, Volume volume, bool shouldLoop = false)
     {
         FilePath = filePath;
         Volume = volume;
