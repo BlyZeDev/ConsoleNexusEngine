@@ -4,7 +4,6 @@ using ConsoleNexusEngine.Common;
 using ConsoleNexusEngine.Internal;
 using NAudio.Wave;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 
 /// <summary>
 /// Music player for a console game
@@ -14,7 +13,7 @@ public sealed class ConsoleGameMusic
     private readonly IDictionary<NexusSound, WaveOutEvent> _playing;
 
     /// <summary>
-    /// A collection of all sounds that are currently playing
+    /// The sounds that are currently played
     /// </summary>
     public IReadOnlyCollection<NexusSound> CurrentlyPlaying => _playing.Keys.AsReadOnly();
 
@@ -24,39 +23,54 @@ public sealed class ConsoleGameMusic
     }
 
     /// <summary>
-    /// Plays a <see cref="NexusSound"/>
+    /// Plays a sound
     /// </summary>
     /// <param name="sound">The sound to play</param>
     public void PlaySound(NexusSound sound)
     {
-        using (var reader = new LoopStream(new AudioFileReader(sound.FilePath)))
+        using (var reader = new LoopStream(new AudioFileReader(sound.FilePath), sound))
         {
             var outputDevice = new WaveOutEvent();
 
-            Task.Run(() =>
-            {
-                outputDevice.Init(reader);
-                outputDevice.Volume = sound.Volume._value;
-                outputDevice.Play();
+            reader.Volume = sound.Volume;
 
-                while (outputDevice.PlaybackState is PlaybackState.Playing)
-                {
-                    if (outputDevice.Volume != sound.Volume._value)
-                        outputDevice.Volume = sound.Volume._value;
-
-                    reader.EnableLoop = sound.IsLooped;
-                }
-            });
+            outputDevice.PlaybackStopped += OnSoundFinished;
+            outputDevice.Init(reader);
+            outputDevice.Play();
 
             _playing.Add(sound, outputDevice);
         }
     }
 
     /// <summary>
-    /// Stops a played sound
+    /// Pauses a playing sound
+    /// </summary>
+    /// <param name="sound">The sound to pause</param>
+    /// <remarks>This method will do nothing if the sound is not found</remarks>
+    public void PauseSound(NexusSound sound)
+    {
+        if (!_playing.ContainsKey(sound)) return;
+
+        _playing[sound].Pause();
+    }
+
+    /// <summary>
+    /// Resumes a playing sound
+    /// </summary>
+    /// <param name="sound">The sound to resume</param>
+    /// <remarks>This method will do nothing if the sound is not found</remarks>
+    public void ResumeSound(NexusSound sound)
+    {
+        if (!_playing.ContainsKey(sound)) return;
+
+        _playing[sound].Play();
+    }
+
+    /// <summary>
+    /// Stops a playing sound
     /// </summary>
     /// <param name="sound">The sound to stop</param>
-    /// <remarks>If the sound is not found, nothing happens</remarks>
+    /// <remarks>This method will do nothing if the sound is not found</remarks>
     public void StopSound(NexusSound sound)
     {
         if (!_playing.ContainsKey(sound)) return;
@@ -65,5 +79,12 @@ public sealed class ConsoleGameMusic
         _playing[sound].Dispose();
 
         _playing.Remove(sound);
+    }
+
+    private void OnSoundFinished(object? sender, StoppedEventArgs e)
+    {
+        if (!_playing.TryGetKey(sender as WaveOutEvent, out var sound)) return;
+
+        StopSound(sound);
     }
 }

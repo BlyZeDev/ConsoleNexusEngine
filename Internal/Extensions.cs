@@ -1,6 +1,7 @@
 ﻿namespace ConsoleNexusEngine.Internal;
 
 using ConsoleNexusEngine.Common;
+using NAudio.Wave;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -15,6 +16,25 @@ internal static class Extensions
         }
 
         return -1;
+    }
+
+    public static bool TryGetKey(this IDictionary<NexusSound, WaveOutEvent> dictionary, WaveOutEvent? player, out NexusSound sound)
+    {
+        sound = default!;
+
+        if (player is not null)
+        {
+            foreach (var pair in dictionary)
+            {
+                if (pair.Value == player)
+                {
+                    sound = pair.Key;
+                    return true;
+                }
+            }
+        }        
+
+        return false;
     }
 
     public static bool IsInRange<T>(this T[,] array, Coord coord)

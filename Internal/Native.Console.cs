@@ -130,8 +130,8 @@ internal static partial class Native
 
         SetColorPalette(stdOutput, colorPalette, ref csbe);
 
-        csbe.dwSize.X = (short)(desktopWidth / fontWidth);
-        csbe.dwSize.Y = (short)(desktopHeight / fontHeight);
+        csbe.dwSize.X = 1;
+        csbe.dwSize.Y = 1;
         ++csbe.srWindow.Bottom;
         ++csbe.srWindow.Right;
 

@@ -69,4 +69,7 @@ public readonly record struct Coord : IAdditionOperators<Coord, Coord, Coord>, I
     /// <inheritdoc/>
     public static Coord operator ++(Coord value)
         => new(value.X + 1, value.Y + 1);
+
+    /// <inheritdoc/>
+    public override string ToString() => $"[{X},{Y}]";
 }

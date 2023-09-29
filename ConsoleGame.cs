@@ -124,7 +124,7 @@ public abstract partial class ConsoleGame
     }
 
     /// <summary>
-    /// Pauses the current thread while the game is running until a specific key is pressed
+    /// Pauses the current thread while the game is running until the <see cref="StopGameKey"/> is pressed
     /// </summary>
     public void WaitForStop()
     {

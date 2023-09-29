@@ -7,8 +7,12 @@ using System;
 /// </summary>
 public sealed record NexusSound
 {
+    private Volume volume;
+
+    internal event EventHandler? OnVolumeChanged;
+
     /// <summary>
-    /// The path to the played file
+    /// The path to the sound file
     /// </summary>
     public string FilePath { get; }
 
@@ -21,7 +25,15 @@ public sealed record NexusSound
     /// The volume of the sound
     /// </summary>
     /// <remarks>Clamped between 0 and 100</remarks>
-    public Volume Volume { get; set; }
+    public Volume Volume
+    {
+        get => volume;
+        set
+        {
+            volume = value;
+            OnVolumeChanged?.Invoke(null, EventArgs.Empty);
+        }
+    }
 
     /// <summary>
     /// Initializes a new Nexus Sound

@@ -53,4 +53,7 @@ public readonly record struct Framerate
     /// </summary>
     /// <param name="framerate">Framerate to convert</param>
     public static implicit operator Framerate(int framerate) => new(framerate);
+
+    /// <inheritdoc/>
+    public override string ToString() => Value.ToString();
 }

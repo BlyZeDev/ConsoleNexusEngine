@@ -35,9 +35,9 @@ public sealed record NexusFiggleText : INexusColored
     /// <param name="figgleFont">The Figgle Font that is used on the <paramref name="value"/></param>
     /// <param name="foreground">The foreground color of the text</param>
     /// <param name="background">The background color of the text, <see langword="null"/> if the console background color should be used</param>
-    public NexusFiggleText(char value, FiggleFont figgleFont, NexusColor foreground, NexusColor? background = null)
+    public NexusFiggleText(string value, FiggleFont figgleFont, NexusColor foreground, NexusColor? background = null)
     {
-        (Value, _longestStringLength) = InitText(value.ToString(), figgleFont);
+        (Value, _longestStringLength) = InitText(value, figgleFont);
         Foreground = foreground;
         Background = background;
         FiggleFont = figgleFont;
@@ -50,13 +50,18 @@ public sealed record NexusFiggleText : INexusColored
     /// <param name="figgleFont">The Figgle Font that is used on the <paramref name="value"/></param>
     /// <param name="foreground">The foreground color of the text</param>
     /// <param name="background">The background color of the text, <see langword="null"/> if the console background color should be used</param>
-    public NexusFiggleText(string value, FiggleFont figgleFont, NexusColor foreground, NexusColor? background = null)
-    {
-        (Value, _longestStringLength) = InitText(value, figgleFont);
-        Foreground = foreground;
-        Background = background;
-        FiggleFont = figgleFont;
-    }
+    public NexusFiggleText(char value, FiggleFont figgleFont, NexusColor foreground, NexusColor? background = null)
+        : this(value.ToString(), figgleFont, foreground, background) { }
+
+    /// <summary>
+    /// Initializes a new console text in figgle font
+    /// </summary>
+    /// <param name="value">The text itself</param>
+    /// <param name="figgleFont">The Figgle Font that is used on the <paramref name="value"/></param>
+    /// <param name="foreground">The foreground color of the text</param>
+    /// <param name="background">The background color of the text, <see langword="null"/> if the console background color should be used</param>
+    public NexusFiggleText(object value, FiggleFont figgleFont, NexusColor foreground, NexusColor? background = null)
+        : this(value?.ToString() ?? "", figgleFont, foreground, background) { }
 
     private static (string[], int) InitText(string value, FiggleFont font)
     {
