@@ -9,7 +9,7 @@ public sealed partial record NexusFont
     /// <param name="height">The height the font should have</param>
     /// <returns><see cref="NexusFont"/></returns>
     public static NexusFont Consolas(int width, int height)
-        => new ("Consolas", width, height);
+        => new("Consolas", width, height);
 
     /// <summary>
     /// The console font 'Terminal'
