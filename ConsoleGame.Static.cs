@@ -10,7 +10,7 @@ public abstract partial class ConsoleGame
 
     static ConsoleGame()
     {
-        _keys = (NexusKey[])Enum.GetValues(typeof(NexusKey));
+        _keys = ((NexusKey[])Enum.GetValues(typeof(NexusKey)));
     }
 
     private static bool IsKeyPressed(NexusKey key)
@@ -19,10 +19,10 @@ public abstract partial class ConsoleGame
     private static ReadOnlySpan<NexusKey> GetPressedKeys()
     {
         var currentlyPressedKeys = new SpanBuilder<NexusKey>();
-
+        
         foreach (var key in _keys)
         {
-            if (Native.IsKeyPressed(key))
+            if (IsKeyPressed(key))
                 currentlyPressedKeys.Append(key);
         }
 
