@@ -1,6 +1,6 @@
 ﻿namespace ConsoleNexusEngine.Common;
 
-using ConsoleNexusEngine.Internal;
+using ConsoleNexusEngine.Internal.Models;
 
 /// <summary>
 /// Represents a character in the console

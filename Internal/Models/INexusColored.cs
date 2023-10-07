@@ -1,4 +1,4 @@
-﻿namespace ConsoleNexusEngine.Internal;
+﻿namespace ConsoleNexusEngine.Internal.Models;
 
 using ConsoleNexusEngine.Common;
 

@@ -1,6 +1,6 @@
 ﻿namespace ConsoleNexusEngine.Common;
 
-using ConsoleNexusEngine.Internal;
+using ConsoleNexusEngine.Internal.Models;
 using Figgle;
 using System;
 using System.Linq;
