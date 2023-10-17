@@ -15,6 +15,9 @@ internal static partial class Native
     [LibraryImport("kernel32.dll")]
     private static partial nint GetConsoleWindow();
 
+    [DllImport("user32.dll")]
+    public static extern bool SetWindowText(nint hwnd, string title);
+
     [LibraryImport("user32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     private static partial bool SetWindowPos(nint hWnd, nint hWndInsertAfter, int x, int y, int cx, int cy, uint uFlags);
@@ -82,9 +85,6 @@ internal static partial class Native
     public static nint GetConsoleStdOutput()
         => GetStdHandle(-11);
 
-    public static void FocusConsoleWindow(in nint consoleHandle)
-        => SetForegroundWindow(consoleHandle);
-
     public static uint GetConsoleMode(in nint inputHandle)
     {
         GetConsoleMode(inputHandle, out var mode);
@@ -113,7 +113,7 @@ internal static partial class Native
     public static void WriteToConsoleBuffer(SafeFileHandle handle, CHAR_INFO[] charBuffer, COORD consoleSize, ref SMALL_RECT region)
         => WriteConsoleOutputW(handle, charBuffer, consoleSize, new COORD { X = 0, Y = 0 }, ref region);
 
-    public static Coord InitializeConsole(in nint consoleHandle, in nint stdOutput, in int fontWidth, in int fontHeight, ColorPalette colorPalette)
+    public static Coord InitializeConsole(in nint consoleHandle, in nint stdOutput, in int fontWidth, in int fontHeight, ColorPalette colorPalette, string title)
     {
         var consoleRect = new RECT();
         GetWindowRect(consoleHandle, ref consoleRect);
@@ -148,6 +148,10 @@ internal static partial class Native
         DrawMenuBar(consoleHandle);
 
         GetConsoleScreenBufferInfoEx(stdOutput, ref csbe);
+
+        SetWindowText(consoleHandle, title);
+
+        SetForegroundWindow(consoleHandle);
 
         return new(csbe.dwSize.X, csbe.dwSize.Y);
     }

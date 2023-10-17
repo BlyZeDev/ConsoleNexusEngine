@@ -6,6 +6,11 @@
 public sealed class ConsoleGameConfig
 {
     /// <summary>
+    /// The title the console should have
+    /// </summary>
+    public required string Title { get; init; }
+
+    /// <summary>
     /// The font the Console should use
     /// </summary>
     public required NexusFont Font { get; init; }

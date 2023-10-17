@@ -14,6 +14,7 @@ public sealed class ConsoleEngine
 
     private Glyph[,] glyphBuffer;
 
+    internal string Title => _console.Title;
     internal ColorPalette ColorPalette => _console.ColorPalette;
     internal int Width => _console.Width;
     internal int Height => _console.Height;
@@ -21,9 +22,9 @@ public sealed class ConsoleEngine
 
     internal int Background { get; private set; }
 
-    internal ConsoleEngine(NexusFont font, ColorPalette colorPalette)
+    internal ConsoleEngine(NexusFont font, ColorPalette colorPalette, string title)
     {
-        _console = new CmdConsole(font, colorPalette);
+        _console = new CmdConsole(font, colorPalette, title);
 
         glyphBuffer = new Glyph[_console.Width, _console.Height];
 

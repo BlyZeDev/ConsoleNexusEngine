@@ -43,6 +43,11 @@ public abstract partial class ConsoleGame
     public int TotalFrameCount { get; private set; }
 
     /// <summary>
+    /// The time the game started, set in <see cref="Start()"/>
+    /// </summary>
+    public DateTime StartTime { get; private set; }
+
+    /// <summary>
     /// Set the speed the frames should be rendered
     /// </summary>
     /// <remarks><see cref="DeltaTime"/> only works when the <see cref="TargetFramerate"/> is not <see cref="Framerate.Unlimited"/></remarks>
@@ -61,6 +66,11 @@ public abstract partial class ConsoleGame
     /// The key that stops the game if pressed
     /// </summary>
     public NexusKey StopGameKey => _config.StopGameKey;
+
+    /// <summary>
+    /// The title of the console
+    /// </summary>
+    public string Title => Engine.Title;
 
     /// <summary>
     /// The Color Palette of the console
@@ -95,7 +105,7 @@ public abstract partial class ConsoleGame
     {
         IsRunning = false;
 
-        Engine = new(config.Font, config.ColorPalette);
+        Engine = new(config.Font, config.ColorPalette, config.Title);
         Utility = new();
         MusicPlayer = new();
 
@@ -119,6 +129,8 @@ public abstract partial class ConsoleGame
         Load();
 
         IsRunning = true;
+
+        StartTime = DateTime.Now;
 
         _game.Start();
     }
