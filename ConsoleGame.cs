@@ -20,17 +20,17 @@ public abstract partial class ConsoleGame
     /// <summary>
     /// The Core of the Console Game
     /// </summary>
-    public ConsoleEngine Engine { get; }
+    protected ConsoleEngine Engine { get; }
 
     /// <summary>
     /// Useful utility for the Console Game
     /// </summary>
-    public ConsoleGameUtil Utility { get; }
+    protected ConsoleGameUtil Utility { get; }
 
     /// <summary>
     /// Plays music and sounds for the Console Game
     /// </summary>
-    public ConsoleGameMusic MusicPlayer { get; }
+    protected ConsoleGameMusic MusicPlayer { get; }
 
     /// <summary>
     /// <see langword="true"/> if the game is running, otherwise <see langword="false"/>
@@ -54,7 +54,7 @@ public abstract partial class ConsoleGame
     public float DeltaTime
     {
         get => deltaTime;
-        set => deltaTime = Math.Clamp(value, 0, 100);
+        protected set => deltaTime = Math.Clamp(value, 0, 100);
     }
 
     /// <summary>
@@ -163,19 +163,19 @@ public abstract partial class ConsoleGame
     /// Called once before the start of the game.<br/>
     /// Import game files and resources here.
     /// </summary>
-    public abstract void Load();
+    protected abstract void Load();
 
     /// <summary>
     /// Called before every frame.<br/>
     /// Do math and other logic here.
     /// </summary>
-    public abstract void Update(in ReadOnlySpan<NexusKey> pressedKeys);
+    protected abstract void Update(in ReadOnlySpan<NexusKey> pressedKeys);
 
     /// <summary>
     /// Called after every frame.<br/>
     /// Render your graphics here.
     /// </summary>
-    public abstract void Render();
+    protected abstract void Render();
 
     private void GameLoopCapped()
     {
