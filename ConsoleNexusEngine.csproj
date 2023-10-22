@@ -8,14 +8,15 @@
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
     <Authors>BlyZe</Authors>
-    <Version>1.1.0</Version>
+    <Version>1.2.0</Version>
     <Title>$(AssemblyName)</Title>
     <Description>A powerful and easy to use engine to create console games</Description>
     <PackageProjectUrl>https://github.com/BlyZeYT/ConsoleNexus-Engine</PackageProjectUrl>
-    <PackageIcon>hyper-seeklogo_1.com.png</PackageIcon>
+    <PackageIcon>Icon.png</PackageIcon>
     <RepositoryUrl>https://github.com/BlyZeYT/ConsoleNexus-Engine</RepositoryUrl>
     <PackageTags>engine, console engine, blyze, console nexus, console nexus engine, nexus engine, console, console game</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReleaseNotes>Added the DrawLine and SetPixels method</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
@@ -23,15 +24,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\..\..\..\..\..\Downloads\hyper-vector-logo-seeklogo.com\hyper-seeklogo_1.com.png">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
+    <PackageReference Include="Figgle" Version="0.5.1" />
+    <PackageReference Include="NAudio" Version="2.2.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Figgle" Version="0.5.1" />
-    <PackageReference Include="NAudio" Version="2.2.1" />
+    <None Update="Icon.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>

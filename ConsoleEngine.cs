@@ -4,6 +4,7 @@ using ConsoleNexusEngine.Common;
 using ConsoleNexusEngine.Internal;
 using ConsoleNexusEngine.Internal.Models;
 using System;
+using System.Drawing;
 
 /// <summary>
 /// The core engine of the <see cref="ConsoleGame"/>
@@ -68,7 +69,7 @@ public sealed class ConsoleEngine
     }
 
     /// <summary>
-    /// Set a pixel in the console at a specific position
+    /// Set a text in the console at a specific position
     /// </summary>
     /// <param name="coordinate">The coordinates where the text should start</param>
     /// <param name="text">The text itself</param>
@@ -98,7 +99,7 @@ public sealed class ConsoleEngine
     }
 
     /// <summary>
-    /// Set a pixel in the console at a specific position
+    /// Set a text in the console at a specific position
     /// </summary>
     /// <param name="coordinate">The coordinates where the text should start</param>
     /// <param name="text">The text itself</param>
@@ -127,6 +128,83 @@ public sealed class ConsoleEngine
             }
 
             posX = -1;
+        }
+    }
+
+    /// <summary>
+    /// Set a pixel in the console at specific positions
+    /// </summary>
+    /// <param name="character">The character itself</param>
+    /// <param name="coordinates">The coordinates where the character should be placed</param>
+    public void SetPixels(NexusChar character, params Coord[] coordinates)
+    {
+        foreach (var coordinate in coordinates)
+        {
+            SetPixel(coordinate, character);
+        }
+    }
+
+
+    /// <summary>
+    /// Draws a line from one coordinate to the other
+    /// </summary>
+    /// <param name="start">The coordinate of the start point</param>
+    /// <param name="end">The coordinate of the end point</param>
+    /// <param name="character">The character itself</param>
+    public void DrawLine(Coord start, Coord end, NexusChar character)
+    {
+        var x = start.X;
+        var y = start.Y;
+        var x2 = end.X;
+        var y2 = end.Y;
+
+        var w = x2 - x;
+        var h = y2 - y;
+
+        int dx1 = 0, dy1 = 0, dx2 = 0, dy2 = 0;
+
+        if (w < 0) dx1 = -1;
+        else if (w > 0) dx1 = 1;
+
+        if (h < 0) dy1 = -1;
+        else if (h > 0) dy1 = 1;
+
+        if (w < 0) dx2 = -1;
+        else if (w > 0) dx2 = 1;
+
+        var longest = Math.Abs(w);
+        var shortest = Math.Abs(h);
+
+        if (!(longest > shortest))
+        {
+            longest = Math.Abs(h);
+            shortest = Math.Abs(w);
+
+            if (h < 0) dy2 = -1;
+            else if (h > 0) dy2 = 1;
+
+            dx2 = 0;
+        }
+
+        var numerator = longest >> 1;
+
+        for (int i = 0; i <= longest; i++)
+        {
+            SetPixel(new Coord(x, y), character);
+
+            numerator += shortest;
+
+            if (!(numerator < longest))
+            {
+                numerator -= longest;
+                x += dx1;
+                y += dy1;
+            }
+            else
+            {
+                x += dx2;
+                y += dy2;
+            }
         }
     }
 
