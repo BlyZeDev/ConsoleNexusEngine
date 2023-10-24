@@ -209,6 +209,23 @@ public sealed class ConsoleEngine
     }
 
     /// <summary>
+    /// Fills a space from one coordinate to the other
+    /// </summary>
+    /// <param name="start">The coordinate of the start point</param>
+    /// <param name="end">The coordinate of the end point</param>
+    /// <param name="character">The character itself</param>
+    public void Fill(Coord start, Coord end, NexusChar character)
+    {
+        for (int sx = start.X; sx <= end.X; sx++)
+        {
+            for (int sy = start.Y; sy <= end.Y; sy++)
+            {
+                SetPixel(new Coord(sx, sy), character);
+            }
+        }
+    }
+
+    /// <summary>
     /// Set the background of the whole console to a specific color
     /// </summary>
     /// <param name="color">The color to set as background</param>
