@@ -34,7 +34,7 @@ internal sealed record CmdConsole
         Font = font;
 
         Native.SetConsoleFont(StandardOutput, font);
-        Native.SetConsoleMode(StandardInput, 0x0080);
+        Native.SetConsoleMode(StandardInput, (0x0080 | 0x0010) & ~0x0004);
 
         var size = Native.InitializeConsole(Handle, StandardOutput, font.Width, font.Height, colorPalette, title);
         Width = size.X;

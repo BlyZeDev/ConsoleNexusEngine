@@ -11,9 +11,9 @@ using System.Drawing;
 /// </summary>
 public sealed class ConsoleEngine
 {
-    private readonly CmdConsole _console;
-
     private Glyph[,] glyphBuffer;
+
+    internal readonly CmdConsole _console;
 
     internal string Title => _console.Title;
     internal ColorPalette ColorPalette => _console.ColorPalette;

@@ -169,7 +169,7 @@ public abstract partial class ConsoleGame
     /// Called before every frame.<br/>
     /// Do math and other logic here.
     /// </summary>
-    protected abstract void Update(in ReadOnlySpan<NexusKey> pressedKeys);
+    protected abstract void Update(in ReadOnlySpan<INexusInput> inputs);
 
     /// <summary>
     /// Called after every frame.<br/>
@@ -195,10 +195,14 @@ public abstract partial class ConsoleGame
 
             while (accumulator >= targetFrameTime)
             {
-                if (IsKeyPressed(StopGameKey)) _cts.Cancel();
-                Update(GetPressedKeys());
+                if (Native.IsKeyPressed(StopGameKey)) _cts.Cancel();
+
+                Update(Native.ReadConsoleInput(Engine._console.StandardInput));
+
                 unchecked { TotalFrameCount++; }
+
                 Render();
+
                 accumulator -= targetFrameTime;
             }
 
@@ -216,9 +220,12 @@ public abstract partial class ConsoleGame
     {
         while (IsRunning)
         {
-            if (IsKeyPressed(StopGameKey)) _cts.Cancel();
-            Update(GetPressedKeys());
+            if (Native.IsKeyPressed(StopGameKey)) _cts.Cancel();
+
+            Update(Native.ReadConsoleInput(Engine._console.StandardInput));
+
             unchecked { TotalFrameCount++; }
+
             Render();
         }
     }

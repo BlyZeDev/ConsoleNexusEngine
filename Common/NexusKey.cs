@@ -5,6 +5,8 @@
 /// </summary>
 public enum NexusKey
 {
+    /// <summary>No button</summary>
+    None = 0x0,
     /// <summary>Left mouse button</summary>
     MouseLeft = 0x01,
     /// <summary>Right mouse button</summary>
