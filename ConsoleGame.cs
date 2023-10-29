@@ -166,13 +166,14 @@ public abstract partial class ConsoleGame
     protected abstract void Load();
 
     /// <summary>
-    /// Called before every frame.<br/>
+    /// Called every frame.<br/>
     /// Do math and other logic here.
     /// </summary>
+    /// <param name="inputs">The inputs made during the last frame</param>
     protected abstract void Update(in ReadOnlySpan<INexusInput> inputs);
 
     /// <summary>
-    /// Called after every frame.<br/>
+    /// Called after <see cref="Update(in ReadOnlySpan{INexusInput})"/><br/>
     /// Render your graphics here.
     /// </summary>
     protected abstract void Render();
