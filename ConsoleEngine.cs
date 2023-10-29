@@ -33,7 +33,7 @@ public sealed class ConsoleEngine
     }
 
     /// <summary>
-    /// Get a pixel in the console at a specific position
+    /// Gets a pixel in the console at a specific position
     /// </summary>
     /// <param name="coordinate">The coordinates where the character should be placed</param>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
@@ -48,7 +48,7 @@ public sealed class ConsoleEngine
     }
 
     /// <summary>
-    /// Set a pixel in the console at a specific position
+    /// Sets a pixel in the console at a specific position
     /// </summary>
     /// <param name="coordinate">The coordinates where the character should be placed</param>
     /// <param name="character">The character itself</param>
@@ -69,7 +69,7 @@ public sealed class ConsoleEngine
     }
 
     /// <summary>
-    /// Set a text in the console at a specific position
+    /// Sets a text in the console at a specific position
     /// </summary>
     /// <param name="coordinate">The coordinates where the text should start</param>
     /// <param name="text">The text itself</param>
@@ -99,7 +99,7 @@ public sealed class ConsoleEngine
     }
 
     /// <summary>
-    /// Set a text in the console at a specific position
+    /// Sets a text in the console at a specific position
     /// </summary>
     /// <param name="coordinate">The coordinates where the text should start</param>
     /// <param name="text">The text itself</param>
@@ -132,7 +132,7 @@ public sealed class ConsoleEngine
     }
 
     /// <summary>
-    /// Set a pixel in the console at specific positions
+    /// Sets a pixel in the console at specific positions
     /// </summary>
     /// <param name="character">The character itself</param>
     /// <param name="coordinates">The coordinates where the character should be placed</param>
@@ -240,6 +240,17 @@ public sealed class ConsoleEngine
         Background = index;
 
         _console.Buffer.SetBackgroundBuffer(ref glyphBuffer, Background);
+    }
+
+    /// <summary>
+    /// Clears a pixel in the console at a specific position
+    /// </summary>
+    /// <param name="coordinate">The coordinates where the character should be cleared</param>
+    public void ClearAt(Coord coordinate)
+    {
+        ThrowIfOutOfBounds(coordinate);
+
+        SetGlyph(coordinate, new Glyph('\0', Background, Background));
     }
 
     /// <summary>
