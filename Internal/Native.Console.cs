@@ -113,13 +113,18 @@ internal static partial class Native
     public static void WriteToConsoleBuffer(SafeFileHandle handle, CHAR_INFO[] charBuffer, COORD consoleSize, ref SMALL_RECT region)
         => WriteConsoleOutputW(handle, charBuffer, consoleSize, new COORD { X = 0, Y = 0 }, ref region);
 
+    public static int GetScreenWidth()
+        => GetSystemMetrics(0);
+
+    public static int GetScreenHeight()
+        => GetSystemMetrics(1);
+
     public static Coord InitializeConsole(in nint consoleHandle, in nint stdOutput, in int fontWidth, in int fontHeight, ColorPalette colorPalette, string title)
     {
         var consoleRect = new RECT();
         GetWindowRect(consoleHandle, ref consoleRect);
 
-        var desktopWidth = GetSystemMetrics(0);
-        var desktopHeight = GetSystemMetrics(1);
+        var screen = GetScreen();
 
         _ = SetWindowLong(consoleHandle, -16, 0x00080000);
 
@@ -141,8 +146,8 @@ internal static partial class Native
             consoleHandle,
             nint.Zero,
             0, 0,
-            desktopWidth,
-            desktopHeight,
+            screen.X,
+            screen.Y,
             0x0040);
         
         DrawMenuBar(consoleHandle);
@@ -181,4 +186,7 @@ internal static partial class Native
             }
         }
     }
+
+    private static Coord GetScreen()
+        => new(GetScreenWidth(), GetScreenHeight());
 }

@@ -11,6 +11,22 @@ using System.Threading.Tasks;
 /// </summary>
 public abstract partial class ConsoleGame
 {
+    /// <summary>
+    /// The width of the primary screen in pixeln
+    /// </summary>
+    public static int ScreenWidth { get; }
+
+    /// <summary>
+    /// The height of the primary screen in pixeln
+    /// </summary>
+    public static int ScreenHeight { get; }
+
+    static ConsoleGame()
+    {
+        ScreenWidth = Native.GetScreenWidth();
+        ScreenHeight = Native.GetScreenHeight();
+    }
+
     private readonly Thread _game;
     private readonly ConsoleGameConfig _config;
     private readonly CancellationTokenSource _cts;
@@ -142,7 +158,7 @@ public abstract partial class ConsoleGame
     {
         try
         {
-            Task.Delay(-1, _cts.Token).GetAwaiter().GetResult();
+            Task.Delay(-1, _cts.Token).Wait();
         }
         catch (TaskCanceledException) { }
     }

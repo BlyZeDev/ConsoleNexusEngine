@@ -14,11 +14,11 @@ public static class NexusExtensions
     /// <param name="keys">The span to check</param>
     /// <param name="key">The key to check</param>
     /// <returns><see langword="true"/> if the key was found, otherwise <see langword="false"/></returns>
-    public static bool Contains(this in ReadOnlySpan<NexusKey> keys, NexusKey key)
+    public static bool Contains(this in ReadOnlySpan<INexusInput> keys, NexusKey key)
     {
         foreach (var value in keys)
         {
-            if (value == key) return true;
+            if (value.Key == key) return true;
         }
 
         return false;
