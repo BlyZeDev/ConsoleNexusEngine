@@ -8,12 +8,12 @@ public sealed class ConsoleGameConfig
     /// <summary>
     /// The title the console should have
     /// </summary>
-    public required string Title { get; set; }
+    public required string Title { get; init; }
 
     /// <summary>
     /// The font the Console should use
     /// </summary>
-    public required NexusFont Font { get; set; }
+    public required NexusFont Font { get; init; }
 
     /// <summary>
     /// The Framerate the Console game tries to run at
@@ -23,7 +23,7 @@ public sealed class ConsoleGameConfig
     /// <summary>
     /// The Color Palette of the Console
     /// </summary>
-    public required ColorPalette ColorPalette { get; set; }
+    public required ColorPalette ColorPalette { get; init; }
 
     /// <summary>
     /// The key that stops the game if pressed

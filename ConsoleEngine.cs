@@ -4,7 +4,6 @@ using ConsoleNexusEngine.Common;
 using ConsoleNexusEngine.Internal;
 using ConsoleNexusEngine.Internal.Models;
 using System;
-using System.Drawing;
 
 /// <summary>
 /// The core engine of the <see cref="ConsoleGame"/>
@@ -45,6 +44,28 @@ public sealed class ConsoleEngine
         var glyph = glyphBuffer[coordinate.X, coordinate.Y];
 
         return new(glyph.Value, ColorPalette[glyph.ForegroundIndex], ColorPalette[glyph.BackgroundIndex]);
+    }
+
+    /// <summary>
+    /// Gets the whole buffer of the console as 2d array
+    /// </summary>
+    /// <remarks>
+    /// This includes characters that are not rendered yet
+    /// </remarks>
+    /// <returns><see cref="NexusChar"/>[,]</returns>
+    public NexusChar[,] GetBuffer()
+    {
+        var buffer = new NexusChar[Width, Height];
+
+        for (int x = 0; x < Width; x++)
+        {
+            for (int y = 0; y < Height; y++)
+            {
+                buffer[x, y] = NexusChar.FromGlyph(glyphBuffer[x, y], ColorPalette);
+            }
+        }
+
+        return buffer;
     }
 
     /// <summary>
@@ -143,7 +164,6 @@ public sealed class ConsoleEngine
             SetPixel(coordinate, character);
         }
     }
-
 
     /// <summary>
     /// Draws a line from one coordinate to the other

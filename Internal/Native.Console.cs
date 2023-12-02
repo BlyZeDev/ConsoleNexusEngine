@@ -124,8 +124,6 @@ internal static partial class Native
         var consoleRect = new RECT();
         GetWindowRect(consoleHandle, ref consoleRect);
 
-        var screen = GetScreen();
-
         _ = SetWindowLong(consoleHandle, -16, 0x00080000);
 
         var csbe = new CONSOLE_SCREEN_BUFFER_INFO_EX();
@@ -146,8 +144,8 @@ internal static partial class Native
             consoleHandle,
             nint.Zero,
             0, 0,
-            screen.X,
-            screen.Y,
+            GetScreenWidth(),
+            GetScreenHeight(),
             0x0040);
         
         DrawMenuBar(consoleHandle);
@@ -186,7 +184,4 @@ internal static partial class Native
             }
         }
     }
-
-    private static Coord GetScreen()
-        => new(GetScreenWidth(), GetScreenHeight());
 }

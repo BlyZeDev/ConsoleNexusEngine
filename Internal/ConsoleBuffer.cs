@@ -10,8 +10,7 @@ internal sealed class ConsoleBuffer
     private readonly int _width;
     private readonly int _height;
     private readonly SafeFileHandle _file;
-
-    private CHAR_INFO[] charInfoBuffer;
+    private readonly CHAR_INFO[] charInfoBuffer;
 
     public ConsoleBuffer(in int width, in int height)
     {

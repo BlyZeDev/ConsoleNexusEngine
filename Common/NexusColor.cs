@@ -44,7 +44,17 @@ public readonly partial record struct NexusColor : ISpanParsable<NexusColor>, IP
     /// </summary>
     /// <returns><see cref="double"/> between 0.0 and 1.0</returns>
     public double GetLuminance()
-        => 0.299 * R + 0.587 * G + 0.114 * B;
+        => (0.2126 * R + 0.7152 * G + 0.0722 * B) / 255.0;
+
+    /// <summary>
+    /// Converts this color to grayscale
+    /// </summary>
+    /// <returns><see cref="NexusColor"/></returns>
+    public NexusColor ToGrayscale()
+    {
+        var gray = (byte)Math.Clamp(R * 0.3 + G * 0.59 + B * 0.11, byte.MinValue, byte.MaxValue);
+        return new(gray, gray, gray);
+    }
 
     /// <summary>
     /// Format: "[R={<see cref="R"/>},G={<see cref="G"/>},B={<see cref="B"/>}]"
