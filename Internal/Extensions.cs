@@ -1,10 +1,6 @@
 ﻿namespace ConsoleNexusEngine.Internal;
 
-using ConsoleNexusEngine.Common;
-using NAudio.Wave;
-using System;
 using System.Collections;
-using System.Collections.Generic;
 
 internal static class Extensions
 {
@@ -18,22 +14,21 @@ internal static class Extensions
         return -1;
     }
 
-    public static bool TryGetKey(this IDictionary<NexusSound, WaveOutEvent> dictionary, WaveOutEvent? player, out NexusSound sound)
+    public static bool TryGetKey<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TValue? value, out TKey key) where TValue : notnull
     {
-        sound = default!;
-
-        if (player is not null)
+        if (value is not null)
         {
             foreach (var pair in dictionary)
             {
-                if (pair.Value == player)
+                if (pair.Value.Equals(value))
                 {
-                    sound = pair.Key;
+                    key = pair.Key;
                     return true;
                 }
             }
-        }        
+        }
 
+        key = default!;
         return false;
     }
 

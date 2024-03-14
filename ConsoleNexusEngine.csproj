@@ -8,7 +8,7 @@
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
     <Authors>BlyZe</Authors>
-    <Version>2.4.0</Version>
+    <Version>3.0.0</Version>
     <Title>$(AssemblyName)</Title>
     <Description>A powerful and easy to use engine to create console games</Description>
     <PackageProjectUrl>https://github.com/BlyZeYT/ConsoleNexus-Engine</PackageProjectUrl>
@@ -16,18 +16,29 @@
     <RepositoryUrl>https://github.com/BlyZeYT/ConsoleNexus-Engine</RepositoryUrl>
     <PackageTags>engine, console engine, blyze, console nexus, console nexus engine, nexus engine, console, console game</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageReleaseNotes>Added Screen Info to ConsoleGame class</PackageReleaseNotes>
+    <PackageReleaseNotes>Upgrade to .net8</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
     <Content Include="Icon.ico" />
   </ItemGroup>
 
+	<ItemGroup>
+		<Using Include="ConsoleNexusEngine.Internal" />
+		<Using Include="ConsoleNexusEngine.IO" />
+		<Using Include="ConsoleNexusEngine.Internal.WIN" />
+		<Using Include="ConsoleNexusEngine.Graphics" />
+		<Using Include="ConsoleNexusEngine.Sound" />
+		<Using Include="System" />
+		<Using Include="System.Collections.Generic" />
+	</ItemGroup>
+	
   <ItemGroup>
+    <PackageReference Include="BlyZe.BackgroundTimer" Version="4.0.2" />
     <PackageReference Include="CommunityToolkit.HighPerformance" Version="8.2.2" />
     <PackageReference Include="Figgle" Version="0.5.1" />
     <PackageReference Include="NAudio" Version="2.2.1" />
-    <PackageReference Include="System.Drawing.Common" Version="8.0.0" />
+    <PackageReference Include="System.Drawing.Common" Version="8.0.2" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,20 +1,16 @@
 ﻿namespace ConsoleNexusEngine.Internal;
 
-using ConsoleNexusEngine.Common;
 using NAudio.Wave;
-using System;
 
 internal sealed class LoopStream : WaveStream
 {
     private readonly AudioFileReader _sourceStream;
-    private readonly NexusSound _sound;
+    private readonly bool _isLooped;
 
-    public LoopStream(AudioFileReader sourceStream, NexusSound sound)
+    public LoopStream(AudioFileReader sourceStream, in bool isLooped)
     {
         _sourceStream = sourceStream;
-        _sound = sound;
-
-        _sound.OnVolumeChanged += OnVolumeChanged;
+        _isLooped = isLooped;
     }
 
     public override WaveFormat WaveFormat => _sourceStream.WaveFormat;
@@ -43,7 +39,7 @@ internal sealed class LoopStream : WaveStream
 
             if (bytesRead == 0)
             {
-                if (_sourceStream.Position == 0 || !_sound.IsLooped) break;
+                if (_sourceStream.Position == 0 || !_isLooped) break;
 
                 _sourceStream.Position = 0;
             }
@@ -53,6 +49,4 @@ internal sealed class LoopStream : WaveStream
 
         return totalBytesRead;
     }
-
-    private void OnVolumeChanged(object? sender, EventArgs e) => Volume = _sound.Volume._value;
 }

@@ -1,8 +1,8 @@
 ﻿namespace ConsoleNexusEngine.Internal;
 
-using ConsoleNexusEngine.Common;
-using ConsoleNexusEngine.Internal.Models;
+using ConsoleNexusEngine;
 using Microsoft.Win32.SafeHandles;
+using System.IO;
 using System.Runtime.InteropServices;
 
 internal sealed class ConsoleBuffer
@@ -17,10 +17,10 @@ internal sealed class ConsoleBuffer
         _width = width;
         _height = height;
 
-        _file = Native.CreateConOutFile();
+        _file = Native.CreateFile("CONOUT$", 0x40000000, 2, nint.Zero, FileMode.Open, 0, nint.Zero);
 
         if (_file.IsInvalid)
-            throw new ExternalException("The SafeFileHandle for the Console Buffer was invalid");
+            throw new ExternalException("The SafeFileHandle for the Console Buffer is invalid");
         
         charInfoBuffer = new CHAR_INFO[_width * _height];
     }
@@ -78,6 +78,19 @@ internal sealed class ConsoleBuffer
             Bottom = (short)_height
         };
 
-        Native.WriteToConsoleBuffer(_file, charInfoBuffer, new COORD { X = (short)_width, Y = (short)_height }, ref rect);
+        Native.WriteConsoleOutputW(
+            _file,
+            charInfoBuffer,
+            new COORD
+            {
+                X = (short)_width,
+                Y = (short)_height
+            },
+            new COORD
+            {
+                X = 0,
+                Y = 0
+            },
+            ref rect);
     }
 }

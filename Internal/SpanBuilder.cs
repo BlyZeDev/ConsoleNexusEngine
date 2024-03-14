@@ -1,8 +1,6 @@
 ﻿namespace ConsoleNexusEngine.Internal;
 
-using System;
 using System.Buffers;
-using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
 internal ref struct SpanBuilder<T>
@@ -11,11 +9,11 @@ internal ref struct SpanBuilder<T>
     private Span<T> _values;
     private int _pos;
 
-    public SpanBuilder() : this(Span<T>.Empty) { }
+    public SpanBuilder() : this([]) { }
 
     public SpanBuilder(Span<T> initialBuffer)
     {
-        _arrayToReturnToPool = Array.Empty<T>();
+        _arrayToReturnToPool = [];
         _values = initialBuffer;
         _pos = 0;
     }
@@ -25,8 +23,8 @@ internal ref struct SpanBuilder<T>
         readonly get => _pos;
         set
         {
-            if (value < 0) throw new ArgumentOutOfRangeException(nameof(value), $"{nameof(Length)} can not be smaller than 0");
-            if (value > _values.Length) throw new ArgumentOutOfRangeException(nameof(value), $"{nameof(Length)} can not be greater than {nameof(Capacity)}");
+            ArgumentOutOfRangeException.ThrowIfLessThan(value, 0);
+            ArgumentOutOfRangeException.ThrowIfGreaterThan(value, _values.Length);
             _pos = value;
         }
     }
@@ -36,40 +34,40 @@ internal ref struct SpanBuilder<T>
     public ref T this[int index] => ref _values[index];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Append(T c)
+    public void Append(T value)
     {
-        int pos = _pos;
-        if ((uint)pos < (uint)_values.Length)
+        if (_pos < _values.Length)
         {
-            _values[pos] = c;
-            _pos = pos + 1;
+            _values[_pos] = value;
+            _pos++;
+            return;
         }
-        else GrowAndAppend(c);
+        
+        GrowAndAppend(value);
     }
 
     public void Append(ReadOnlySpan<T> value)
     {
-        int pos = _pos;
-        if (pos > _values.Length - value.Length) Grow(value.Length);
+        if (_pos > _values.Length - value.Length) Grow(value.Length);
 
         value.CopyTo(_values[_pos..]);
         _pos += value.Length;
     }
 
     [MethodImpl(MethodImplOptions.NoInlining)]
-    private void GrowAndAppend(T c)
+    private void GrowAndAppend(T value)
     {
         Grow(1);
-        Append(c);
+        Append(value);
     }
 
     [MethodImpl(MethodImplOptions.NoInlining)]
-    private void Grow(int additionalCapacityBeyondPos)
+    private void Grow(int additionalCapacity)
     {
-        Debug.Assert(additionalCapacityBeyondPos > 0);
-        Debug.Assert(_pos > _values.Length - additionalCapacityBeyondPos, "Grow called incorrectly, no resize is needed.");
+        if (additionalCapacity < 1) return;
+        if (_pos <= _values.Length - additionalCapacity) return;
 
-        T[] poolArray = ArrayPool<T>.Shared.Rent(Math.Max(_pos + additionalCapacityBeyondPos, _values.Length * 2));
+        T[] poolArray = ArrayPool<T>.Shared.Rent(Math.Max(_pos + additionalCapacity, _values.Length * 2));
 
         _values[.._pos].CopyTo(poolArray);
 
