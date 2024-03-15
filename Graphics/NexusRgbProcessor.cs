@@ -3,7 +3,7 @@
 /// <summary>
 /// Uses the RGB color space for image processing
 /// </summary>
-public sealed class NexusRgbProcessor : NexusImageProcessor //Fix RGB processing
+public sealed class NexusRgbProcessor : NexusImageProcessor
 {
     /// <inheritdoc/>
     public NexusRgbProcessor(ColorPalette colorPalette) : base(colorPalette) { }

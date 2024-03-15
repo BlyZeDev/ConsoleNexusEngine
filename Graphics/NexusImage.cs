@@ -27,8 +27,38 @@ public readonly struct NexusImage
     /// </summary>
     /// <param name="filepath">The path to the image file</param>
     /// <param name="imageProcessor">The image processor that should be used</param>
+    public NexusImage(string filepath, NexusImageProcessor imageProcessor) : this((Bitmap)Image.FromFile(filepath), imageProcessor) { }
+
+    /// <summary>
+    /// Initializes a new NexusImage
+    /// </summary>
+    /// <param name="image">The bitmap</param>
+    /// <param name="imageProcessor">The image processor that should be used</param>
+    public NexusImage(Bitmap image, NexusImageProcessor imageProcessor) : this(image, imageProcessor, Size.Empty) { }
+
+    /// <summary>
+    /// Initializes a new NexusImage
+    /// </summary>
+    /// <param name="filepath">The path to the image file</param>
+    /// <param name="imageProcessor">The image processor that should be used</param>
+    /// <param name="percentage">The desired percentage size of the bitmap</param>
+    public NexusImage(string filepath, NexusImageProcessor imageProcessor, float percentage) : this((Bitmap)Image.FromFile(filepath), imageProcessor, percentage) { }
+
+    /// <summary>
+    /// Initializes a new NexusImage
+    /// </summary>
+    /// <param name="image">The bitmap</param>
+    /// <param name="imageProcessor">The image processor that should be used</param>
+    /// <param name="percentage">The desired percentage size of the bitmap</param>
+    public NexusImage(Bitmap image, NexusImageProcessor imageProcessor, float percentage) : this(image, imageProcessor, GetSize(image.Width, image.Height, percentage)) { }
+
+    /// <summary>
+    /// Initializes a new NexusImage
+    /// </summary>
+    /// <param name="filepath">The path to the image file</param>
+    /// <param name="imageProcessor">The image processor that should be used</param>
     /// <param name="size">The desired size of the bitmap</param>
-    public NexusImage(string filepath, NexusImageProcessor imageProcessor, Size? size = null) : this((Bitmap)Image.FromFile(filepath), imageProcessor, size) { }
+    public NexusImage(string filepath, NexusImageProcessor imageProcessor, Size size) : this((Bitmap)Image.FromFile(filepath), imageProcessor, size) { }
 
     /// <summary>
     /// Initializes a new NexusImage
@@ -36,32 +66,22 @@ public readonly struct NexusImage
     /// <param name="image">The bitmap</param>
     /// <param name="imageProcessor">The image processor that should be used</param>
     /// <param name="size">The desired size of the bitmap</param>
-    public NexusImage(Bitmap image, NexusImageProcessor imageProcessor, Size? size = null) => _pixels = InitializePixels(image, imageProcessor, size ?? Size.Empty);
+    public NexusImage(Bitmap image, NexusImageProcessor imageProcessor, Size size) => _pixels = InitializePixels(image, imageProcessor, size);
 
     private static NexusChar[,] InitializePixels(Bitmap bitmap, NexusImageProcessor processor, Size size)
     {
-        var temp = bitmap;
+        var resized = Resize(bitmap, size);
 
-        if (!size.IsEmpty)
-        {
-            temp = new Bitmap(size.Width, size.Height);
+        var pixels = new NexusChar[resized.Width, resized.Height];
 
-            using (var graphics = Graphics.FromImage(temp))
-            {
-                graphics.DrawImage(bitmap, 0, 0, size.Width, size.Height);
-            }
-        }
-
-        var pixels = new NexusChar[temp.Width, temp.Height];
-
-        var data = temp.LockBits(
-            new Rectangle(0, 0, temp.Width, temp.Height),
+        var data = resized.LockBits(
+            new Rectangle(0, 0, resized.Width, resized.Height),
             ImageLockMode.ReadOnly,
             PixelFormat.Format32bppArgb);
         
         unsafe
         {
-            var pixelSize = Image.GetPixelFormatSize(temp.PixelFormat) / 8;
+            var pixelSize = Image.GetPixelFormatSize(resized.PixelFormat) / 8;
             var scan0 = (byte*)data.Scan0;
 
             byte* row;
@@ -82,8 +102,27 @@ public readonly struct NexusImage
             }
         }
 
-        temp.UnlockBits(data);
+        resized.UnlockBits(data);
 
         return pixels;
     }
+
+    private static Bitmap Resize(Bitmap bitmap, Size size)
+    {
+        if (size.IsEmpty) return bitmap;
+
+        var resized = new Bitmap(size.Width, size.Height);
+
+        using (var graphics = Graphics.FromImage(resized))
+        {
+            graphics.DrawImage(bitmap, 0, 0, size.Width, size.Height);
+        }
+
+        return resized;
+    }
+
+    private static Size GetSize(in int width, in int height, in float percentage)
+        => percentage <= 0
+        ? new Size(width, height)
+        : new Size((int)(width * percentage), (int)(height * percentage));
 }
