@@ -170,7 +170,7 @@ public abstract class ConsoleGame : IDisposable
 
         _fpsTimer.Stop();
 
-        Unload();
+        CleanUp();
 
         _game.Join();
     }
@@ -206,7 +206,7 @@ public abstract class ConsoleGame : IDisposable
     /// Called once after stopping the game.<br/>
     /// Clean up used files or stop music here.
     /// </summary>
-    protected abstract void Unload();
+    protected abstract void CleanUp();
 
     private void GameLoopCapped()
     {

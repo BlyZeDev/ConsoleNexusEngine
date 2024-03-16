@@ -4,7 +4,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 
 /// <summary>
-/// Represents an image that can be rendered as ascii art
+/// Represents an image that can be rendered in the console
 /// </summary>
 public readonly struct NexusImage
 {

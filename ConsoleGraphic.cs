@@ -285,7 +285,7 @@ public sealed class ConsoleGraphic
 
         if (index is -1)
             throw new ArgumentException("The color is not in the color palette", nameof(color));
-
+        
         BackgroundIndex = index;
 
         _console.Buffer.SetBackgroundBuffer(ref glyphBuffer, BackgroundIndex);

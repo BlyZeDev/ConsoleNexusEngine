@@ -1,8 +1,10 @@
 ﻿namespace ConsoleNexusEngine.Graphics;
 
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.Linq;
 
-public sealed partial record ColorPalette
+public sealed partial class ColorPalette
 {
     /// <summary>
     /// The default windows console color palette<br/>
@@ -237,5 +239,63 @@ public sealed partial record ColorPalette
             new NexusColor(0x50459B),
             new NexusColor(0xA057A3)
         ]);
+    }
+
+    /// <summary>
+    /// Creates a color palette with the 16 most used colors in the image
+    /// </summary>
+    /// <param name="filepath">The filepath of the image</param>
+    /// <returns><see cref="ColorPalette"/></returns>
+    public static ColorPalette FromImage(string filepath) => FromImage((Bitmap)Image.FromFile(filepath));
+
+    /// <summary>
+    /// Creates a color palette with the 16 most used colors in the image
+    /// </summary>
+    /// <param name="bitmap">The image</param>
+    /// <returns><see cref="ColorPalette"/></returns>
+    public static ColorPalette FromImage(Bitmap bitmap)
+    {
+        var data = bitmap.LockBits(
+            new Rectangle(0, 0, bitmap.Width, bitmap.Height),
+            ImageLockMode.ReadOnly,
+            PixelFormat.Format32bppArgb);
+
+        var mostUsedColors = new Dictionary<NexusColor, int>();
+        unsafe
+        {
+            var pixelSize = Image.GetPixelFormatSize(bitmap.PixelFormat) / 8;
+            var scan0 = (byte*)data.Scan0;
+
+            byte* row;
+            byte* pixel;
+            NexusColor color;
+
+            for (int y = 0; y < data.Height; y++)
+            {
+                row = scan0 + y * data.Stride;
+
+                for (int x = 0; x < data.Width; x++)
+                {
+                    pixel = row + x * pixelSize;
+
+                    if (pixel[3] < 128) continue;
+
+                    color = new NexusColor(pixel[2], pixel[1], pixel[0]);
+
+                    if (!mostUsedColors.TryAdd(color, 0)) mostUsedColors[color]++;
+                }
+            }
+        }
+
+        bitmap.UnlockBits(data);
+
+        var builder = new SpanBuilder<NexusColor>();
+
+        foreach (var color in mostUsedColors.Keys.Take(16))
+        {
+            builder.Append(color);
+        }
+
+        return new(builder.AsReadOnlySpan());
     }
 }

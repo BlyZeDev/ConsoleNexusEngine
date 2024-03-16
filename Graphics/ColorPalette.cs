@@ -1,9 +1,11 @@
 ﻿namespace ConsoleNexusEngine.Graphics;
 
+using System.Collections;
+
 /// <summary>
 /// Represents a color palette for the console
 /// </summary>
-public sealed partial record ColorPalette
+public sealed partial class ColorPalette : IEnumerable<NexusColor>, IEnumerable
 {
     private readonly Dictionary<ConsoleColor, NexusColor> _colors;
 
@@ -153,6 +155,11 @@ public sealed partial record ColorPalette
     /// <param name="index">The index of the color [0-15]</param>
     /// <returns><see cref="NexusColor"/></returns>
     public NexusColor this[int index] => Colors[(ConsoleColor)index];
+
+    /// <inheritdoc/>
+    public IEnumerator<NexusColor> GetEnumerator() => Colors.Values.GetEnumerator();
+
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     internal int GetIndex(NexusColor color)
         => Colors.GetKey(color);

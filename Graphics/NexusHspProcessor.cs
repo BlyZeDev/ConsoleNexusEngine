@@ -18,7 +18,7 @@ public sealed class NexusHspProcessor : NexusImageProcessor
     {
         var builder = new SpanBuilder<HSP>();
 
-        foreach (var color in _colorPalette.Colors.Values)
+        foreach (var color in _colorPalette)
         {
             builder.Append(RgbToHsp(color));
         }
