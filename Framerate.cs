@@ -43,10 +43,10 @@ public readonly record struct Framerate
     }
 
     /// <summary>
-    /// Implicitly converts <see cref="Framerate"/> to <see cref="int"/>
+    /// Explicitly converts <see cref="Framerate"/> to <see cref="int"/>
     /// </summary>
     /// <param name="framerate">Framerate to convert</param>
-    public static implicit operator int(Framerate framerate) => framerate.Value;
+    public static explicit operator int(Framerate framerate) => framerate.Value;
 
     /// <summary>
     /// Implicitly converts <see cref="int"/> to <see cref="Framerate"/>

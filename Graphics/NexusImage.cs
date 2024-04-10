@@ -27,14 +27,16 @@ public readonly struct NexusImage
     /// </summary>
     /// <param name="filepath">The path to the image file</param>
     /// <param name="imageProcessor">The image processor that should be used</param>
-    public NexusImage(string filepath, NexusImageProcessor imageProcessor) : this((Bitmap)Image.FromFile(filepath), imageProcessor) { }
+    public NexusImage(string filepath, NexusImageProcessor imageProcessor)
+        : this((Bitmap)Image.FromFile(filepath), imageProcessor) { }
 
     /// <summary>
     /// Initializes a new NexusImage
     /// </summary>
-    /// <param name="image">The bitmap</param>
+    /// <param name="bitmap">The bitmap</param>
     /// <param name="imageProcessor">The image processor that should be used</param>
-    public NexusImage(Bitmap image, NexusImageProcessor imageProcessor) : this(image, imageProcessor, Size.Empty) { }
+    public NexusImage(Bitmap bitmap, NexusImageProcessor imageProcessor)
+        : this(bitmap, imageProcessor, Size.Empty) { }
 
     /// <summary>
     /// Initializes a new NexusImage
@@ -42,15 +44,17 @@ public readonly struct NexusImage
     /// <param name="filepath">The path to the image file</param>
     /// <param name="imageProcessor">The image processor that should be used</param>
     /// <param name="percentage">The desired percentage size of the bitmap</param>
-    public NexusImage(string filepath, NexusImageProcessor imageProcessor, float percentage) : this((Bitmap)Image.FromFile(filepath), imageProcessor, percentage) { }
+    public NexusImage(string filepath, NexusImageProcessor imageProcessor, float percentage)
+        : this((Bitmap)Image.FromFile(filepath), imageProcessor, percentage) { }
 
     /// <summary>
     /// Initializes a new NexusImage
     /// </summary>
-    /// <param name="image">The bitmap</param>
+    /// <param name="bitmap">The bitmap</param>
     /// <param name="imageProcessor">The image processor that should be used</param>
     /// <param name="percentage">The desired percentage size of the bitmap</param>
-    public NexusImage(Bitmap image, NexusImageProcessor imageProcessor, float percentage) : this(image, imageProcessor, GetSize(image.Width, image.Height, percentage)) { }
+    public NexusImage(Bitmap bitmap, NexusImageProcessor imageProcessor, float percentage)
+        : this(bitmap, imageProcessor, GetSize(bitmap.Width, bitmap.Height, percentage)) { }
 
     /// <summary>
     /// Initializes a new NexusImage
@@ -58,15 +62,17 @@ public readonly struct NexusImage
     /// <param name="filepath">The path to the image file</param>
     /// <param name="imageProcessor">The image processor that should be used</param>
     /// <param name="size">The desired size of the bitmap</param>
-    public NexusImage(string filepath, NexusImageProcessor imageProcessor, Size size) : this((Bitmap)Image.FromFile(filepath), imageProcessor, size) { }
+    public NexusImage(string filepath, NexusImageProcessor imageProcessor, Size size)
+        : this((Bitmap)Image.FromFile(filepath), imageProcessor, size) { }
 
     /// <summary>
     /// Initializes a new NexusImage
     /// </summary>
-    /// <param name="image">The bitmap</param>
+    /// <param name="bitmap">The bitmap</param>
     /// <param name="imageProcessor">The image processor that should be used</param>
     /// <param name="size">The desired size of the bitmap</param>
-    public NexusImage(Bitmap image, NexusImageProcessor imageProcessor, Size size) => _pixels = InitializePixels(image, imageProcessor, size);
+    public NexusImage(Bitmap bitmap, NexusImageProcessor imageProcessor, Size size)
+        => _pixels = InitializePixels(bitmap, imageProcessor, size);
 
     private static NexusChar[,] InitializePixels(Bitmap bitmap, NexusImageProcessor processor, Size size)
     {

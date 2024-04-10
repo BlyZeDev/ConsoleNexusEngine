@@ -11,26 +11,30 @@ public sealed class ConsoleGameUtil
 
     static ConsoleGameUtil() => _specialChars = Enum.GetValues<NexusSpecialChar>();
 
-    private readonly ColorPalette _colorPalette;
+    private readonly ConsoleGameSettings _settings;
 
-    internal ConsoleGameUtil(ColorPalette colorPalette) => _colorPalette = colorPalette;
+    internal ConsoleGameUtil(ConsoleGameSettings settings) => _settings = settings;
 
     /// <summary>
     /// Generate a pseudo or strong random color
     /// </summary>
-    /// <param name="onlyColorPalette"><see langword="true"/> if only colors from the <see cref="ColorPalette"/> should be included</param>
+    /// <param name="onlyColorPalette"><see langword="true"/> if only colors from the current <see cref="ColorPalette"/> should be included</param>
     /// <param name="pseudoRandom"><see langword="false"/> if it should be generated as a strong random</param>
     /// <returns><see cref="NexusColor"/></returns>
     public NexusColor GetRandomColor(bool onlyColorPalette, bool pseudoRandom = true)
     {
-        if (onlyColorPalette) return _colorPalette[pseudoRandom ? Random.Shared.Next(0, 16) : RandomNumberGenerator.GetInt32(0, 16)];
+        if (onlyColorPalette) return _settings.ColorPalette[GetRandomNumber(16, pseudoRandom)];
 
         Span<byte> rgb = stackalloc byte[3];
 
         if (pseudoRandom) Random.Shared.NextBytes(rgb);
         else
+        {
             using (var rng = RandomNumberGenerator.Create())
+            {
                 rng.GetNonZeroBytes(rgb);
+            }
+        }
 
         return new NexusColor(rgb[0], rgb[1], rgb[2]);
     }
@@ -48,21 +52,21 @@ public sealed class ConsoleGameUtil
     /// <summary>
     /// Generate a pseudo or strong random number
     /// </summary>
+    /// <param name="maxValue">Exclusive upper bounds</param>
+    /// <param name="pseudoRandom"><see langword="false"/> if it should be generated as a strong random</param>
+    /// <returns><see cref="int"/></returns>
+    public int GetRandomNumber(int maxValue, bool pseudoRandom = true)
+        => GetRandomNumber(0, maxValue, pseudoRandom);
+
+    /// <summary>
+    /// Generate a pseudo or strong random number
+    /// </summary>
     /// <param name="minValue">Inclusive lower bound</param>
     /// <param name="maxValue">Exclusive upper bounds</param>
     /// <param name="pseudoRandom"><see langword="false"/> if it should be generated as a strong random</param>
     /// <returns><see cref="int"/></returns>
     public int GetRandomNumber(int minValue, int maxValue, bool pseudoRandom = true)
         => pseudoRandom ? Random.Shared.Next(minValue, maxValue) : RandomNumberGenerator.GetInt32(minValue, maxValue);
-
-    /// <summary>
-    /// Generate a pseudo or strong random number
-    /// </summary>
-    /// <param name="maxValue">Exclusive upper bounds</param>
-    /// <param name="pseudoRandom"><see langword="false"/> if it should be generated as a strong random</param>
-    /// <returns><see cref="int"/></returns>
-    public int GetRandomNumber(int maxValue, bool pseudoRandom = true)
-        => GetRandomNumber(0, maxValue, pseudoRandom);
 
     /// <summary>
     /// Generate a pseudo or strong random <see cref="NexusSpecialChar"/>
@@ -99,4 +103,12 @@ public sealed class ConsoleGameUtil
     /// <returns><see cref="char"/></returns>
     public char GetRandomChar(bool pseudoRandom = true)
         => GetRandomChar(char.MinValue, char.MaxValue, pseudoRandom);
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="pseudoRandom"><see langword="false"/> if it should be generated as a strong random</param>
+    /// <returns><see cref="ColorPalette"/></returns>
+    public ColorPalette GetRandomColorPalette(bool pseudoRandom = true)
+        => ColorPalette._presets[GetRandomNumber(ColorPalette._presets.Length, pseudoRandom)];
 }

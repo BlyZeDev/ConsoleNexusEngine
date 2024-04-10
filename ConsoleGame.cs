@@ -2,13 +2,14 @@
 
 using BackgroundTimer;
 using System.Threading;
-using System.Threading.Tasks;
 
 /// <summary>
 /// Provides methods for your Console game
 /// </summary>
 public abstract class ConsoleGame : IDisposable
 {
+    private static bool hasInstance;
+
     /// <summary>
     /// The width of the primary screen in pixeln
     /// </summary>
@@ -23,6 +24,8 @@ public abstract class ConsoleGame : IDisposable
     {
         ScreenWidth = Native.GetSystemMetrics(0);
         ScreenHeight = Native.GetSystemMetrics(1);
+
+        hasInstance = false;
     }
 
     private readonly Thread _game;
@@ -30,13 +33,12 @@ public abstract class ConsoleGame : IDisposable
     private readonly BackgroundTimer _fpsTimer;
 
     private bool shouldStop;
-    private float deltaTime;
     private int lastTotalFrameCount;
 
     /// <summary>
-    /// The configuration of the game
+    /// The settings of the game
     /// </summary>
-    protected ConsoleGameConfig Config { get; }
+    protected ConsoleGameSettings Settings { get; }
 
     /// <summary>
     /// Renders all graphics
@@ -74,64 +76,49 @@ public abstract class ConsoleGame : IDisposable
     public DateTime StartTime { get; private set; }
 
     /// <summary>
-    /// Set the speed the frames should be rendered
-    /// </summary>
-    /// <remarks><see cref="DeltaTime"/> is ignored when <see cref="ConsoleGameConfig.TargetFramerate"/> is <see cref="Framerate.Unlimited"/></remarks>
-    public float DeltaTime
-    {
-        get => deltaTime;
-        protected set => deltaTime = Math.Clamp(value, 0, 100);
-    }
-
-    /// <summary>
-    /// If <see langword="false"/> all inputs are ignored
-    /// </summary>
-    public bool IsInputAllowed { get; protected set; }
-
-    /// <summary>
     /// The width of the console in characters
     /// </summary>
-    public int Width => _console.Width;
+    public int BufferWidth => _console.Buffer.Width;
 
     /// <summary>
     /// The height of the console in characters
     /// </summary>
-    public int Height => _console.Height;
+    public int BufferHeight => _console.Buffer.Height;
 
     /// <summary>
     /// The background color of the whole console
     /// </summary>
-    public NexusColor Background => Config.ColorPalette[Graphic.BackgroundIndex];
+    public NexusColor Background => Settings.ColorPalette[Graphic.BackgroundIndex];
 
     /// <summary>
     /// Initializes the <see cref="ConsoleGame"/>
     /// </summary>
-    /// <param name="config">The configuration for the console game</param>
-    protected ConsoleGame(ConsoleGameConfig config)
+    protected ConsoleGame()
     {
+        if (hasInstance) throw new NexusEngineException("There is already a Console Game instance running.\nPlease dispose it before running a new Console Game");
+
+        hasInstance = true;
+
         IsRunning = false;
 
-        Config = config;
+        _console = new CmdConsole(ConsoleGameSettings.Default);
 
-        _console = new CmdConsole(Config.Title, Config.ColorPalette, Config.Font);
-
-        _game = new Thread(Config.TargetFramerate.IsUnlimited ? GameLoopUnlimited : GameLoopCapped)
-        {
-            Priority = Config.Priority
-        };
+        _game = new Thread(GameLoop);
 
         _fpsTimer = new BackgroundTimer();
 
-        Graphic = new(_console);
+        Settings = ConsoleGameSettings.Default;
+        Graphic = new(_console, Settings);
         Controller = new(_console);
-        Utility = new(Config.ColorPalette);
+        Utility = new(Settings);
 
-        DeltaTime = 1f;
-        IsInputAllowed = true;
+        _game.Priority = Settings.Priority;
+
+        Settings.Changed += OnSettingsChange;
     }
 
     /// <summary>
-    /// Starts the game
+    /// Starts the game and pauses the current thread while the game is running until the <see cref="ConsoleGameSettings.StopGameKey"/> is pressed
     /// </summary>
     public void Start()
     {
@@ -149,13 +136,7 @@ public abstract class ConsoleGame : IDisposable
             lastTotalFrameCount = TotalFrameCount;
             FixedUpdate();
         });
-    }
 
-    /// <summary>
-    /// Pauses the current thread while the game is running until the <see cref="ConsoleGameConfig.StopGameKey"/> is pressed
-    /// </summary>
-    public void WaitForStop()
-    {
         SpinWait.SpinUntil(() => shouldStop);
     }
 
@@ -183,6 +164,8 @@ public abstract class ConsoleGame : IDisposable
         _fpsTimer.Dispose();
 
         GC.SuppressFinalize(this);
+
+        hasInstance = false;
     }
 
     /// <summary>
@@ -208,11 +191,17 @@ public abstract class ConsoleGame : IDisposable
     /// </summary>
     protected abstract void CleanUp();
 
+    private void GameLoop()
+    {
+        while (IsRunning)
+        {
+            GameLoopUnlimited();
+            GameLoopCapped();
+        }
+    }
+
     private void GameLoopCapped()
     {
-        var targetFrameTime = 1d / Config.TargetFramerate;
-        var stopKey = Config.StopGameKey;
-
         var currentTime = GetHighResolutionTimestamp();
         var accumulator = 0d;
 
@@ -220,10 +209,12 @@ public abstract class ConsoleGame : IDisposable
         double frameTime;
         double sleepTime;
 
-        while (IsRunning)
+        while (!Settings.TargetFramerate.IsUnlimited && IsRunning)
         {
+            var targetFrameTime = 1d / (int)Settings.TargetFramerate;
+
             newTime = GetHighResolutionTimestamp();
-            frameTime = (newTime - currentTime) * DeltaTime;
+            frameTime = newTime - currentTime;
             currentTime = newTime;
 
             accumulator += frameTime;
@@ -232,9 +223,9 @@ public abstract class ConsoleGame : IDisposable
             {
                 unchecked { TotalFrameCount++; }
 
-                if (Controller.IsKeyPressed(stopKey)) shouldStop = true;
+                if (Controller.IsKeyPressed(Settings.StopGameKey)) shouldStop = true;
 
-                Update(IsInputAllowed ? _console.ReadInput() : []);
+                Update(_console.ReadInput(Settings.AllowInputs));
 
                 accumulator -= targetFrameTime;
             }
@@ -247,17 +238,17 @@ public abstract class ConsoleGame : IDisposable
 
     private void GameLoopUnlimited()
     {
-        var stopKey = Config.StopGameKey;
-
-        while (IsRunning)
+        while (Settings.TargetFramerate.IsUnlimited && IsRunning)
         {
             unchecked { TotalFrameCount++; }
 
-            if (Controller.IsKeyPressed(stopKey)) shouldStop = true;
+            if (Controller.IsKeyPressed(Settings.StopGameKey)) shouldStop = true;
 
-            Update(IsInputAllowed ? _console.ReadInput() : []);
+            Update(_console.ReadInput(Settings.AllowInputs));
         }
     }
+
+    private void OnSettingsChange(object? sender, EventArgs e) => _console.UpdateSettings(Settings);
 
     private static double GetHighResolutionTimestamp()
     {

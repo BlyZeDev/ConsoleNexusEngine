@@ -5,7 +5,7 @@ using System.Collections;
 /// <summary>
 /// Represents a color palette for the console
 /// </summary>
-public sealed partial class ColorPalette : IEnumerable<NexusColor>, IEnumerable
+public sealed partial class ColorPalette : IEnumerable<NexusColor>, IEnumerable, IEquatable<ColorPalette>
 {
     private readonly Dictionary<ConsoleColor, NexusColor> _colors;
 
@@ -158,6 +158,31 @@ public sealed partial class ColorPalette : IEnumerable<NexusColor>, IEnumerable
 
     /// <inheritdoc/>
     public IEnumerator<NexusColor> GetEnumerator() => Colors.Values.GetEnumerator();
+
+    /// <inheritdoc/>
+    public static bool operator ==(ColorPalette left, ColorPalette right) => left.Equals(right);
+
+    /// <inheritdoc/>
+    public static bool operator !=(ColorPalette left, ColorPalette right) => !(left == right);
+
+    /// <inheritdoc/>
+    public bool Equals(ColorPalette? other)
+    {
+        if (other is null) return false;
+
+        for (int i = 0; i < Colors.Count; i++)
+        {
+            if (this[i] != other[i]) return false;
+        }
+
+        return true;
+    }
+
+    /// <inheritdoc/>
+    public override bool Equals(object? obj) => obj is ColorPalette colorPalette && Equals(colorPalette);
+
+    /// <inheritdoc/>
+    public override int GetHashCode() => HashCode.Combine(Colors);
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 

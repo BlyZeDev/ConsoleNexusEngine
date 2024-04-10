@@ -1,7 +1,6 @@
 ﻿namespace ConsoleNexusEngine.Internal;
 
 using System.Runtime.InteropServices;
-using ConsoleNexusEngine;
 
 internal sealed class CmdConsole
 {
@@ -9,32 +8,25 @@ internal sealed class CmdConsole
     private readonly nint _standardInput;
     private readonly nint _standardOutput;
 
-    public string Title { get; }
-    public ColorPalette ColorPalette { get; }
-    public NexusFont Font { get; }
+    public ConsoleBuffer Buffer { get; private set; } = null!;
 
-    public int Width { get; }
-    public int Height { get; }
-
-    public ConsoleBuffer Buffer { get; }
-
-    public CmdConsole(string title, ColorPalette colorPalette, NexusFont font)
+    public CmdConsole(ConsoleGameSettings settings)
     {
         _handle = Native.GetConsoleWindow();
         _standardInput = Native.GetStdHandle(-10);
         _standardOutput = Native.GetStdHandle(-11);
 
-        Title = title;
-        ColorPalette = colorPalette;
-        Font = font;
-
-        (Width, Height) = InitializeConsole();
-
-        Buffer = new ConsoleBuffer(Width, Height);
+        UpdateSettings(settings);
     }
 
-    public ReadOnlySpan<INexusInput> ReadInput()
+    public ReadOnlySpan<INexusInput> ReadInput(bool isInputAllowed)
     {
+        if (!isInputAllowed)
+        {
+            Native.FlushConsoleInputBuffer(_standardInput);
+            return [];
+        }
+
         Native.GetNumberOfConsoleInputEvents(_standardInput, out var numEventsRead);
 
         if (numEventsRead is 0) return [];
@@ -108,7 +100,7 @@ internal sealed class CmdConsole
         Native.WriteConsoleInput(_standardInput, buffer, (uint)buffer.Length, out _);
     }
 
-    private Coord InitializeConsole()
+    public void UpdateSettings(ConsoleGameSettings settings)
     {
         var cursorInfo = new CONSOLE_CURSOR_INFO
         {
@@ -117,20 +109,9 @@ internal sealed class CmdConsole
         };
         Native.SetConsoleCursorInfo(_standardOutput, ref cursorInfo);
 
-        var fontInfo = new CONSOLE_FONT_INFO_EX();
-        fontInfo.cbSize = (uint)Marshal.SizeOf(fontInfo);
-        fontInfo.nFont = 0;
-
-        fontInfo.dwFontSize.X = (short)Font.Width;
-        fontInfo.dwFontSize.Y = (short)Font.Height;
-        fontInfo.FaceName = Font.Name;
-
-        Native.SetCurrentConsoleFontEx(_standardOutput, false, ref fontInfo);
+        SetFont(settings.Font);
 
         Native.SetConsoleMode(_standardInput, (0x0080 | 0x0010) & ~0x0004 & ~0x0040 & ~0x0008);
-
-        var consoleRect = new RECT();
-        Native.GetWindowRect(_handle, ref consoleRect);
 
         _ = Native.SetWindowLong(_handle, -16, 0x00080000);
 
@@ -139,7 +120,7 @@ internal sealed class CmdConsole
 
         Native.GetConsoleScreenBufferInfoEx(_standardOutput, ref csbe);
 
-        SetColorPalette(ref csbe);
+        SetColorPalette(ref csbe, settings.ColorPalette);
 
         csbe.dwSize.X = 1;
         csbe.dwSize.Y = 1;
@@ -158,16 +139,29 @@ internal sealed class CmdConsole
 
         Native.GetConsoleScreenBufferInfoEx(_standardOutput, ref csbe);
 
-        Native.SetWindowText(_handle, Title);
+        Native.SetWindowText(_handle, settings.Title);
 
         Native.SetForegroundWindow(_handle);
 
-        return new(csbe.dwSize.X, csbe.dwSize.Y);
+        Buffer = new ConsoleBuffer(csbe.dwSize.X, csbe.dwSize.Y);
     }
 
-    private void SetColorPalette(ref CONSOLE_SCREEN_BUFFER_INFO_EX csbe)
+    private void SetFont(NexusFont font)
     {
-        foreach (var color in ColorPalette.Colors)
+        var fontInfo = new CONSOLE_FONT_INFO_EX();
+        fontInfo.cbSize = (uint)Marshal.SizeOf(fontInfo);
+        fontInfo.nFont = 0;
+
+        fontInfo.dwFontSize.X = (short)font.Width;
+        fontInfo.dwFontSize.Y = (short)font.Height;
+        fontInfo.FaceName = font.Name;
+
+        Native.SetCurrentConsoleFontEx(_standardOutput, false, ref fontInfo);
+    }
+
+    private static void SetColorPalette(ref CONSOLE_SCREEN_BUFFER_INFO_EX csbe, ColorPalette colorPalette)
+    {
+        foreach (var color in colorPalette.Colors)
         {
             switch (color.Key)
             {

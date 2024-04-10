@@ -6,16 +6,18 @@
 public sealed class ConsoleGraphic
 {
     private readonly CmdConsole _console;
+    private readonly ConsoleGameSettings _settings;
 
     private Glyph[,] glyphBuffer;
 
     internal int BackgroundIndex { get; private set; }
 
-    internal ConsoleGraphic(CmdConsole console)
+    internal ConsoleGraphic(CmdConsole console, ConsoleGameSettings settings)
     {
         _console = console;
+        _settings = settings;
 
-        glyphBuffer = new Glyph[_console.Width, _console.Height];
+        glyphBuffer = new Glyph[_console.Buffer.Width, _console.Buffer.Height];
 
         BackgroundIndex = 0;
     }
@@ -32,7 +34,7 @@ public sealed class ConsoleGraphic
 
         var glyph = glyphBuffer[coordinate.X, coordinate.Y];
 
-        return new(glyph.Value, _console.ColorPalette[glyph.ForegroundIndex], _console.ColorPalette[glyph.BackgroundIndex]);
+        return new(glyph.Value, _settings.ColorPalette[glyph.ForegroundIndex], _settings.ColorPalette[glyph.BackgroundIndex]);
     }
 
     /// <summary>
@@ -44,13 +46,13 @@ public sealed class ConsoleGraphic
     /// <returns><see cref="NexusChar"/>[,]</returns>
     public NexusChar[,] GetBuffer()
     {
-        var buffer = new NexusChar[_console.Width, _console.Height];
+        var buffer = new NexusChar[_console.Buffer.Width, _console.Buffer.Height];
 
-        for (int x = 0; x < _console.Width; x++)
+        for (int x = 0; x < _console.Buffer.Width; x++)
         {
-            for (int y = 0; y < _console.Height; y++)
+            for (int y = 0; y < _console.Buffer.Height; y++)
             {
-                buffer[x, y] = NexusChar.FromGlyph(glyphBuffer[x, y], _console.ColorPalette);
+                buffer[x, y] = NexusChar.FromGlyph(glyphBuffer[x, y], _settings.ColorPalette);
             }
         }
 
@@ -281,7 +283,7 @@ public sealed class ConsoleGraphic
     /// <exception cref="ArgumentException"></exception>
     public void SetBackground(NexusColor color)
     {
-        var index = _console.ColorPalette.GetIndex(color);
+        var index = _settings.ColorPalette.GetIndex(color);
 
         if (index is -1)
             throw new ArgumentException("The color is not in the color palette", nameof(color));
@@ -308,7 +310,7 @@ public sealed class ConsoleGraphic
     /// <param name="start">The coordinate of the start point</param>
     /// <param name="end">The coordinate of the end point</param>
     public void ClearLine(Coord start, Coord end)
-        => DrawLine(start, end, NexusChar.FromGlyph(GetClearGlyph(), _console.ColorPalette));
+        => DrawLine(start, end, NexusChar.FromGlyph(GetClearGlyph(), _settings.ColorPalette));
 
     /// <summary>
     /// Clears the current buffer of the console
@@ -342,5 +344,5 @@ public sealed class ConsoleGraphic
     private Glyph GetClearGlyph() => new(char.MinValue, BackgroundIndex, BackgroundIndex);
 
     private int GetColorIndex(in NexusColor color)
-        => _console.ColorPalette.Colors.GetKey(color);
+        => _settings.ColorPalette.Colors.GetKey(color);
 }
