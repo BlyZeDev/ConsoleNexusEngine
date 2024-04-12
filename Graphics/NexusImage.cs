@@ -10,7 +10,7 @@ public readonly struct NexusImage
 {
     private const char FullBlock = (char)NexusSpecialChar.FullBlock;
 
-    internal readonly NexusChar[,] _pixels;
+    private readonly NexusChar[,] _pixels;
 
     /// <summary>
     /// The width of the image
@@ -73,6 +73,8 @@ public readonly struct NexusImage
     /// <param name="size">The desired size of the bitmap</param>
     public NexusImage(Bitmap bitmap, NexusImageProcessor imageProcessor, Size size)
         => _pixels = InitializePixels(bitmap, imageProcessor, size);
+
+    internal NexusChar this[int x, int y] => _pixels[x, y];
 
     private static NexusChar[,] InitializePixels(Bitmap bitmap, NexusImageProcessor processor, Size size)
     {

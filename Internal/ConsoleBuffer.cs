@@ -2,7 +2,6 @@
 
 using Microsoft.Win32.SafeHandles;
 using System.IO;
-using System.Runtime.InteropServices;
 
 internal sealed class ConsoleBuffer
 {

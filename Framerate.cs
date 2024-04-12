@@ -30,7 +30,7 @@ public readonly record struct Framerate
     public Framerate() : this(30) { }
 
     /// <summary>
-    /// Initializes a new Framerate. Framerate can't be lower than 0
+    /// Initializes a new Framerate. Framerate can't be lower than -1 (unlimited)
     /// </summary>
     /// <param name="framerate">Frames per second</param>
     /// <exception cref="ArgumentOutOfRangeException"></exception>

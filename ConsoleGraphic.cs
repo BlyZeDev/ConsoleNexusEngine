@@ -155,10 +155,17 @@ public sealed class ConsoleGraphic
         {
             for (int y = 0, yCord = coordinate.Y; y < image.Height; y++, yCord++)
             {
-                SetPixel(new Coord(xCord, yCord), image._pixels[x, y]);
+                SetPixel(new Coord(xCord, yCord), image[x, y]);
             }
         }
     }
+
+    /// <summary>
+    /// Sets the current animation frame in the console at a specific position
+    /// </summary>
+    /// <param name="coordinate">The top left coordinates of the animation</param>
+    /// <param name="animation">The animation itself</param>
+    public void SetAnimation(Coord coordinate, NexusAnimation animation) => SetImage(coordinate, animation.NextFrame());
 
     /// <summary>
     /// Sets a pixel in the console at specific positions
@@ -324,10 +331,7 @@ public sealed class ConsoleGraphic
     /// <summary>
     /// Renders the buffer to the console
     /// </summary>
-    public void Render()
-    {
-        _console.Buffer.RenderBuffer();
-    }
+    public void Render() => _console.Buffer.RenderBuffer();
 
     private void SetGlyph(in Coord coord, in Glyph glyph)
     {
