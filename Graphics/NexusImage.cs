@@ -1,5 +1,6 @@
 ﻿namespace ConsoleNexusEngine.Graphics;
 
+using CommunityToolkit.HighPerformance;
 using System.Drawing;
 using System.Drawing.Imaging;
 
@@ -10,17 +11,17 @@ public readonly struct NexusImage
 {
     private const char FullBlock = (char)NexusSpecialChar.FullBlock;
 
-    private readonly NexusChar[,] _pixels;
+    private readonly ReadOnlyMemory2D<NexusChar> _pixels;
 
     /// <summary>
     /// The width of the image
     /// </summary>
-    public int Width => _pixels.GetLength(0);
+    public int Width => _pixels.Height;
 
     /// <summary>
     /// The height of the image
     /// </summary>
-    public int Height => _pixels.GetLength(1);
+    public int Height => _pixels.Width;
 
     /// <summary>
     /// Initializes a new NexusImage
@@ -54,7 +55,7 @@ public readonly struct NexusImage
     /// <param name="imageProcessor">The image processor that should be used</param>
     /// <param name="percentage">The desired percentage size of the bitmap</param>
     public NexusImage(Bitmap bitmap, NexusImageProcessor imageProcessor, float percentage)
-        : this(bitmap, imageProcessor, GetSize(bitmap.Width, bitmap.Height, percentage)) { }
+        : this(bitmap, imageProcessor, ImageHelper.GetSize(bitmap.Width, bitmap.Height, percentage)) { }
 
     /// <summary>
     /// Initializes a new NexusImage
@@ -74,11 +75,11 @@ public readonly struct NexusImage
     public NexusImage(Bitmap bitmap, NexusImageProcessor imageProcessor, Size size)
         => _pixels = InitializePixels(bitmap, imageProcessor, size);
 
-    internal NexusChar this[int x, int y] => _pixels[x, y];
+    internal NexusChar this[in int x, in int y] => _pixels.Span[x, y];
 
-    private static NexusChar[,] InitializePixels(Bitmap bitmap, NexusImageProcessor processor, Size size)
+    private static ReadOnlyMemory2D<NexusChar> InitializePixels(Bitmap bitmap, NexusImageProcessor processor, Size size)
     {
-        var resized = Resize(bitmap, size);
+        var resized = ImageHelper.Resize(bitmap, size);
 
         var pixels = new NexusChar[resized.Width, resized.Height];
 
@@ -114,23 +115,4 @@ public readonly struct NexusImage
 
         return pixels;
     }
-
-    private static Bitmap Resize(Bitmap bitmap, Size size)
-    {
-        if (size.IsEmpty) return bitmap;
-
-        var resized = new Bitmap(size.Width, size.Height);
-
-        using (var graphics = Graphics.FromImage(resized))
-        {
-            graphics.DrawImage(bitmap, 0, 0, size.Width, size.Height);
-        }
-
-        return resized;
-    }
-
-    private static Size GetSize(in int width, in int height, in float percentage)
-        => percentage <= 0
-        ? new Size(width, height)
-        : new Size((int)(width * percentage), (int)(height * percentage));
 }

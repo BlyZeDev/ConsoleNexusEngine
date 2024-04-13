@@ -5,7 +5,7 @@ using System.Threading;
 /// <summary>
 /// Initial configuration for <see cref="ConsoleGame"/>
 /// </summary>
-public sealed class ConsoleGameSettings
+public sealed record ConsoleGameSettings
 {
     internal static ConsoleGameSettings Default => new();
 
@@ -15,7 +15,7 @@ public sealed class ConsoleGameSettings
     private ColorPalette colorPalette;
     private NexusKey stopGameKey;
     private ThreadPriority priority;
-    private bool isInputAllowed;
+    private bool allowInputs;
 
     /// <summary>
     /// The title the console should have
@@ -26,7 +26,7 @@ public sealed class ConsoleGameSettings
         set
         {
             title = value;
-            OnSettingsChange();
+            Update(nameof(Title));
         }
     }
 
@@ -39,7 +39,7 @@ public sealed class ConsoleGameSettings
         set
         {
             font = value;
-            OnSettingsChange();
+            Update(nameof(Font));
         }
     }
 
@@ -52,7 +52,7 @@ public sealed class ConsoleGameSettings
         set
         {
             targetFramerate = value;
-            OnSettingsChange();
+            Update(nameof(TargetFramerate));
         }
     }
 
@@ -65,7 +65,7 @@ public sealed class ConsoleGameSettings
         set
         {
             colorPalette = value;
-            OnSettingsChange();
+            Update(nameof(ColorPalette));
         }
     }
 
@@ -78,7 +78,7 @@ public sealed class ConsoleGameSettings
         set
         {
             stopGameKey = value;
-            OnSettingsChange();
+            Update(nameof(StopGameKey));
         }
     }
 
@@ -91,7 +91,7 @@ public sealed class ConsoleGameSettings
         set
         {
             priority = value;
-            OnSettingsChange();
+            Update(nameof(Priority));
         }
     }
 
@@ -100,26 +100,26 @@ public sealed class ConsoleGameSettings
     /// </summary>
     public bool AllowInputs
     {
-        get => isInputAllowed;
+        get => allowInputs;
         set
         {
-            isInputAllowed = value;
-            OnSettingsChange();
+            allowInputs = value;
+            Update(nameof(AllowInputs));
         }
     }
 
-    internal event EventHandler? Changed;
+    internal event EventHandler<string>? Updated;
 
     private ConsoleGameSettings()
     {
         title = "ConsoleGame";
         font = NexusFont.Consolas(10, 10);
         targetFramerate = 60;
-        colorPalette = ColorPalette.Windows;
+        colorPalette = ColorPalette.Default;
         stopGameKey = NexusKey.Escape;
         priority = ThreadPriority.Normal;
-        isInputAllowed = true;
+        allowInputs = true;
     }
 
-    internal void OnSettingsChange() => Changed?.Invoke(this, EventArgs.Empty);
+    private void Update(string propertyName) => Updated?.Invoke(this, propertyName);
 }

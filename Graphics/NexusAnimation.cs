@@ -13,6 +13,16 @@ public sealed class NexusAnimation
     private int currentFrameIndex;
 
     /// <summary>
+    /// The width of the animation
+    /// </summary>
+    public int Width => _images.Span[0].Width;
+
+    /// <summary>
+    /// The height of the animation
+    /// </summary>
+    public int Height => _images.Span[0].Height;
+
+    /// <summary>
     /// Initializes a new NexusAnimation
     /// </summary>
     /// <param name="filepath">The path to the gif file</param>
@@ -48,7 +58,7 @@ public sealed class NexusAnimation
         if (animation.RawFormat.Guid != ImageFormat.Gif.Guid)
             throw new ArgumentException("The file has to be a gif file");
 
-        _images = Initialize(animation, imageProcessor, percentage);
+        _images = Initialize(animation, imageProcessor, ImageHelper.GetSize(animation.Width, animation.Height, percentage));
 
         currentFrameIndex = -1;
     }
@@ -119,22 +129,6 @@ public sealed class NexusAnimation
             images[i] = new NexusImage(bitmap, processor, size);
         }
         
-        return new ReadOnlyMemory<NexusImage>(images);
-    }
-
-    private static ReadOnlyMemory<NexusImage> Initialize(Bitmap bitmap, NexusImageProcessor processor, float percentage)
-    {
-        var dimension = new FrameDimension(bitmap.FrameDimensionsList[0]);
-        var frames = bitmap.GetFrameCount(dimension);
-
-        var images = new NexusImage[frames];
-        for (int i = 0; i < frames; i++)
-        {
-            bitmap.SelectActiveFrame(dimension, i);
-
-            images[i] = new NexusImage(bitmap, processor, percentage);
-        }
-
         return new ReadOnlyMemory<NexusImage>(images);
     }
 }

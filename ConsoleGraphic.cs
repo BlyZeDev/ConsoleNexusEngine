@@ -20,6 +20,8 @@ public sealed class ConsoleGraphic
         glyphBuffer = new Glyph[_console.Buffer.Width, _console.Buffer.Height];
 
         BackgroundIndex = 0;
+
+        _console.Buffer.Updated += OnBufferUpdated;
     }
 
     /// <summary>
@@ -312,6 +314,18 @@ public sealed class ConsoleGraphic
     }
 
     /// <summary>
+    /// Clears a specific whole column
+    /// </summary>
+    /// <param name="column">The column to clear</param>
+    public void ClearColumn(int column) => ClearLine(new Coord(column, 0), new Coord(column, _console.Buffer.Height - 1));
+
+    /// <summary>
+    /// Clears a specific whole row
+    /// </summary>
+    /// <param name="row">The row to clear</param>
+    public void ClearRow(int row) => ClearLine(new Coord(0, row), new Coord(_console.Buffer.Width - 1, row));
+
+    /// <summary>
     /// Clears a line from one coordinate to the other
     /// </summary>
     /// <param name="start">The coordinate of the start point</param>
@@ -333,6 +347,12 @@ public sealed class ConsoleGraphic
     /// </summary>
     public void Render() => _console.Buffer.RenderBuffer();
 
+    private void OnBufferUpdated(object? sender, EventArgs e)
+    {
+        Resize(ref glyphBuffer, _console.Buffer.Width, _console.Buffer.Height);
+        SetBackground(_settings.ColorPalette[BackgroundIndex]);
+    }
+
     private void SetGlyph(in Coord coord, in Glyph glyph)
     {
         glyphBuffer[coord.X, coord.Y] = glyph;
@@ -349,4 +369,21 @@ public sealed class ConsoleGraphic
 
     private int GetColorIndex(in NexusColor color)
         => _settings.ColorPalette.Colors.GetKey(color);
+
+    private static void Resize<T>(ref T[,] array, in int width, in int height)
+    {
+        var result = new T[width, height];
+
+        var prevHeight = array.GetLength(1);
+
+        var minWidth = Math.Min(array.GetLength(0), width);
+        var minHeight = Math.Min(prevHeight, height);
+
+        for (int i = 0; i < minWidth; i++)
+        {
+            Array.Copy(array, i * prevHeight, result, i * height, minHeight);
+        }
+
+        array = result;
+    }
 }

@@ -114,7 +114,7 @@ public abstract class ConsoleGame : IDisposable
 
         _game.Priority = Settings.Priority;
 
-        Settings.Changed += OnSettingsChange;
+        Settings.Updated += OnSettingsUpdated;
     }
 
     /// <summary>
@@ -248,7 +248,15 @@ public abstract class ConsoleGame : IDisposable
         }
     }
 
-    private void OnSettingsChange(object? sender, EventArgs e) => _console.UpdateSettings(Settings);
+    private void OnSettingsUpdated(object? sender, string propertyName)
+    {
+        switch (propertyName)
+        {
+            case nameof(ConsoleGameSettings.Title): _console.UpdateTitle(Settings.Title); break;
+            case nameof(ConsoleGameSettings.ColorPalette): _console.UpdateColorPalette(Settings.ColorPalette); break;
+            case nameof(ConsoleGameSettings.Font): _console.UpdateFont(Settings.Font); break;
+        }
+    }
 
     private static double GetHighResolutionTimestamp()
     {

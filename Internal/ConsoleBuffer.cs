@@ -6,22 +6,35 @@ using System.IO;
 internal sealed class ConsoleBuffer
 {
     private readonly SafeFileHandle _file;
-    private readonly CHAR_INFO[] charInfoBuffer;
 
-    public int Width { get; }
+    private CHAR_INFO[] charInfoBuffer;
 
-    public int Height { get; }
+    public short Width { get; private set; }
+
+    public short Height { get; private set; }
+
+    public event EventHandler? Updated;
 
     public ConsoleBuffer(in int width, in int height)
     {
-        Width = width;
-        Height = height;
+        Width = (short)width;
+        Height = (short)height;
 
         _file = Native.CreateFile("CONOUT$", 0x40000000, 2, nint.Zero, FileMode.Open, 0, nint.Zero);
 
         if (_file.IsInvalid) throw new NexusEngineException("The SafeFileHandle for the Console Buffer is invalid");
         
         charInfoBuffer = new CHAR_INFO[Width * Height];
+    }
+
+    public void ChangeDimensions(in int width, in int height)
+    {
+        Width = (short)width;
+        Height = (short)height;
+
+        Array.Resize(ref charInfoBuffer, Width * Height);
+
+        Updated?.Invoke(this, EventArgs.Empty);
     }
 
     public void ClearBuffer(in int background)
@@ -73,8 +86,8 @@ internal sealed class ConsoleBuffer
         {
             Left = 0,
             Top = 0,
-            Right = (short)Width,
-            Bottom = (short)Height
+            Right = Width,
+            Bottom = Height
         };
 
         Native.WriteConsoleOutputW(
@@ -82,8 +95,8 @@ internal sealed class ConsoleBuffer
             charInfoBuffer,
             new COORD
             {
-                X = (short)Width,
-                Y = (short)Height
+                X = Width,
+                Y = Height
             },
             new COORD
             {
