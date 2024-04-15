@@ -134,6 +134,7 @@ internal sealed class CmdConsole
             }
         }
 
+        Native.SetConsoleScreenBufferInfoEx(_standardOutput, ref csbe);
         AdjustBufferSize(ref csbe);
     }
 
@@ -142,7 +143,7 @@ internal sealed class CmdConsole
         var fontInfo = new CONSOLE_FONT_INFO_EX();
         fontInfo.cbSize = (uint)Marshal.SizeOf(fontInfo);
         fontInfo.nFont = 0;
-
+        
         fontInfo.dwFontSize.X = (short)font.Width;
         fontInfo.dwFontSize.Y = (short)font.Height;
         fontInfo.FaceName = font.Name;

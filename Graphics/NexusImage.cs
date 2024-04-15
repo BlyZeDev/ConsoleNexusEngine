@@ -9,6 +9,9 @@ using System.Drawing.Imaging;
 /// </summary>
 public readonly struct NexusImage
 {
+    private const char LightBlock = (char)NexusSpecialChar.LightBlock;
+    private const char MiddleBlock = (char)NexusSpecialChar.MiddleBlock;
+    private const char DarkBlock = (char)NexusSpecialChar.DarkBlock;
     private const char FullBlock = (char)NexusSpecialChar.FullBlock;
 
     private readonly ReadOnlyMemory2D<NexusChar> _pixels;
@@ -104,9 +107,8 @@ public readonly struct NexusImage
                 {
                     pixel = row + x * pixelSize;
 
-                    pixels[x, y] = pixel[3] < 128
-                        ? new NexusChar(char.MinValue, processor._colorPalette.Color1)
-                        : new NexusChar(FullBlock, processor.Process(new NexusColor(pixel[2], pixel[1], pixel[0])));
+                    pixels[x, y] = new NexusChar(GetAlphaLevel(pixel[3]),
+                        processor.Process(new NexusColor(pixel[2], pixel[1], pixel[0])));
                 }
             }
         }
@@ -114,5 +116,17 @@ public readonly struct NexusImage
         resized.UnlockBits(data);
 
         return pixels;
+    }
+
+    private static char GetAlphaLevel(in byte alpha)
+    {
+        return alpha switch
+        {
+            < 52 => char.MinValue,
+            < 103 => LightBlock,
+            < 154 => MiddleBlock,
+            < 205 => DarkBlock,
+            _ => FullBlock
+        };
     }
 }

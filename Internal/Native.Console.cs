@@ -60,10 +60,10 @@ internal static partial class Native
             [MarshalAs(UnmanagedType.U4)] int flags,
             nint template);
 
-    [DllImport("kernel32.dll")]
+    [DllImport("kernel32.dll", ExactSpelling = true)]
     public static extern bool WriteConsoleOutputW(
         SafeFileHandle hConsoleOutput,
-        CHAR_INFO[] lpBuffer,
+        [MarshalAs(UnmanagedType.LPArray), In] CHAR_INFO[] lpBuffer,
         COORD dwBufferSize,
         COORD dwBufferCoord,
         ref SMALL_RECT lpWriteRegion);

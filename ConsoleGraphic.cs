@@ -71,13 +71,7 @@ public sealed class ConsoleGraphic
     public void SetPixel(Coord coordinate, NexusChar character)
     {
         ThrowIfOutOfBounds(coordinate);
-
-        var foregroundColorIndex = GetColorIndex(character.Foreground);
-        var backgroundColorIndex = character.Background is null
-            ? BackgroundIndex : GetColorIndex(character.Background.Value);
-
-        if (foregroundColorIndex is -1 || backgroundColorIndex is -1)
-            throw new ArgumentException("The color is not in the color palette", nameof(character));
+        GetOrThrowColorIndex(character.Foreground, character.Background, nameof(character), out var foregroundColorIndex, out var backgroundColorIndex);
 
         SetGlyph(coordinate, new Glyph(character.Value, foregroundColorIndex, backgroundColorIndex));
     }
@@ -93,13 +87,7 @@ public sealed class ConsoleGraphic
     {
         var isHorizontal = text.TextDirection is TextDirection.Horizontal;
         ThrowIfOutOfBounds(coordinate + (isHorizontal ? new Coord(text.Value.Length - 1, 0) : new Coord(0, text.Value.Length - 1)));
-
-        var foregroundColorIndex = GetColorIndex(text.Foreground);
-        var backgroundColorIndex = text.Background is null
-            ? BackgroundIndex : GetColorIndex(text.Background.Value);
-        
-        if (foregroundColorIndex is -1 || backgroundColorIndex is -1)
-            throw new ArgumentException("The color is not in the color palette", nameof(text));
+        GetOrThrowColorIndex(text.Foreground, text.Background, nameof(text), out var foregroundColorIndex, out var backgroundColorIndex);
 
         var posX = -1;
         var posY = -1;
@@ -122,13 +110,7 @@ public sealed class ConsoleGraphic
     public void SetText(Coord coordinate, NexusFiggleText text)
     {
         ThrowIfOutOfBounds(coordinate + new Coord(text._longestStringLength, text.Value.Length - 1));
-
-        var foregroundColorIndex = GetColorIndex(text.Foreground);
-        var backgroundColorIndex = text.Background is null
-            ? BackgroundIndex : GetColorIndex(text.Background.Value);
-
-        if (foregroundColorIndex is -1 || backgroundColorIndex is -1)
-            throw new ArgumentException("The color is not in the color palette", nameof(text));
+        GetOrThrowColorIndex(text.Foreground, text.Background, nameof(text), out var foregroundColorIndex, out var backgroundColorIndex);
 
         var posX = -1;
         var posY = -1;
@@ -153,11 +135,19 @@ public sealed class ConsoleGraphic
     /// <param name="image">The image itself</param>
     public void SetImage(Coord coordinate, NexusImage image)
     {
+        ThrowIfOutOfBounds(coordinate);
+        ThrowIfOutOfBounds(new Coord(image.Width - 1, image.Height - 1));
+
+        NexusChar currentPixel;
         for (int x = 0, xCord = coordinate.X; x < image.Width; x++, xCord++)
         {
             for (int y = 0, yCord = coordinate.Y; y < image.Height; y++, yCord++)
             {
-                SetPixel(new Coord(xCord, yCord), image[x, y]);
+                currentPixel = image[x, y];
+
+                GetOrThrowColorIndex(currentPixel.Foreground, currentPixel.Background, nameof(image), out var foregroundColorIndex, out var backgroundColorIndex);
+
+                SetGlyph(new Coord(xCord, yCord), new Glyph(image[x, y].Value, foregroundColorIndex, backgroundColorIndex));
             }
         }
     }
@@ -317,13 +307,15 @@ public sealed class ConsoleGraphic
     /// Clears a specific whole column
     /// </summary>
     /// <param name="column">The column to clear</param>
-    public void ClearColumn(int column) => ClearLine(new Coord(column, 0), new Coord(column, _console.Buffer.Height - 1));
+    public void ClearColumn(int column)
+        => ClearLine(new Coord(column, 0), new Coord(column, _console.Buffer.Height - 1));
 
     /// <summary>
     /// Clears a specific whole row
     /// </summary>
     /// <param name="row">The row to clear</param>
-    public void ClearRow(int row) => ClearLine(new Coord(0, row), new Coord(_console.Buffer.Width - 1, row));
+    public void ClearRow(int row)
+        => ClearLine(new Coord(0, row), new Coord(_console.Buffer.Width - 1, row));
 
     /// <summary>
     /// Clears a line from one coordinate to the other
@@ -363,6 +355,15 @@ public sealed class ConsoleGraphic
     {
         if (!glyphBuffer.IsInRange(coord))
             throw new ArgumentOutOfRangeException(nameof(coord), "The coordinate is not in bounds of the console buffer");
+    }
+
+    private void GetOrThrowColorIndex(in NexusColor foreground, in NexusColor? background, string paramName, out int foregroundColorIndex, out int backgroundColorIndex)
+    {
+        foregroundColorIndex = GetColorIndex(foreground);
+        backgroundColorIndex = background is null ? BackgroundIndex : GetColorIndex(background.Value);
+
+        if (foregroundColorIndex is -1 || backgroundColorIndex is -1)
+            throw new ArgumentException("The color is not in the color palette", paramName);
     }
 
     private Glyph GetClearGlyph() => new(char.MinValue, BackgroundIndex, BackgroundIndex);

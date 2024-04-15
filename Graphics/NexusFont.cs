@@ -22,6 +22,9 @@ public sealed partial record NexusFont
 
     private NexusFont(string name, in int width, in int height)
     {
+        ArgumentOutOfRangeException.ThrowIfLessThan(width, 1, nameof(width));
+        ArgumentOutOfRangeException.ThrowIfLessThan(height, 1, nameof(height));
+
         Name = name;
         Width = width;
         Height = height;

@@ -10,7 +10,6 @@ internal sealed class ConsoleBuffer
     private CHAR_INFO[] charInfoBuffer;
 
     public short Width { get; private set; }
-
     public short Height { get; private set; }
 
     public event EventHandler? Updated;
@@ -39,17 +38,10 @@ internal sealed class ConsoleBuffer
 
     public void ClearBuffer(in int background)
     {
-        int index;
-
-        for (int x = 0; x < Width; x++)
+        for (int i = 0; i < charInfoBuffer.Length; i++)
         {
-            for (int y = 0; y < Height; y++)
-            {
-                index = y * Width + x;
-
-                charInfoBuffer[index].Attributes = (short)(background | background << 4);
-                charInfoBuffer[index].UnicodeChar = (char)0;
-            }
+            charInfoBuffer[i].Attributes = (short)(background | background << 4);
+            charInfoBuffer[i].UnicodeChar = (char)0;
         }
     }
 
@@ -89,7 +81,7 @@ internal sealed class ConsoleBuffer
             Right = Width,
             Bottom = Height
         };
-
+        
         Native.WriteConsoleOutputW(
             _file,
             charInfoBuffer,
