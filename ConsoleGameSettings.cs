@@ -113,7 +113,7 @@ public sealed record ConsoleGameSettings
     private ConsoleGameSettings()
     {
         title = "ConsoleGame";
-        font = NexusFont.Consolas(10, 10);
+        font = new Consolas(10, 10);
         targetFramerate = 60;
         colorPalette = ColorPalette.Default;
         stopGameKey = NexusKey.Escape;

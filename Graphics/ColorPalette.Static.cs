@@ -3,6 +3,7 @@
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
+using System.Net.Http;
 
 public sealed partial class ColorPalette
 {
@@ -234,6 +235,25 @@ public sealed partial class ColorPalette
     /// <param name="filepath">The filepath of the image</param>
     /// <returns><see cref="ColorPalette"/></returns>
     public static ColorPalette FromImage(string filepath) => FromImage((Bitmap)Image.FromFile(filepath));
+
+    /// <summary>
+    /// Creates a color palette with the 16 most used colors in the image
+    /// </summary>
+    /// <param name="url">The url of the image</param>
+    /// <returns><see cref="ColorPalette"/></returns>
+    /// <exception cref="HttpRequestException"></exception>
+    public static ColorPalette FromImage(Uri url)
+    {
+        using (var client = new HttpClient())
+        {
+            using (var stream = TaskHelper.RunSync(() => client.GetStreamAsync(url)))
+            {
+                return stream is null
+                    ? throw new HttpRequestException("Couldn't read the image")
+                    : FromImage(new Bitmap(stream));
+            }
+        }
+    }
 
     /// <summary>
     /// Creates a color palette with the 16 most used colors in the image

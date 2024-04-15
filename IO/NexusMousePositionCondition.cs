@@ -1,7 +1,6 @@
 ﻿namespace ConsoleNexusEngine.IO;
 
 using System.Linq;
-using ConsoleNexusEngine;
 
 /// <summary>
 /// Represents a mouse position input condition

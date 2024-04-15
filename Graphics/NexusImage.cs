@@ -3,6 +3,9 @@
 using CommunityToolkit.HighPerformance;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 /// <summary>
 /// Represents an image that can be rendered in the console
@@ -77,6 +80,25 @@ public readonly struct NexusImage
     /// <param name="size">The desired size of the bitmap</param>
     public NexusImage(Bitmap bitmap, NexusImageProcessor imageProcessor, Size size)
         => _pixels = InitializePixels(bitmap, imageProcessor, size);
+
+    /// <summary>
+    /// Initializes a new NexusImage
+    /// </summary>
+    /// <param name="url">The url to the image</param>
+    /// <param name="imageProcessor">The image processor that should be used</param>
+    /// <returns><see cref="NexusImage"/></returns>
+    public static NexusImage FromUrl(Uri url, NexusImageProcessor imageProcessor)
+    {
+        using (var client = new HttpClient())
+        {
+            using (var stream = TaskHelper.RunSync(() => client.GetStreamAsync(url)))
+            {
+                return stream is null
+                    ? throw new HttpRequestException("Couldn't read the image")
+                    : new NexusImage(new Bitmap(stream), imageProcessor);
+            }
+        }
+    }
 
     internal NexusChar this[in int x, in int y] => _pixels.Span[x, y];
 

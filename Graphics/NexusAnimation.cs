@@ -2,6 +2,7 @@
 
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Net.Http;
 
 /// <summary>
 /// Represents a animation that can be played in console
@@ -106,6 +107,26 @@ public sealed class NexusAnimation
     /// </summary>
     /// <param name="images">The images the animation should have</param>
     public NexusAnimation(in ReadOnlySpan<NexusImage> images) : this(images.ToArray()) { }
+
+    /// <summary>
+    /// Initializes a new NexusAnimation
+    /// </summary>
+    /// <param name="url">The url of the gif</param>
+    /// <param name="imageProcessor">The image processor that should be used</param>
+    /// <returns><see cref="NexusAnimation"/></returns>
+    /// <exception cref="HttpRequestException"></exception>
+    public static NexusAnimation FromUrl(Uri url, NexusImageProcessor imageProcessor)
+    {
+        using (var client = new HttpClient())
+        {
+            using (var stream = TaskHelper.RunSync(() => client.GetStreamAsync(url)))
+            {
+                return stream is null
+                    ? throw new HttpRequestException("Couldn't read the image")
+                    : new NexusAnimation(new Bitmap(stream), imageProcessor);
+            }
+        }
+    }
 
     internal NexusImage NextFrame()
     {
