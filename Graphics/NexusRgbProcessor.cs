@@ -12,9 +12,9 @@ public sealed class NexusRgbProcessor : NexusImageProcessor
     public override NexusColor Process(in NexusColor targetColor)
     {
         var nearestColorIndex = 0;
-        var minDistance = double.MaxValue;
+        var minDistance = CalculateRgbDistance(targetColor, _colorPalette[0]);
 
-        for (int i = 0; i < _colorPalette.Colors.Count; i++)
+        for (int i = 1; i < _colorPalette.Colors.Count; i++)
         {
             var distance = CalculateRgbDistance(targetColor, _colorPalette[i]);
 

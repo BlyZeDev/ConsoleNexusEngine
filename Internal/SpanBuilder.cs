@@ -6,40 +6,40 @@ using System.Runtime.CompilerServices;
 internal ref struct SpanBuilder<T>
 {
     private T[] _arrayToReturnToPool;
-    private Span<T> _values;
-    private int _pos;
+    private Span<T> values;
+    private int pos;
 
     public SpanBuilder() : this([]) { }
 
     public SpanBuilder(Span<T> initialBuffer)
     {
         _arrayToReturnToPool = [];
-        _values = initialBuffer;
-        _pos = 0;
+        values = initialBuffer;
+        pos = 0;
     }
 
     public int Length
     {
-        readonly get => _pos;
+        readonly get => pos;
         set
         {
             ArgumentOutOfRangeException.ThrowIfLessThan(value, 0);
-            ArgumentOutOfRangeException.ThrowIfGreaterThan(value, _values.Length);
-            _pos = value;
+            ArgumentOutOfRangeException.ThrowIfGreaterThan(value, values.Length);
+            pos = value;
         }
     }
 
-    public readonly int Capacity => _values.Length;
+    public readonly int Capacity => values.Length;
 
-    public ref T this[int index] => ref _values[index];
+    public ref T this[int index] => ref values[index];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Append(T value)
     {
-        if (_pos < _values.Length)
+        if (pos < values.Length)
         {
-            _values[_pos] = value;
-            _pos++;
+            values[pos] = value;
+            pos++;
             return;
         }
         
@@ -48,11 +48,13 @@ internal ref struct SpanBuilder<T>
 
     public void Append(ReadOnlySpan<T> value)
     {
-        if (_pos > _values.Length - value.Length) Grow(value.Length);
+        if (pos > values.Length - value.Length) Grow(value.Length);
 
-        value.CopyTo(_values[_pos..]);
-        _pos += value.Length;
+        value.CopyTo(values[pos..]);
+        pos += value.Length;
     }
+
+    public readonly bool Contains(T value) => values.BinarySearch(value, Comparer<T>.Default) > -1;
 
     [MethodImpl(MethodImplOptions.NoInlining)]
     private void GrowAndAppend(T value)
@@ -65,22 +67,22 @@ internal ref struct SpanBuilder<T>
     private void Grow(int additionalCapacity)
     {
         if (additionalCapacity < 1) return;
-        if (_pos <= _values.Length - additionalCapacity) return;
+        if (pos <= values.Length - additionalCapacity) return;
 
-        T[] poolArray = ArrayPool<T>.Shared.Rent(Math.Max(_pos + additionalCapacity, _values.Length * 2));
+        T[] poolArray = ArrayPool<T>.Shared.Rent(Math.Max(pos + additionalCapacity, values.Length * 2));
 
-        _values[.._pos].CopyTo(poolArray);
-
+        values[..pos].CopyTo(poolArray);
+        
         T[] toReturn = _arrayToReturnToPool;
-        _values = _arrayToReturnToPool = poolArray;
+        values = _arrayToReturnToPool = poolArray;
         ArrayPool<T>.Shared.Return(toReturn);
     }
 
-    public readonly Span<T> AsSpan() => _values[.._pos];
-    public readonly Span<T> AsSpan(int start) => _values[start.._pos];
-    public readonly Span<T> AsSpan(int start, int length) => _values.Slice(start, length);
+    public readonly Span<T> AsSpan() => values[..pos];
+    public readonly Span<T> AsSpan(int start) => values[start..pos];
+    public readonly Span<T> AsSpan(int start, int length) => values.Slice(start, length);
 
-    public readonly ReadOnlySpan<T> AsReadOnlySpan() => _values[.._pos];
-    public readonly ReadOnlySpan<T> AsReadOnlySpan(int start) => _values[start.._pos];
-    public readonly ReadOnlySpan<T> AsReadOnlySpan(int start, int length) => _values.Slice(start, length);
+    public readonly ReadOnlySpan<T> AsReadOnlySpan() => values[..pos];
+    public readonly ReadOnlySpan<T> AsReadOnlySpan(int start) => values[start..pos];
+    public readonly ReadOnlySpan<T> AsReadOnlySpan(int start, int length) => values.Slice(start, length);
 }

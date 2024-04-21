@@ -1,11 +1,8 @@
 ﻿namespace ConsoleNexusEngine.Graphics;
 
-using CommunityToolkit.HighPerformance;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.IO;
 using System.Net.Http;
-using System.Threading.Tasks;
 
 /// <summary>
 /// Represents an image that can be rendered in the console
@@ -22,12 +19,12 @@ public readonly struct NexusImage
     /// <summary>
     /// The width of the image
     /// </summary>
-    public int Width => _pixels.Height;
+    public int Width => _pixels.Width;
 
     /// <summary>
     /// The height of the image
     /// </summary>
-    public int Height => _pixels.Width;
+    public int Height => _pixels.Height;
 
     /// <summary>
     /// Initializes a new NexusImage
@@ -100,13 +97,13 @@ public readonly struct NexusImage
         }
     }
 
-    internal NexusChar this[in int x, in int y] => _pixels.Span[x, y];
+    internal NexusChar this[in int x, in int y] => _pixels[x, y];
 
     private static ReadOnlyMemory2D<NexusChar> InitializePixels(Bitmap bitmap, NexusImageProcessor processor, Size size)
     {
         var resized = ImageHelper.Resize(bitmap, size);
 
-        var pixels = new NexusChar[resized.Width, resized.Height];
+        var pixels = new Memory2D<NexusChar>(resized.Width, resized.Height);
 
         var data = resized.LockBits(
             new Rectangle(0, 0, resized.Width, resized.Height),
@@ -137,7 +134,7 @@ public readonly struct NexusImage
 
         resized.UnlockBits(data);
 
-        return pixels;
+        return pixels.ToReadOnly();
     }
 
     private static char GetAlphaLevel(in byte alpha)

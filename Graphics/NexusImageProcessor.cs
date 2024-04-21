@@ -17,7 +17,7 @@ public abstract class NexusImageProcessor
     protected NexusImageProcessor(ColorPalette colorPalette) => _colorPalette = colorPalette;
 
     /// <summary>
-    /// The process to get calculate the color
+    /// The process to calculate the color
     /// </summary>
     /// <param name="targetColor">The color to process</param>
     /// <returns><see cref="NexusColor"/></returns>

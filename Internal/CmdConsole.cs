@@ -1,5 +1,6 @@
 ﻿namespace ConsoleNexusEngine.Internal;
 
+using System.Collections.Immutable;
 using System.Runtime.InteropServices;
 
 internal sealed class CmdConsole
@@ -7,6 +8,11 @@ internal sealed class CmdConsole
     private readonly nint _handle;
     private readonly nint _standardInput;
     private readonly nint _standardOutput;
+    private readonly HashSet<NexusKey> _lastPressedKeys;
+
+    private Coord currentMousePos;
+
+    internal bool stopGameKeyPressed;
 
     public ConsoleBuffer Buffer { get; }
 
@@ -16,90 +22,62 @@ internal sealed class CmdConsole
         _standardInput = Native.GetStdHandle(-10);
         _standardOutput = Native.GetStdHandle(-11);
 
+        _lastPressedKeys = [];
+        currentMousePos = Coord.MaxValue;
+        stopGameKeyPressed = false;
+
         var dimensions = Initialize(settings);
 
         Buffer = new ConsoleBuffer(dimensions.X, dimensions.Y);
     }
 
-    public ReadOnlySpan<INexusInput> ReadInput(bool isInputAllowed)
+    public NexusInputCollection ReadInput(NexusKey stopGameKey)
     {
-        if (!isInputAllowed)
-        {
-            Native.FlushConsoleInputBuffer(_standardInput);
-            return [];
-        }
+        _lastPressedKeys.RemoveWhere(key => !IsKeyPressed(key));
 
         Native.GetNumberOfConsoleInputEvents(_standardInput, out var numEventsRead);
 
-        if (numEventsRead is 0) return [];
+        if (numEventsRead is 0 && _lastPressedKeys.Count is 0) return new NexusInputCollection(currentMousePos);
 
         var buffer = new INPUT_RECORD[numEventsRead];
 
-        Native.PeekConsoleInput(_standardInput, buffer, buffer.Length, out numEventsRead);
+        Native.PeekConsoleInput(_standardInput, buffer, numEventsRead, out _);
         Native.FlushConsoleInputBuffer(_standardInput);
 
-        if (numEventsRead is 0) return [];
+        var pressedKeys = new HashSet<NexusKey>();
+        var key = NexusKey.None;
 
-        var builder = new SpanBuilder<INexusInput>();
-
-        INPUT_RECORD input;
-        for (int i = 0; i < numEventsRead; i++)
+        foreach (var input in buffer.AsSpan())
         {
-            input = buffer[i];
-
             switch (input.EventType)
             {
                 case 1:
                     if (input.KeyEvent.KeyDown)
-                        builder.Append(new KeyboardInput((NexusKey)input.KeyEvent.VirtualKeyCode));
+                    {
+                        key = (NexusKey)input.KeyEvent.VirtualKeyCode;
+                        pressedKeys.Add(key);
+                    }
                     break;
 
                 case 2:
-                    builder.Append(
-                        new MouseInput((NexusKey)buffer[i].MouseEvent.ButtonState,
-                        new Coord(
-                            buffer[i].MouseEvent.MousePosition.X,
-                            buffer[i].MouseEvent.MousePosition.Y)));
+                    currentMousePos = Coord.FromCOORD(input.MouseEvent.MousePosition);
+
+                    key = (NexusKey)input.MouseEvent.ButtonState;
+
+                    if (key is not NexusKey.None) pressedKeys.Add(key);
                     break;
             }
+
+            stopGameKeyPressed = key == stopGameKey;
         }
 
-        return builder.AsReadOnlySpan();
-    }
+        foreach (var lastPressedKey in _lastPressedKeys) pressedKeys.Add(lastPressedKey);
 
-    public void WriteInput(in ReadOnlySpan<INexusInput> inputs)
-    {
-        var buffer = new INPUT_RECORD[inputs.Length];
+        if (pressedKeys.Count is 0) return new NexusInputCollection(currentMousePos);
 
-        INexusInput input;
-        for (int i = 0; i < buffer.Length; i++)
-        {
-            input = inputs[i];
+        foreach (var pressedKey in pressedKeys) _lastPressedKeys.Add(pressedKey);
 
-            buffer[i] = input switch
-            {
-                var keyboardInput when keyboardInput.MousePosition is null => new INPUT_RECORD
-                {
-                    EventType = 1,
-                    KeyEvent = new KEY_EVENT_RECORD
-                    {
-                        KeyDown = true,
-                        VirtualKeyCode = (ushort)keyboardInput.Key
-                    }
-                },
-                _ => new INPUT_RECORD
-                {
-                    EventType = 2,
-                    MouseEvent = new MOUSE_EVENT_RECORD
-                    {
-                        ButtonState = (uint)input.Key,
-                        MousePosition = input.MousePosition!.Value.ToCOORD()
-                    }
-                }
-            };
-        }
-
-        Native.WriteConsoleInput(_standardInput, buffer, (uint)buffer.Length, out _);
+        return new NexusInputCollection(currentMousePos, pressedKeys.ToImmutableArray());
     }
 
     public void UpdateTitle(string title) => Native.SetWindowText(_handle, title);
@@ -259,4 +237,6 @@ internal sealed class CmdConsole
 
         Buffer.ChangeDimensions(csbe.dwSize.X, csbe.dwSize.Y);
     }
+
+    private static bool IsKeyPressed(NexusKey key) => (Native.GetAsyncKeyState((int)key) & 0x8000) is not 0;
 }

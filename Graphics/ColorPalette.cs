@@ -5,7 +5,7 @@ using System.Collections;
 /// <summary>
 /// Represents a color palette for the console
 /// </summary>
-public sealed partial class ColorPalette : IEnumerable<NexusColor>, IEnumerable, IEquatable<ColorPalette>
+public sealed partial class ColorPalette : IEnumerable<NexusColor>, IEquatable<ColorPalette>
 {
     private readonly Dictionary<ConsoleColor, NexusColor> _colors;
 
@@ -147,7 +147,7 @@ public sealed partial class ColorPalette : IEnumerable<NexusColor>, IEnumerable,
     /// <param name="color">The color to check for</param>
     /// <returns><see langword="true"/> if the color is in the color palette, otherwise <see langword="false"/></returns>
     public bool Contains(NexusColor color)
-        => GetIndex(color) is not -1;
+        => Colors.GetKey(color) is not -1;
 
     /// <summary>
     /// Get the color at a specific index
@@ -185,7 +185,4 @@ public sealed partial class ColorPalette : IEnumerable<NexusColor>, IEnumerable,
     public override int GetHashCode() => HashCode.Combine(Colors);
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-    internal int GetIndex(NexusColor color)
-        => Colors.GetKey(color);
 }

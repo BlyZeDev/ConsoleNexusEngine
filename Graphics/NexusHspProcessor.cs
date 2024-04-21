@@ -30,11 +30,12 @@ public sealed class NexusHspProcessor : NexusImageProcessor
     public override NexusColor Process(in NexusColor targetColor)
     {
         var nearestColorIndex = 0;
-        var minDistance = double.MaxValue;
-
+        
         var targetHsp = RgbToHsp(targetColor);
 
-        for (int i = 0; i < _colors.Length; i++)
+        var minDistance = CalculateHspDistance(targetHsp, _colors[0]);
+
+        for (int i = 1; i < _colors.Length; i++)
         {
             var distance = CalculateHspDistance(targetHsp, _colors[i]);
 

@@ -8,7 +8,7 @@ public abstract class NexusController
     /// <summary>
     /// The controls of the controller
     /// </summary>
-    public Dictionary<INexusInputCondition, Action> Controls { get; set; }
+    public Dictionary<NexusInputCondition, Action> Controls { get; set; }
 
     /// <summary>
     /// Initializes a new controller
@@ -19,18 +19,19 @@ public abstract class NexusController
     /// Invokes all actions of the inputs that are made
     /// </summary>
     /// <param name="inputs">The inputs that were made</param>
-    public void Control(in ReadOnlySpan<INexusInput> inputs)
+    public void Control(in NexusInputCollection inputs)
     {
-        if (inputs.IsEmpty) return;
-
-        foreach (var input in inputs)
+        foreach (var (condition, action) in Controls)
         {
-            foreach (var control in Controls)
+            if (condition._isMousePosCondition)
             {
-                if (control.Key.Check(input))
+                if (condition.Check(inputs.MousePosition)) action();
+            }
+            else
+            {
+                foreach (var key in inputs.Keys)
                 {
-                    control.Value();
-                    break;
+                    if (condition.Check(key)) action();
                 }
             }
         }

@@ -16,12 +16,12 @@ public sealed class NexusAnimation
     /// <summary>
     /// The width of the animation
     /// </summary>
-    public int Width => _images.Span[0].Width;
+    public int Width { get; }
 
     /// <summary>
     /// The height of the animation
     /// </summary>
-    public int Height => _images.Span[0].Height;
+    public int Height { get; }
 
     /// <summary>
     /// Initializes a new NexusAnimation
@@ -55,14 +55,7 @@ public sealed class NexusAnimation
     /// <param name="imageProcessor">The image processor that should be used</param>
     /// <param name="percentage">The desired percentage size of the bitmap</param>
     public NexusAnimation(Bitmap animation, NexusImageProcessor imageProcessor, float percentage)
-    {
-        if (animation.RawFormat.Guid != ImageFormat.Gif.Guid)
-            throw new ArgumentException("The file has to be a gif file");
-
-        _images = Initialize(animation, imageProcessor, ImageHelper.GetSize(animation.Width, animation.Height, percentage));
-
-        currentFrameIndex = -1;
-    }
+        : this(animation, imageProcessor, ImageHelper.GetSize(animation.Width, animation.Height, percentage)) { }
 
     /// <summary>
     /// Initializes a new NexusAnimation
@@ -85,6 +78,11 @@ public sealed class NexusAnimation
             throw new ArgumentException("The file has to be a gif file");
 
         _images = Initialize(animation, imageProcessor, size);
+
+        var span = _images.Span[0];
+
+        Width = span.Width;
+        Height = span.Height;
 
         currentFrameIndex = -1;
     }

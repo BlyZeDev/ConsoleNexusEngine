@@ -16,7 +16,7 @@ public readonly partial record struct NexusColor : ISpanParsable<NexusColor>, IP
     /// Green component of the color
     /// </summary>
     public byte G => (byte)((_value >> 8) & 0xFF);
-    
+
     /// <summary>
     /// Blue component of the color
     /// </summary>

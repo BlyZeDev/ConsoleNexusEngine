@@ -1,11 +1,8 @@
 ﻿namespace ConsoleNexusEngine.Internal;
 
-using Microsoft.Win32.SafeHandles;
-using System.IO;
-
-internal sealed class ConsoleBuffer
+internal sealed unsafe class ConsoleBuffer
 {
-    private readonly SafeFileHandle _file;
+    private readonly nint _fileHandle;
 
     private CHAR_INFO[] charInfoBuffer;
 
@@ -19,10 +16,13 @@ internal sealed class ConsoleBuffer
         Width = (short)width;
         Height = (short)height;
 
-        _file = Native.CreateFile("CONOUT$", 0x40000000, 2, nint.Zero, FileMode.Open, 0, nint.Zero);
-
-        if (_file.IsInvalid) throw new NexusEngineException("The SafeFileHandle for the Console Buffer is invalid");
+        fixed (char* fileNameP = "CONOUT$")
+        {
+            _fileHandle = Native.CreateFile(fileNameP, 0x40000000, 2, nint.Zero, 3, 0, nint.Zero);
+        }
         
+        if (_fileHandle == nint.Zero) throw new NexusEngineException("The file handle for the console buffer is invalid");
+
         charInfoBuffer = new CHAR_INFO[Width * Height];
     }
 
@@ -38,29 +38,26 @@ internal sealed class ConsoleBuffer
 
     public void ClearBuffer(in int background)
     {
+        var attributes = (short)(background | background << 4);
+
         for (int i = 0; i < charInfoBuffer.Length; i++)
         {
-            charInfoBuffer[i].Attributes = (short)(background | background << 4);
-            charInfoBuffer[i].UnicodeChar = (char)0;
+            charInfoBuffer[i].Attributes = attributes;
+            charInfoBuffer[i].UnicodeChar = char.MinValue;
         }
     }
 
-    public void SetBackgroundBuffer(ref Glyph[,] glyphBuffer, in int background)
+    public void SetBackgroundBuffer(in Memory2D<Glyph> glyphBuffer, in int background)
     {
         Glyph current;
-        int index;
 
-        for (int x = 0; x < Width; x++)
+        for (int i = 0; i < glyphBuffer.Length; ++i)
         {
-            for (int y = 0; y < Height; y++)
-            {
-                index = y * Width + x;
-                current = glyphBuffer[x, y];
+            current = glyphBuffer[i];
 
-                charInfoBuffer[index].Attributes =
-                    (short)(current.ForegroundIndex | (current.Value == 0 ? background << 4 : current.BackgroundIndex << 4));
-                charInfoBuffer[index].UnicodeChar = current.Value;
-            }
+            charInfoBuffer[i].Attributes =
+                    (short)(current.ForegroundIndex | (current.Value == char.MinValue ? background << 4 : current.BackgroundIndex << 4));
+            charInfoBuffer[i].UnicodeChar = current.Value;
         }
     }
 
@@ -81,20 +78,23 @@ internal sealed class ConsoleBuffer
             Right = Width,
             Bottom = Height
         };
-        
-        Native.WriteConsoleOutputW(
-            _file,
-            charInfoBuffer,
-            new COORD
-            {
-                X = Width,
-                Y = Height
-            },
-            new COORD
-            {
-                X = 0,
-                Y = 0
-            },
-            ref rect);
+
+        fixed (CHAR_INFO* arrayP = &charInfoBuffer[0])
+        {
+            Native.WriteConsoleOutputW(
+                _fileHandle,
+                arrayP,
+                new COORD
+                {
+                    X = Width,
+                    Y = Height
+                },
+                new COORD
+                {
+                    X = 0,
+                    Y = 0
+                },
+                &rect);
+        }
     }
 }

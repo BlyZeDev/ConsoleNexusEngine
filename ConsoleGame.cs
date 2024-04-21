@@ -32,7 +32,6 @@ public abstract class ConsoleGame : IDisposable
     private readonly CmdConsole _console;
     private readonly BackgroundTimer _fpsTimer;
 
-    private bool shouldStop;
     private int lastTotalFrameCount;
 
     /// <summary>
@@ -122,6 +121,8 @@ public abstract class ConsoleGame : IDisposable
     /// </summary>
     public void Start()
     {
+        if (_console.stopGameKeyPressed) throw new NexusEngineException("Can't restart a console game");
+
         Load();
 
         IsRunning = true;
@@ -137,7 +138,7 @@ public abstract class ConsoleGame : IDisposable
             FixedUpdate();
         });
 
-        SpinWait.SpinUntil(() => shouldStop);
+        SpinWait.SpinUntil(() => _console.stopGameKeyPressed);
     }
 
     /// <summary>
@@ -147,7 +148,7 @@ public abstract class ConsoleGame : IDisposable
     {
         IsRunning = false;
 
-        shouldStop = true;
+        _console.stopGameKeyPressed = true;
 
         _fpsTimer.Stop();
 
@@ -178,7 +179,7 @@ public abstract class ConsoleGame : IDisposable
     /// Called every frame
     /// </summary>
     /// <param name="inputs">The inputs made during the last frame</param>
-    protected abstract void Update(in ReadOnlySpan<INexusInput> inputs);
+    protected abstract void Update(in NexusInputCollection inputs);
 
     /// <summary>
     /// Called every second
@@ -223,9 +224,7 @@ public abstract class ConsoleGame : IDisposable
             {
                 unchecked { TotalFrameCount++; }
 
-                if (Controller.IsKeyPressed(Settings.StopGameKey)) shouldStop = true;
-
-                Update(_console.ReadInput(Settings.AllowInputs));
+                if (Settings.AllowInputs) Update(_console.ReadInput(Settings.StopGameKey));
 
                 accumulator -= targetFrameTime;
             }
@@ -242,9 +241,7 @@ public abstract class ConsoleGame : IDisposable
         {
             unchecked { TotalFrameCount++; }
 
-            if (Controller.IsKeyPressed(Settings.StopGameKey)) shouldStop = true;
-
-            Update(_console.ReadInput(Settings.AllowInputs));
+            if (Settings.AllowInputs) Update(_console.ReadInput(Settings.StopGameKey));
         }
     }
 

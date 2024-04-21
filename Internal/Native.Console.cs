@@ -1,10 +1,8 @@
 ﻿namespace ConsoleNexusEngine.Internal;
 
-using Microsoft.Win32.SafeHandles;
-using System.IO;
 using System.Runtime.InteropServices;
 
-internal static partial class Native
+internal static unsafe partial class Native
 {
     [LibraryImport("kernel32.dll")]
     public static partial nint GetStdHandle(int nStdHandle);
@@ -26,7 +24,7 @@ internal static partial class Native
     public static extern bool GetConsoleScreenBufferInfoEx(nint hConsoleOutput, ref CONSOLE_SCREEN_BUFFER_INFO_EX csbe);
 
     [DllImport("kernel32.dll")]
-    public static extern bool SetConsoleScreenBufferInfoEx(nint hConsoleOutput, ref CONSOLE_SCREEN_BUFFER_INFO_EX csbe);
+    public static extern bool SetConsoleScreenBufferInfoEx(nint hConsoleOutput, [In] ref CONSOLE_SCREEN_BUFFER_INFO_EX csbe);
 
     [LibraryImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
@@ -51,20 +49,20 @@ internal static partial class Native
     public static extern bool SetCurrentConsoleFontEx(nint hConsoleOutput, [MarshalAs(UnmanagedType.Bool)] bool bMaximumWindow, ref CONSOLE_FONT_INFO_EX lpConsoleCurrentFont);
 
     [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
-    public static extern SafeFileHandle CreateFile(
-            string fileName,
+    public static extern nint CreateFile(
+            [In] char* fileName,
             [MarshalAs(UnmanagedType.U4)] uint fileAccess,
             [MarshalAs(UnmanagedType.U4)] uint fileShare,
             nint securityAttributes,
-            [MarshalAs(UnmanagedType.U4)] FileMode creationDisposition,
-            [MarshalAs(UnmanagedType.U4)] int flags,
+            [MarshalAs(UnmanagedType.U4)] uint creationDisposition,
+            [MarshalAs(UnmanagedType.U4)] uint flags,
             nint template);
 
     [DllImport("kernel32.dll", ExactSpelling = true)]
     public static extern bool WriteConsoleOutputW(
-        SafeFileHandle hConsoleOutput,
-        [MarshalAs(UnmanagedType.LPArray), In] CHAR_INFO[] lpBuffer,
-        COORD dwBufferSize,
-        COORD dwBufferCoord,
-        ref SMALL_RECT lpWriteRegion);
+        [In] nint hConsoleOutput,
+        [In] CHAR_INFO* lpBuffer,
+        [In] COORD dwBufferSize,
+        [In] COORD dwBufferCoord,
+        [In] SMALL_RECT* lpWriteRegion);
 }

@@ -32,8 +32,8 @@ internal static class Extensions
         return false;
     }
 
-    public static bool IsInRange<T>(this T[,] array, Coord coord)
-        => coord.X >= 0 && coord.X < array.GetLength(0) && coord.Y >= 0 && coord.Y < array.GetLength(1);
+    public static bool IsInRange<T>(this Memory2D<T> memory, Coord coord) where T : struct
+        => coord.X >= 0 && coord.X < memory.Width && coord.Y >= 0 && coord.Y < memory.Height;
 
     public static IReadOnlyCollection<T> AsReadOnly<T>(this ICollection<T> source)
         => source as IReadOnlyCollection<T> ?? new ReadOnlyCollectionAdapter<T>(source);
