@@ -21,7 +21,7 @@ public sealed record NexusText : INexusColored
     /// <summary>
     /// The flow direction of the text
     /// </summary>
-    public TextDirection TextDirection { get; }
+    public NexusTextDirection TextDirection { get; }
 
     /// <summary>
     /// Initializes a new console text
@@ -30,7 +30,7 @@ public sealed record NexusText : INexusColored
     /// <param name="foreground">The foreground color of the text</param>
     /// <param name="background">The background color of the text, <see langword="null"/> if the console background color should be used</param>
     /// <param name="textDirection">The flow direction of the text</param>
-    public NexusText(string value, NexusColor foreground, NexusColor? background = null, TextDirection textDirection = TextDirection.Horizontal)
+    public NexusText(string value, NexusColor foreground, NexusColor? background = null, NexusTextDirection textDirection = NexusTextDirection.Horizontal)
     {
         Value = value;
         Foreground = foreground;
@@ -45,6 +45,6 @@ public sealed record NexusText : INexusColored
     /// <param name="foreground">The foreground color of the text</param>
     /// <param name="background">The background color of the text, <see langword="null"/> if the console background color should be used</param>
     /// <param name="textDirection">The flow direction of the text</param>
-    public NexusText(object value, NexusColor foreground, NexusColor? background = null, TextDirection textDirection = TextDirection.Horizontal)
+    public NexusText(object value, NexusColor foreground, NexusColor? background = null, NexusTextDirection textDirection = NexusTextDirection.Horizontal)
         : this(value?.ToString() ?? "", foreground, background, textDirection) { }
 }

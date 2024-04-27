@@ -1,10 +1,26 @@
 ﻿namespace ConsoleNexusEngine.IO;
 
 /// <summary>
-/// Virtual key codes for keyboard and mouse buttons.
+/// Virtual key codes for keyboard and mouse buttons
 /// </summary>
 public enum NexusKey
 {
+    /// <summary>
+    /// Mouse wheel rotated to the left
+    /// </summary>
+    MouseWheelLeft = -0x04,
+    /// <summary>
+    /// Mouse wheel rotated to the right
+    /// </summary>
+    MouseWheelRight = -0x03,
+    /// <summary>
+    /// Mouse wheel rotated down
+    /// </summary>
+    MouseWheelDown = -0x02,
+    /// <summary>
+    /// Mouse wheel rotated up
+    /// </summary>
+    MouseWheelUp = -0x01,
     /// <summary>No button</summary>
     None = 0x0,
     /// <summary>Left mouse button</summary>

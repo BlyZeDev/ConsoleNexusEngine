@@ -6,7 +6,7 @@
 public sealed class NexusRgbProcessor : NexusImageProcessor
 {
     /// <inheritdoc/>
-    public NexusRgbProcessor(ColorPalette colorPalette) : base(colorPalette) { }
+    public NexusRgbProcessor(NexusColorPalette colorPalette) : base(colorPalette) { }
 
     /// <inheritdoc/>
     public override NexusColor Process(in NexusColor targetColor)

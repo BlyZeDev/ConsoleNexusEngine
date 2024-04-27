@@ -7,10 +7,12 @@ using System.Collections.Immutable;
 /// </summary>
 public readonly record struct NexusInputCollection
 {
+    internal static NexusInputCollection Empty => default;
+
     /// <summary>
     /// The mouse position
     /// </summary>
-    public readonly Coord MousePosition { get; }
+    public readonly NexusCoord MousePosition { get; }
 
     /// <summary>
     /// The pressed keys
@@ -20,11 +22,11 @@ public readonly record struct NexusInputCollection
     /// <summary>
     /// Creates an empty <see cref="NexusInputCollection"/>
     /// </summary>
-    public NexusInputCollection() : this(Coord.MinValue, []) { }
+    public NexusInputCollection() : this(NexusCoord.MinValue, []) { }
 
-    internal NexusInputCollection(Coord mousePosition) : this(mousePosition, []) { }
+    internal NexusInputCollection(NexusCoord mousePosition) : this(mousePosition, []) { }
 
-    internal NexusInputCollection(Coord mousePosition, ImmutableArray<NexusKey> keys)
+    internal NexusInputCollection(NexusCoord mousePosition, ImmutableArray<NexusKey> keys)
     {
         MousePosition = mousePosition;
         Keys = keys;

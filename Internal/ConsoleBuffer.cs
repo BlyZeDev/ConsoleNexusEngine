@@ -61,7 +61,7 @@ internal sealed unsafe class ConsoleBuffer
         }
     }
 
-    public void SetBuffer(in Coord coord, in Glyph glyph)
+    public void SetBuffer(in NexusCoord coord, in Glyph glyph)
     {
         var index = coord.Y * Width + coord.X;
 

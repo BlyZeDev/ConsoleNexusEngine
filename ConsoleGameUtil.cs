@@ -18,7 +18,7 @@ public sealed class ConsoleGameUtil
     /// <summary>
     /// Generate a pseudo or strong random color
     /// </summary>
-    /// <param name="onlyColorPalette"><see langword="true"/> if only colors from the current <see cref="ColorPalette"/> should be included</param>
+    /// <param name="onlyColorPalette"><see langword="true"/> if only colors from the current <see cref="NexusColorPalette"/> should be included</param>
     /// <param name="pseudoRandom"><see langword="false"/> if it should be generated as a strong random</param>
     /// <returns><see cref="NexusColor"/></returns>
     public NexusColor GetRandomColor(bool onlyColorPalette, bool pseudoRandom = true)
@@ -45,8 +45,8 @@ public sealed class ConsoleGameUtil
     /// <param name="maxWidth">Exclusive maximum width</param>
     /// <param name="maxHeight">Exclusive maximum height</param>
     /// <param name="pseudoRandom"><see langword="false"/> if it should be generated as a strong random</param>
-    /// <returns><see cref="Coord"/></returns>
-    public Coord GetRandomCoord(int maxWidth, int maxHeight, bool pseudoRandom = true)
+    /// <returns><see cref="NexusCoord"/></returns>
+    public NexusCoord GetRandomCoord(int maxWidth, int maxHeight, bool pseudoRandom = true)
         => new(GetRandomNumber(maxWidth, pseudoRandom), GetRandomNumber(maxHeight, pseudoRandom));
 
     /// <summary>
@@ -108,7 +108,7 @@ public sealed class ConsoleGameUtil
     /// 
     /// </summary>
     /// <param name="pseudoRandom"><see langword="false"/> if it should be generated as a strong random</param>
-    /// <returns><see cref="ColorPalette"/></returns>
-    public ColorPalette GetRandomColorPalette(bool pseudoRandom = true)
-        => ColorPalette._presets[GetRandomNumber(ColorPalette._presets.Length, pseudoRandom)];
+    /// <returns><see cref="NexusColorPalette"/></returns>
+    public NexusColorPalette GetRandomColorPalette(bool pseudoRandom = true)
+        => NexusColorPalette._presets[GetRandomNumber(NexusColorPalette._presets.Length, pseudoRandom)];
 }

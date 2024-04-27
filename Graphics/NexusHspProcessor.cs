@@ -14,7 +14,7 @@ public sealed class NexusHspProcessor : NexusImageProcessor
     private readonly ImmutableArray<HSP> _colors;
     
     /// <inheritdoc/>
-    public NexusHspProcessor(ColorPalette colorPalette) : base(colorPalette)
+    public NexusHspProcessor(NexusColorPalette colorPalette) : base(colorPalette)
     {
         var builder = new SpanBuilder<HSP>();
 

@@ -47,6 +47,6 @@ public readonly record struct NexusChar : INexusColored
         Background = background;
     }
 
-    internal static NexusChar FromGlyph(Glyph glyph, ColorPalette colorPalette)
+    internal static NexusChar FromGlyph(Glyph glyph, NexusColorPalette colorPalette)
         => new(glyph.Value, colorPalette[glyph.ForegroundIndex], colorPalette[glyph.BackgroundIndex]);
 }

@@ -67,7 +67,7 @@ public abstract class ConsoleGame : IDisposable
     /// <summary>
     /// The current FPS count
     /// </summary>
-    public int FramesPerSecond { get; private set; }
+    public NexusFramerate FramesPerSecond { get; private set; }
 
     /// <summary>
     /// The time the game started, set in <see cref="Start()"/>
@@ -127,7 +127,7 @@ public abstract class ConsoleGame : IDisposable
 
         IsRunning = true;
 
-        StartTime = DateTime.Now;
+        StartTime = DateTimeOffset.Now.DateTime;
 
         _game.Start();
 
@@ -224,7 +224,7 @@ public abstract class ConsoleGame : IDisposable
             {
                 unchecked { TotalFrameCount++; }
 
-                if (Settings.AllowInputs) Update(_console.ReadInput(Settings.StopGameKey));
+                Update(_console.ReadInput(Settings.StopGameKey, Settings.AllowInputs));
 
                 accumulator -= targetFrameTime;
             }
@@ -241,7 +241,7 @@ public abstract class ConsoleGame : IDisposable
         {
             unchecked { TotalFrameCount++; }
 
-            if (Settings.AllowInputs) Update(_console.ReadInput(Settings.StopGameKey));
+            Update(_console.ReadInput(Settings.StopGameKey, Settings.AllowInputs));
         }
     }
 

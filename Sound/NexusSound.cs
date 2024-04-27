@@ -30,7 +30,7 @@ public sealed record NexusSound : IDisposable
     /// <summary>
     /// The state of the sound
     /// </summary>
-    public PlayerState State { get; private set; }
+    public NexusPlayerState State { get; private set; }
 
     /// <summary>
     /// The position of the sound
@@ -45,9 +45,9 @@ public sealed record NexusSound : IDisposable
     /// The volume of the sound
     /// </summary>
     /// <remarks>Clamped between 0 and 100</remarks>
-    public Volume Volume
+    public NexusVolume Volume
     {
-        get => (Volume)stream.Volume;
+        get => (NexusVolume)stream.Volume;
         set => stream.Volume = value._value;
     }
 
@@ -57,7 +57,7 @@ public sealed record NexusSound : IDisposable
     /// <param name="filePath">The path to the file that should be played</param>
     /// <param name="volume">The volume of the played sound</param>
     /// <param name="shouldLoop"><see langword="true"/> if the sound should be looped, otherwise <see langword="false"/></param>
-    public NexusSound(string filePath, Volume volume, bool shouldLoop = false)
+    public NexusSound(string filePath, NexusVolume volume, bool shouldLoop = false)
     {
         _wave = new WaveOutEvent();
         _wave.PlaybackStopped += OnFinish;
@@ -65,7 +65,7 @@ public sealed record NexusSound : IDisposable
         FilePath = filePath;
         IsLooped = shouldLoop;
 
-        State = PlayerState.NotStarted;
+        State = NexusPlayerState.NotStarted;
 
         InitWave(volume);
     }
@@ -75,12 +75,12 @@ public sealed record NexusSound : IDisposable
     /// </summary>
     public void Play()
     {
-        if (State is PlayerState.Playing) return;
+        if (State is NexusPlayerState.Playing) return;
 
-        if (State is PlayerState.Finished) InitWave(Volume);
+        if (State is NexusPlayerState.Finished) InitWave(Volume);
 
         _wave.Play();
-        State = PlayerState.Playing;
+        State = NexusPlayerState.Playing;
     }
 
     /// <summary>
@@ -88,10 +88,10 @@ public sealed record NexusSound : IDisposable
     /// </summary>
     public void Pause()
     {
-        if (State is not PlayerState.Playing) return;
+        if (State is not NexusPlayerState.Playing) return;
 
         _wave.Pause();
-        State = PlayerState.Paused;
+        State = NexusPlayerState.Paused;
     }
 
     /// <summary>
@@ -99,10 +99,10 @@ public sealed record NexusSound : IDisposable
     /// </summary>
     public void Stop()
     {
-        if (State is PlayerState.NotStarted or PlayerState.Finished) return;
+        if (State is NexusPlayerState.NotStarted or NexusPlayerState.Finished) return;
 
         _wave.Stop();
-        State = PlayerState.Finished;
+        State = NexusPlayerState.Finished;
     }
 
     /// <summary>
@@ -110,11 +110,11 @@ public sealed record NexusSound : IDisposable
     /// </summary>
     public void Restart()
     {
-        if (State is PlayerState.NotStarted) return;
+        if (State is NexusPlayerState.NotStarted) return;
 
         _wave.Stop();
 
-        State = PlayerState.Finished;
+        State = NexusPlayerState.Finished;
 
         Play();
     }
@@ -165,7 +165,7 @@ public sealed record NexusSound : IDisposable
         GC.SuppressFinalize(this);
     }
 
-    private void InitWave(Volume volume)
+    private void InitWave(NexusVolume volume)
     {
         stream = new LoopStream(new AudioFileReader(FilePath), IsLooped)
         {

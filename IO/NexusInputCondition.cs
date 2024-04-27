@@ -8,11 +8,11 @@ using System.Linq;
 public sealed class NexusInputCondition
 {
     private readonly Predicate<NexusKey> _keyPressCondition;
-    private readonly Predicate<Coord> _mousePosCondition;
+    private readonly Predicate<NexusCoord> _mousePosCondition;
 
     internal readonly bool _isMousePosCondition;
 
-    private NexusInputCondition(Predicate<NexusKey> keyPressCondition, Predicate<Coord> mousePosCondition, in bool isMousePosCondition)
+    private NexusInputCondition(Predicate<NexusKey> keyPressCondition, Predicate<NexusCoord> mousePosCondition, in bool isMousePosCondition)
     {
         _keyPressCondition = keyPressCondition;
         _mousePosCondition = mousePosCondition;
@@ -23,7 +23,7 @@ public sealed class NexusInputCondition
     private NexusInputCondition(Predicate<NexusKey> keyPressCondition)
         : this(keyPressCondition, (coord) => false, false) { }
 
-    private NexusInputCondition(Predicate<Coord> mousePosCondition)
+    private NexusInputCondition(Predicate<NexusCoord> mousePosCondition)
         : this((key) => false, mousePosCondition, true) { }
 
     /// <summary>
@@ -36,7 +36,7 @@ public sealed class NexusInputCondition
     /// Checks for a mouse position
     /// </summary>
     /// <param name="mousePosition">The mouse position to check for</param>
-    public NexusInputCondition(Coord mousePosition) : this((toCheck) => toCheck == mousePosition) { }
+    public NexusInputCondition(NexusCoord mousePosition) : this((toCheck) => toCheck == mousePosition) { }
 
     /// <summary>
     /// Checks if any key is pressed
@@ -53,5 +53,5 @@ public sealed class NexusInputCondition
     public static NexusInputCondition All(params NexusKey[] keys) => new((toCheck) => keys.All(x => x == toCheck));
 
     internal bool Check(NexusKey key) => _keyPressCondition(key);
-    internal bool Check(Coord mousePos) => _mousePosCondition(mousePos);
+    internal bool Check(NexusCoord mousePos) => _mousePosCondition(mousePos);
 }
