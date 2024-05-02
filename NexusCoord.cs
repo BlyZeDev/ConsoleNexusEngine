@@ -51,7 +51,7 @@ public readonly record struct NexusCoord
     /// </summary>
     /// <param name="x">The X coordinate</param>
     /// <param name="y">The Y coordinate</param>
-    public NexusCoord(int x, int y)
+    public NexusCoord(in int x, in int y)
     {
         X = Math.Clamp(x, 0, int.MaxValue);
         Y = Math.Clamp(y, 0, int.MaxValue);
@@ -63,7 +63,7 @@ public readonly record struct NexusCoord
     /// <param name="from">The coordinate where the range starts</param>
     /// <param name="to">The coordinate where the range ends</param>
     /// <returns><see cref="bool"/></returns>
-    public readonly bool IsInRange(NexusCoord from, NexusCoord to)
+    public readonly bool IsInRange(in NexusCoord from, in NexusCoord to)
         => X >= from.X && X <= to.X && Y >= from.Y && Y <= to.Y;
 
     /// <inheritdoc/>

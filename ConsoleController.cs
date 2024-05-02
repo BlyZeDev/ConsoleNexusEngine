@@ -1,21 +1,14 @@
 ﻿namespace ConsoleNexusEngine;
 
-using System;
-
 /// <summary>
 /// A controller for <see cref="ConsoleGame"/>
 /// </summary>
 /// <remarks>Provides useful input themed functions like a global controller</remarks>
 public sealed class ConsoleController
 {
-    private readonly CmdConsole _console;
     private readonly GlobalController _controller;
 
-    internal ConsoleController(CmdConsole console)
-    {
-        _console = console;
-        _controller = new GlobalController();
-    }
+    internal ConsoleController() => _controller = new GlobalController();
 
     /// <summary>
     /// Adds a control to the global controller

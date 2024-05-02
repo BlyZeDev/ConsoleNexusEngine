@@ -30,7 +30,7 @@ public abstract record NexusFont
     /// Keep in mind that some characters might not work in a font.<br/>
     /// I would recommend to test if the characters you need are included.
     /// </remarks>
-    protected NexusFont(string name, int width, int height)
+    protected NexusFont(string name, in int width, in int height)
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(width, 1, nameof(width));
         ArgumentOutOfRangeException.ThrowIfLessThan(height, 1, nameof(height));

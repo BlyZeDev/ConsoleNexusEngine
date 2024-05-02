@@ -10,17 +10,17 @@ public readonly partial record struct NexusColor : ISpanParsable<NexusColor>, IP
     /// <summary>
     /// Red component of the color
     /// </summary>
-    public byte R => (byte)(_value >> 16);
+    public readonly byte R => (byte)(_value >> 16);
 
     /// <summary>
     /// Green component of the color
     /// </summary>
-    public byte G => (byte)(_value >> 8);
+    public readonly byte G => (byte)(_value >> 8);
 
     /// <summary>
     /// Blue component of the color
     /// </summary>
-    public byte B => (byte)_value;
+    public readonly byte B => (byte)_value;
 
     internal NexusColor(in uint color) => _value = color;
 
@@ -41,13 +41,13 @@ public readonly partial record struct NexusColor : ISpanParsable<NexusColor>, IP
     /// 1.0 is <see cref="White"/>, 0.0 is <see cref="Black"/>
     /// </summary>
     /// <returns><see cref="float"/> between 0.0 and 1.0</returns>
-    public float GetLuminance()
+    public readonly float GetLuminance()
         => (0.2126f * R + 0.7152f * G + 0.0722f * B) / 255f;
 
     /// <summary>
     /// Format: "[R={<see cref="R"/>},G={<see cref="G"/>},B={<see cref="B"/>}]"
     /// </summary>
     /// <returns><see cref="string"/></returns>
-    public override string ToString()
+    public override readonly string ToString()
         => $"[R={R},G={G},B={B}]";
 }

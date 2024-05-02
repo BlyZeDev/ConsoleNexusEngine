@@ -25,12 +25,12 @@ public readonly record struct NexusVolume
     /// The volume between 0 and 100
     /// </summary>
     /// <remarks>Value is clamped between 0 and 100</remarks>
-    public int Value => (int)(_value * 100);
+    public readonly int Value => (int)(_value * 100);
 
     /// <summary>
     /// Returns <see langword="true"/> if the volume is muted, otherwise <see langword="false"/>
     /// </summary>
-    public bool IsMute => Value is 0;
+    public readonly bool IsMute => Value is 0;
 
     static NexusVolume()
     {
@@ -46,24 +46,24 @@ public readonly record struct NexusVolume
     /// <summary>
     /// Initializes a Volume instance
     /// </summary>
-    public NexusVolume(int volume) : this(volume / 100f) { }
+    public NexusVolume(in int volume) : this(volume / 100f) { }
 
     /// <summary>
     /// Initializes a Volume instance
     /// </summary>
-    public NexusVolume(float volume) => _value = Math.Clamp(volume, 0, 1);
+    public NexusVolume(in float volume) => _value = Math.Clamp(volume, 0, 1);
 
     /// <inheritdoc/>
-    public static explicit operator int(NexusVolume volume) => volume.Value;
+    public static explicit operator int(in NexusVolume volume) => volume.Value;
 
     /// <inheritdoc/>
-    public static explicit operator NexusVolume(int volume) => new(volume);
+    public static explicit operator NexusVolume(in int volume) => new(volume);
 
     /// <inheritdoc/>
-    public static explicit operator float(NexusVolume volume) => volume._value;
+    public static explicit operator float(in NexusVolume volume) => volume._value;
 
     /// <inheritdoc/>
-    public static explicit operator NexusVolume(float volume) => new(volume);
+    public static explicit operator NexusVolume(in float volume) => new(volume);
 
     /// <inheritdoc/>
     public static NexusVolume operator +(NexusVolume left, NexusVolume right)
@@ -88,5 +88,5 @@ public readonly record struct NexusVolume
     public static NexusVolume operator --(NexusVolume value) => new(value._value - 0.01f);
 
     /// <inheritdoc/>
-    public override string ToString() => Value.ToString();
+    public override readonly string ToString() => Value.ToString();
 }

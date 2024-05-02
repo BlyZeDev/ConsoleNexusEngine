@@ -16,14 +16,11 @@ public sealed class NexusHspProcessor : NexusImageProcessor
     /// <inheritdoc/>
     public NexusHspProcessor(NexusColorPalette colorPalette) : base(colorPalette)
     {
-        var builder = new SpanBuilder<HSP>();
+        var builder = ImmutableArray.CreateBuilder<HSP>(16);
 
-        foreach (var color in _colorPalette)
-        {
-            builder.Append(RgbToHsp(color));
-        }
+        foreach (var color in _colorPalette) builder.Add(RgbToHsp(color));
 
-        _colors = ImmutableArray.Create(builder.AsReadOnlySpan());
+        _colors = builder.MoveToImmutable();
     }
     
     /// <inheritdoc/>
@@ -101,8 +98,8 @@ public sealed class NexusHspProcessor : NexusImageProcessor
 
     private readonly record struct HSP
     {
-        public required double H { get; init; }
-        public required double S { get; init; }
-        public required double P { get; init; }
+        public readonly required double H { get; init; }
+        public readonly required double S { get; init; }
+        public readonly required double P { get; init; }
     }
 }

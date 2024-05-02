@@ -35,7 +35,7 @@ internal sealed class CmdConsole
         Buffer = new ConsoleBuffer(dimensions.X, dimensions.Y);
     }
 
-    public NexusInputCollection ReadInput(NexusKey stopGameKey, in bool inputAllowed)
+    public NexusInputCollection ReadInput(in NexusKey stopGameKey, in bool inputAllowed)
     {
         if (!inputAllowed)
         {
@@ -249,9 +249,9 @@ internal sealed class CmdConsole
         Buffer.ChangeDimensions(csbe.dwSize.X, csbe.dwSize.Y);
     }
 
-    private static bool IsKeyPressed(NexusKey key) => (Native.GetAsyncKeyState((int)key) & 0b1000) is not 0;
+    private static bool IsKeyPressed(in NexusKey key) => (Native.GetAsyncKeyState((int)key) & 0b1000) is not 0;
 
-    private static ReadOnlySpan<NexusKey> GetMouseButtons(uint buttonState)
+    private static ReadOnlySpan<NexusKey> GetMouseButtons(in uint buttonState)
     {
         if (buttonState is 0) return [];
 

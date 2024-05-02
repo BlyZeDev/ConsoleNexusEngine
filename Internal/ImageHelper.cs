@@ -4,22 +4,22 @@ using System.Drawing;
 
 internal static class ImageHelper
 {
-    public static Bitmap Resize(Bitmap bitmap, Size size)
+    public static Bitmap Resize(Bitmap bitmap, in NexusSize? size)
     {
-        if (size.IsEmpty) return bitmap;
+        if (!size.HasValue) return bitmap;
 
-        var resized = new Bitmap(size.Width, size.Height);
+        var resized = new Bitmap(size.Value.Width, size.Value.Height);
 
         using (var graphics = Graphics.FromImage(resized))
         {
-            graphics.DrawImage(bitmap, 0, 0, size.Width, size.Height);
+            graphics.DrawImage(bitmap, 0, 0, size.Value.Width, size.Value.Height);
         }
 
         return resized;
     }
 
-    public static Size GetSize(in int width, in int height, in float percentage)
+    public static NexusSize GetSize(in int width, in int height, in float percentage)
         => percentage <= 0
-        ? new Size(width, height)
-        : new Size((int)(width * percentage), (int)(height * percentage));
+        ? new NexusSize(width, height)
+        : new NexusSize((int)(width * percentage), (int)(height * percentage));
 }

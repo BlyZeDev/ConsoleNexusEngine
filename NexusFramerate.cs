@@ -30,7 +30,7 @@ public readonly record struct NexusFramerate
     /// </summary>
     /// <param name="framerate">Frames per second</param>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
-    public NexusFramerate(int framerate)
+    public NexusFramerate(in int framerate)
     {
         if (framerate < -1)
             throw new ArgumentOutOfRangeException(nameof(framerate), "The framerate can't be lower than -1 (unlimited)");
@@ -42,13 +42,13 @@ public readonly record struct NexusFramerate
     /// Explicitly converts <see cref="NexusFramerate"/> to <see cref="int"/>
     /// </summary>
     /// <param name="framerate">Framerate to convert</param>
-    public static explicit operator int(NexusFramerate framerate) => framerate.Value;
+    public static explicit operator int(in NexusFramerate framerate) => framerate.Value;
 
     /// <summary>
     /// Implicitly converts <see cref="int"/> to <see cref="NexusFramerate"/>
     /// </summary>
     /// <param name="framerate">Framerate to convert</param>
-    public static implicit operator NexusFramerate(int framerate) => new(framerate);
+    public static implicit operator NexusFramerate(in int framerate) => new(framerate);
 
     /// <inheritdoc/>
     public override readonly string ToString() => Value.ToString();

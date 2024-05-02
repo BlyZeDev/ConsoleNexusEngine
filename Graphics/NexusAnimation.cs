@@ -23,56 +23,7 @@ public sealed class NexusAnimation
     /// </summary>
     public int Height { get; }
 
-    /// <summary>
-    /// Initializes a new NexusAnimation
-    /// </summary>
-    /// <param name="filepath">The path to the gif file</param>
-    /// <param name="imageProcessor">The image processor that should be used</param>
-    public NexusAnimation(string filepath, NexusImageProcessor imageProcessor)
-        : this(filepath, imageProcessor, Size.Empty) { }
-
-    /// <summary>
-    /// Initializes a new NexusAnimation
-    /// </summary>
-    /// <param name="animation">The gif file</param>
-    /// <param name="imageProcessor">The image processor that should be used</param>
-    public NexusAnimation(Bitmap animation, NexusImageProcessor imageProcessor)
-        : this(animation, imageProcessor, Size.Empty) { }
-
-    /// <summary>
-    /// Initializes a new NexusAnimation
-    /// </summary>
-    /// <param name="filepath">The path to the gif file</param>
-    /// <param name="imageProcessor">The image processor that should be used</param>
-    /// <param name="percentage">The desired percentage size of the bitmap</param>
-    public NexusAnimation(string filepath, NexusImageProcessor imageProcessor, float percentage)
-        : this(new Bitmap(filepath), imageProcessor, percentage) { }
-
-    /// <summary>
-    /// Initializes a new NexusAnimation
-    /// </summary>
-    /// <param name="animation">The gif file</param>
-    /// <param name="imageProcessor">The image processor that should be used</param>
-    /// <param name="percentage">The desired percentage size of the bitmap</param>
-    public NexusAnimation(Bitmap animation, NexusImageProcessor imageProcessor, float percentage)
-        : this(animation, imageProcessor, ImageHelper.GetSize(animation.Width, animation.Height, percentage)) { }
-
-    /// <summary>
-    /// Initializes a new NexusAnimation
-    /// </summary>
-    /// <param name="filepath">The path to the gif file</param>
-    /// <param name="imageProcessor">The image processor that should be used</param>
-    /// <param name="size">The desired size of the animation</param>
-    public NexusAnimation(string filepath, NexusImageProcessor imageProcessor, Size size)
-        : this(new Bitmap(filepath), imageProcessor, size) { }
-
-    /// <summary>
-    /// Initializes a new NexusAnimation
-    /// </summary>
-    /// <param name="animation">The gif file</param>
-    /// <param name="imageProcessor">The image processor that should be used</param>
-    /// <param name="size">The desired size of the animation</param>
-    public NexusAnimation(Bitmap animation, NexusImageProcessor imageProcessor, Size size)
+    private NexusAnimation(Bitmap animation, NexusImageProcessor imageProcessor, in NexusSize? size)
     {
         if (animation.RawFormat.Guid != ImageFormat.Gif.Guid)
             throw new ArgumentException("The file has to be a gif file");
@@ -86,6 +37,58 @@ public sealed class NexusAnimation
 
         currentFrameIndex = -1;
     }
+
+    /// <summary>
+    /// Initializes a new NexusAnimation
+    /// </summary>
+    /// <param name="filepath">The path to the gif file</param>
+    /// <param name="imageProcessor">The image processor that should be used</param>
+    public NexusAnimation(string filepath, NexusImageProcessor imageProcessor)
+        : this(new Bitmap(filepath), imageProcessor, null) { }
+
+    /// <summary>
+    /// Initializes a new NexusAnimation
+    /// </summary>
+    /// <param name="animation">The gif file</param>
+    /// <param name="imageProcessor">The image processor that should be used</param>
+    public NexusAnimation(Bitmap animation, NexusImageProcessor imageProcessor)
+        : this(animation, imageProcessor, null) { }
+
+    /// <summary>
+    /// Initializes a new NexusAnimation
+    /// </summary>
+    /// <param name="filepath">The path to the gif file</param>
+    /// <param name="imageProcessor">The image processor that should be used</param>
+    /// <param name="percentage">The desired percentage size of the bitmap</param>
+    public NexusAnimation(string filepath, NexusImageProcessor imageProcessor, in float percentage)
+        : this(new Bitmap(filepath), imageProcessor, percentage) { }
+
+    /// <summary>
+    /// Initializes a new NexusAnimation
+    /// </summary>
+    /// <param name="animation">The gif file</param>
+    /// <param name="imageProcessor">The image processor that should be used</param>
+    /// <param name="percentage">The desired percentage size of the bitmap</param>
+    public NexusAnimation(Bitmap animation, NexusImageProcessor imageProcessor, in float percentage)
+        : this(animation, imageProcessor, ImageHelper.GetSize(animation.Width, animation.Height, percentage)) { }
+
+    /// <summary>
+    /// Initializes a new NexusAnimation
+    /// </summary>
+    /// <param name="filepath">The path to the gif file</param>
+    /// <param name="imageProcessor">The image processor that should be used</param>
+    /// <param name="size">The desired size of the animation</param>
+    public NexusAnimation(string filepath, NexusImageProcessor imageProcessor, in NexusSize size)
+        : this(new Bitmap(filepath), imageProcessor, size) { }
+
+    /// <summary>
+    /// Initializes a new NexusAnimation
+    /// </summary>
+    /// <param name="animation">The gif file</param>
+    /// <param name="imageProcessor">The image processor that should be used</param>
+    /// <param name="size">The desired size of the animation</param>
+    public NexusAnimation(Bitmap animation, NexusImageProcessor imageProcessor, in NexusSize size)
+        : this(animation, imageProcessor, new NexusSize?(size)) { }
 
     /// <summary>
     /// Initializes a new NexusAnimation
@@ -117,11 +120,9 @@ public sealed class NexusAnimation
     {
         using (var client = new HttpClient())
         {
-            using (var stream = TaskHelper.RunSync(() => client.GetStreamAsync(url)))
+            using (var stream = TaskHelper.RunSync(() => client.GetStreamAsync(url)) ?? throw new HttpRequestException("Couldn't read the image"))
             {
-                return stream is null
-                    ? throw new HttpRequestException("Couldn't read the image")
-                    : new NexusAnimation(new Bitmap(stream), imageProcessor);
+                return new NexusAnimation(new Bitmap(stream), imageProcessor);
             }
         }
     }
@@ -135,7 +136,7 @@ public sealed class NexusAnimation
         return _images.Span[currentFrameIndex];
     }
 
-    private static ReadOnlyMemory<NexusImage> Initialize(Bitmap bitmap, NexusImageProcessor processor, Size size)
+    private static ReadOnlyMemory<NexusImage> Initialize(Bitmap bitmap, NexusImageProcessor processor, in NexusSize? size)
     {
         var dimension = new FrameDimension(bitmap.FrameDimensionsList[0]);
         var frames = bitmap.GetFrameCount(dimension);

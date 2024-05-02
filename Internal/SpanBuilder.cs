@@ -11,7 +11,7 @@ internal ref struct SpanBuilder<T>
 
     public SpanBuilder() : this([]) { }
 
-    public SpanBuilder(Span<T> initialBuffer)
+    public SpanBuilder(scoped in Span<T> initialBuffer)
     {
         _arrayToReturnToPool = [];
         values = initialBuffer;
@@ -31,7 +31,7 @@ internal ref struct SpanBuilder<T>
 
     public readonly int Capacity => values.Length;
 
-    public ref T this[int index] => ref values[index];
+    public ref readonly T this[in int index] => ref values[index];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Append(T value)
@@ -46,7 +46,7 @@ internal ref struct SpanBuilder<T>
         GrowAndAppend(value);
     }
 
-    public void Append(ReadOnlySpan<T> value)
+    public void Append(in ReadOnlySpan<T> value)
     {
         if (pos > values.Length - value.Length) Grow(value.Length);
 
@@ -64,7 +64,7 @@ internal ref struct SpanBuilder<T>
     }
 
     [MethodImpl(MethodImplOptions.NoInlining)]
-    private void Grow(int additionalCapacity)
+    private void Grow(in int additionalCapacity)
     {
         if (additionalCapacity < 1) return;
         if (pos <= values.Length - additionalCapacity) return;
@@ -79,10 +79,10 @@ internal ref struct SpanBuilder<T>
     }
 
     public readonly Span<T> AsSpan() => values[..pos];
-    public readonly Span<T> AsSpan(int start) => values[start..pos];
-    public readonly Span<T> AsSpan(int start, int length) => values.Slice(start, length);
+    public readonly Span<T> AsSpan(in int start) => values[start..pos];
+    public readonly Span<T> AsSpan(in int start, in int length) => values.Slice(start, length);
 
     public readonly ReadOnlySpan<T> AsReadOnlySpan() => values[..pos];
-    public readonly ReadOnlySpan<T> AsReadOnlySpan(int start) => values[start..pos];
-    public readonly ReadOnlySpan<T> AsReadOnlySpan(int start, int length) => values.Slice(start, length);
+    public readonly ReadOnlySpan<T> AsReadOnlySpan(in int start) => values[start..pos];
+    public readonly ReadOnlySpan<T> AsReadOnlySpan(in int start, in int length) => values.Slice(start, length);
 }

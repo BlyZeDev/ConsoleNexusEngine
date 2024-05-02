@@ -51,7 +51,7 @@ internal sealed unsafe class ConsoleBuffer
     {
         Glyph current;
 
-        for (int i = 0; i < glyphBuffer.Length; ++i)
+        for (int i = 0; i < glyphBuffer.Length; i++)
         {
             current = glyphBuffer[i];
 
@@ -61,9 +61,9 @@ internal sealed unsafe class ConsoleBuffer
         }
     }
 
-    public void SetBuffer(in NexusCoord coord, in Glyph glyph)
+    public void SetBuffer(in int x, in int y, in Glyph glyph)
     {
-        var index = coord.Y * Width + coord.X;
+        var index = y * Width + x;
 
         charInfoBuffer[index].Attributes = (short)(glyph.ForegroundIndex | glyph.BackgroundIndex << 4);
         charInfoBuffer[index].UnicodeChar = glyph.Value;

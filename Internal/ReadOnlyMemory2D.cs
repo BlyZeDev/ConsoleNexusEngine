@@ -11,7 +11,7 @@ internal readonly struct ReadOnlyMemory2D<T> where T : struct
 
     public readonly int Length => _memory.Length;
 
-    public ReadOnlyMemory2D(Memory<T> memory, in int width, in int height)
+    public ReadOnlyMemory2D(in ReadOnlyMemory<T> memory, in int width, in int height)
     {
         _memory = memory;
         Width = width;
@@ -26,10 +26,10 @@ internal readonly struct ReadOnlyMemory2D<T> where T : struct
 
     public ReadOnlyMemory2D<T> Resize(in int width, in int height)
     {
-        var newArr = new T[width * height];
+        var newMemory = new T[width * height].AsMemory();
 
-        _memory.TryCopyTo(newArr);
+        _memory.TryCopyTo(newMemory);
 
-        return new ReadOnlyMemory2D<T>(newArr, width, height);
+        return new ReadOnlyMemory2D<T>(newMemory, width, height);
     }
 }

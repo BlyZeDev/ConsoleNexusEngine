@@ -1,9 +1,12 @@
 ﻿namespace ConsoleNexusEngine;
 
+using System.Drawing;
+using System.Drawing.Imaging;
+
 /// <summary>
 /// The graphics engine for <see cref="ConsoleGame"/>
 /// </summary>
-public sealed class ConsoleGraphic
+public sealed partial class ConsoleGraphic
 {
     private readonly CmdConsole _console;
     private readonly ConsoleGameSettings _settings;
@@ -28,9 +31,8 @@ public sealed class ConsoleGraphic
     /// Gets a pixel in the console at a specific position
     /// </summary>
     /// <param name="coordinate">The coordinates where the character should be placed</param>
-    /// <exception cref="ArgumentOutOfRangeException"></exception>
     /// <returns><see cref="NexusChar"/></returns>
-    public NexusChar GetPixel(NexusCoord coordinate)
+    public NexusChar GetPixel(in NexusCoord coordinate)
     {
         ThrowIfOutOfBounds(coordinate);
 
@@ -40,7 +42,7 @@ public sealed class ConsoleGraphic
     }
 
     /// <summary>
-    /// Gets the whole buffer of the console as 2d array
+    /// Gets the whole buffer of the console as two-dimensional array
     /// </summary>
     /// <remarks>
     /// This includes characters that are not rendered yet
@@ -62,13 +64,11 @@ public sealed class ConsoleGraphic
     }
 
     /// <summary>
-    /// Sets a pixel in the console at a specific position
+    /// Draws a pixel in the console at a specific position
     /// </summary>
-    /// <param name="coordinate">The coordinates where the character should be placed</param>
+    /// <param name="coordinate">The coordinates where the character should be drawn</param>
     /// <param name="character">The character to draw</param>
-    /// <exception cref="ArgumentException"></exception>
-    /// <exception cref="ArgumentOutOfRangeException"></exception>
-    public void DrawPixel(NexusCoord coordinate, NexusChar character)
+    public void DrawPixel(in NexusCoord coordinate, in NexusChar character)
     {
         ThrowIfOutOfBounds(coordinate);
         GetOrThrowColorIndex(character.Foreground, character.Background, nameof(character), out var foregroundColorIndex, out var backgroundColorIndex);
@@ -77,50 +77,47 @@ public sealed class ConsoleGraphic
     }
 
     /// <summary>
-    /// Sets a text in the console at a specific position
+    /// Draws a text in the console at a specific position
     /// </summary>
     /// <param name="coordinate">The coordinates where the text should start</param>
     /// <param name="text">The text to draw</param>
-    /// <exception cref="ArgumentException"></exception>
-    /// <exception cref="ArgumentOutOfRangeException"></exception>
-    public void DrawText(NexusCoord coordinate, NexusText text)
+    public void DrawText(in NexusCoord coordinate, NexusText text)
     {
         var isHorizontal = text.TextDirection is NexusTextDirection.Horizontal;
+
         ThrowIfOutOfBounds(coordinate + (isHorizontal ? new NexusCoord(text.Value.Length - 1, 0) : new NexusCoord(0, text.Value.Length - 1)));
         GetOrThrowColorIndex(text.Foreground, text.Background, nameof(text), out var foregroundColorIndex, out var backgroundColorIndex);
 
-        var posX = -1;
-        var posY = -1;
-        foreach (var letter in text.Value)
+        var posX = isHorizontal ? -1 : 0;
+        var posY = isHorizontal ? 0 : -1;
+        foreach (var letter in text.Value.AsSpan())
         {
             if (isHorizontal) posX++;
             else posY++;
 
-            SetGlyph(coordinate + new NexusCoord(posX, posY), new Glyph(letter, foregroundColorIndex, backgroundColorIndex));
+            SetGlyph(coordinate.X + posX, coordinate.Y + posY, new Glyph(letter, foregroundColorIndex, backgroundColorIndex));
         }
     }
 
     /// <summary>
-    /// Sets a text in the console at a specific position
+    /// Draws a text in the console at a specific position
     /// </summary>
     /// <param name="coordinate">The coordinates where the text should start</param>
     /// <param name="text">The text to draw</param>
-    /// <exception cref="ArgumentException"></exception>
-    /// <exception cref="ArgumentOutOfRangeException"></exception>
-    public void DrawText(NexusCoord coordinate, NexusFiggleText text)
+    public void DrawText(in NexusCoord coordinate, NexusFiggleText text)
     {
         ThrowIfOutOfBounds(coordinate + new NexusCoord(text._longestStringLength, text.Value.Length - 1));
         GetOrThrowColorIndex(text.Foreground, text.Background, nameof(text), out var foregroundColorIndex, out var backgroundColorIndex);
 
         var posX = -1;
         var posY = -1;
-        foreach (var letters in text.Value)
+        foreach (var letters in text.Value.AsSpan())
         {
             posY++;
-            foreach (var letter in letters)
+            foreach (var letter in letters.AsSpan())
             {
                 posX++;
-                SetGlyph(coordinate + new NexusCoord(posX, posY), new Glyph(letter, foregroundColorIndex, backgroundColorIndex));
+                SetGlyph(coordinate.X + posX, coordinate.Y + posY, new Glyph(letter, foregroundColorIndex, backgroundColorIndex));
             }
 
             posX = -1;
@@ -128,12 +125,11 @@ public sealed class ConsoleGraphic
     }
 
     /// <summary>
-    /// Sets an image in the console at a specific position
+    /// Draws an image in the console at a specific position
     /// </summary>
-    /// <remarks>The coordinate is the top left of the image</remarks>
     /// <param name="coordinate">The top left coordinates of the image</param>
     /// <param name="image">The image to draw</param>
-    public void DrawImage(NexusCoord coordinate, NexusImage image)
+    public void DrawImage(in NexusCoord coordinate, in NexusImage image)
     {
         ThrowIfOutOfBounds(coordinate);
         ThrowIfOutOfBounds(new NexusCoord(image.Width - 1, image.Height - 1));
@@ -147,24 +143,24 @@ public sealed class ConsoleGraphic
 
                 GetOrThrowColorIndex(currentPixel.Foreground, currentPixel.Background, nameof(image), out var foregroundColorIndex, out var backgroundColorIndex);
 
-                SetGlyph(new NexusCoord(xCord, yCord), new Glyph(image[x, y].Value, foregroundColorIndex, backgroundColorIndex));
+                SetGlyph(xCord, yCord, new Glyph(currentPixel.Value, foregroundColorIndex, backgroundColorIndex));
             }
         }
     }
 
     /// <summary>
-    /// Sets the current animation frame in the console at a specific position
+    /// Draws the current animation frame in the console at a specific position
     /// </summary>
     /// <param name="coordinate">The top left coordinates of the animation</param>
     /// <param name="animation">The animation to draw</param>
-    public void DrawAnimation(NexusCoord coordinate, NexusAnimation animation) => DrawImage(coordinate, animation.NextFrame());
+    public void DrawAnimation(in NexusCoord coordinate, NexusAnimation animation) => DrawImage(coordinate, animation.NextFrame());
 
     /// <summary>
-    /// Sets a pixel in the console at specific positions
+    /// Draws pixels in the console at specific positions
     /// </summary>
     /// <param name="character">The character to draw</param>
-    /// <param name="coordinates">The coordinates where the character should be placed</param>
-    public void DrawPixels(NexusChar character, in ReadOnlySpan<NexusCoord> coordinates)
+    /// <param name="coordinates">The coordinates where the character should be drawn</param>
+    public void DrawPixels(in NexusChar character, in ReadOnlySpan<NexusCoord> coordinates)
     {
         GetOrThrowColorIndex(character.Foreground, character.Background, nameof(character), out var foregroundColorIndex, out var backgroundColorIndex);
 
@@ -178,11 +174,11 @@ public sealed class ConsoleGraphic
     }
 
     /// <summary>
-    /// Sets a pixel in the console at specific positions
+    /// Draws a pixel in the console at specific positions
     /// </summary>
     /// <param name="character">The character to draw</param>
-    /// <param name="coordinates">The coordinates where the character should be placed</param>
-    public void DrawPixels(NexusChar character, params NexusCoord[] coordinates)
+    /// <param name="coordinates">The coordinates where the character should be drawn</param>
+    public void DrawPixels(in NexusChar character, params NexusCoord[] coordinates)
         => DrawPixels(character, coordinates.AsSpan());
 
     /// <summary>
@@ -191,7 +187,7 @@ public sealed class ConsoleGraphic
     /// <param name="start">The coordinate of the start point</param>
     /// <param name="end">The coordinate of the end point</param>
     /// <param name="character">The character to draw</param>
-    public void DrawLine(NexusCoord start, NexusCoord end, NexusChar character)
+    public void DrawLine(in NexusCoord start, in NexusCoord end, in NexusChar character)
     {
         ThrowIfOutOfBounds(start);
         ThrowIfOutOfBounds(end);
@@ -211,7 +207,7 @@ public sealed class ConsoleGraphic
 
             for (int y = startCoord; y <= endCoord; y++)
             {
-                SetGlyph(new NexusCoord(startX, y), glyph);
+                SetGlyph(startX, y, glyph);
             }
 
             return;
@@ -224,7 +220,7 @@ public sealed class ConsoleGraphic
 
             for (int x = startCoord; x <= endCoord; x++)
             {
-                SetGlyph(new NexusCoord(x, startY), glyph);
+                SetGlyph(x, startY, glyph);
             }
 
             return;
@@ -262,7 +258,7 @@ public sealed class ConsoleGraphic
 
         for (int i = 0; i <= longest; i++)
         {
-            SetGlyph(new NexusCoord(startX, startY), glyph);
+            SetGlyph(startX, startY, glyph);
 
             numerator += shortest;
 
@@ -283,47 +279,26 @@ public sealed class ConsoleGraphic
     /// <summary>
     /// Draws a shape from one coordinate to another
     /// </summary>
+    /// <param name="start">The top left coordinate of the start point</param>
     /// <param name="shape">The shape to draw</param>
-    /// <param name="start">The coordinate of the start of the point</param>
-    /// <param name="end">The coordinate of the end of the point</param>
-    /// <param name="character">The character to draw</param>
-    public void DrawShape(NexusShape shape, NexusCoord start, NexusCoord end, NexusChar character)
+    public void DrawShape(in NexusCoord start, INexusShape shape)
     {
-        switch (shape)
-        {
-            case NexusShape.Rectangle: DrawRectangle(start, end, character); break;
-            case NexusShape.Ellipse: DrawEllipse(start, end, character); break;
-        }
+        ThrowIfOutOfBounds(start);
+        ThrowIfOutOfBounds(new NexusCoord(start.X + shape.Size.Width, start.Y + shape.Size.Height));
+        GetOrThrowColorIndex(shape.Character.Foreground, shape.Character.Background, nameof(shape.Character), out var foregroundColorIndex, out var backgroundColorIndex);
+
+        DrawShape(start, shape, new Glyph(shape.Character.Value, foregroundColorIndex, backgroundColorIndex));
     }
 
     /// <summary>
-    /// Fills a shape from one coordinate to another
-    /// </summary>
-    /// <param name="shape">The shape to draw</param>
-    /// <param name="start">The coordinate of the start of the point</param>
-    /// <param name="end">The coordinate of the end of the point</param>
-    /// <param name="character">The character to draw</param>
-    public void FillShape(NexusShape shape, NexusCoord start, NexusCoord end, NexusChar character)
-    {
-        switch (shape)
-        {
-            case NexusShape.Rectangle: FillRectangle(start, end, character); break;
-        }
-    }
-
-    /// <summary>
-    /// Set the background of the whole console to a specific color
+    /// Set the background of the console to a specific color
     /// </summary>
     /// <param name="color">The color to set as background</param>
-    /// <exception cref="ArgumentException"></exception>
-    public void SetBackground(NexusColor color)
+    public void SetBackground(in NexusColor color)
     {
         var index = _settings.ColorPalette.Colors.GetKey(color);
 
-        if (index is -1)
-            throw new ArgumentException("The color is not in the color palette", nameof(color));
-
-        BackgroundIndex = index;
+        BackgroundIndex = index is -1 ? throw new ArgumentException("The color is not in the color palette", nameof(color)) : index;
 
         _console.Buffer.SetBackgroundBuffer(glyphBuffer, BackgroundIndex);
     }
@@ -332,7 +307,7 @@ public sealed class ConsoleGraphic
     /// Clears a pixel in the console at a specific position
     /// </summary>
     /// <param name="coordinate">The coordinates where the character should be cleared</param>
-    public void ClearAt(NexusCoord coordinate)
+    public void ClearPixel(in NexusCoord coordinate)
     {
         ThrowIfOutOfBounds(coordinate);
 
@@ -340,17 +315,17 @@ public sealed class ConsoleGraphic
     }
 
     /// <summary>
-    /// Clears a specific whole column
+    /// Clears a whole column
     /// </summary>
     /// <param name="column">The column to clear</param>
-    public void ClearColumn(int column)
+    public void ClearColumn(in int column)
         => ClearLine(new NexusCoord(column, 0), new NexusCoord(column, _console.Buffer.Height - 1));
 
     /// <summary>
-    /// Clears a specific whole row
+    /// Clears a whole row
     /// </summary>
     /// <param name="row">The row to clear</param>
-    public void ClearRow(int row)
+    public void ClearRow(in int row)
         => ClearLine(new NexusCoord(0, row), new NexusCoord(_console.Buffer.Width - 1, row));
 
     /// <summary>
@@ -358,8 +333,16 @@ public sealed class ConsoleGraphic
     /// </summary>
     /// <param name="start">The coordinate of the start point</param>
     /// <param name="end">The coordinate of the end point</param>
-    public void ClearLine(NexusCoord start, NexusCoord end)
+    public void ClearLine(in NexusCoord start, in NexusCoord end)
         => DrawLine(start, end, NexusChar.FromGlyph(GetClearGlyph(), _settings.ColorPalette));
+
+    /// <summary>
+    /// Clears a shape from one coordinate to another
+    /// </summary>
+    /// <param name="start">The top left coordinate of the start point</param>
+    /// <param name="shape">The shape to clear</param>
+    public void ClearShape(in NexusCoord start, INexusShape shape)
+        => DrawShape(start, shape, GetClearGlyph());
 
     /// <summary>
     /// Clears the current buffer of the console
@@ -381,122 +364,4 @@ public sealed class ConsoleGraphic
 
         SetBackground(_settings.ColorPalette[BackgroundIndex]);
     }
-
-    private void DrawRectangle(in NexusCoord start, in NexusCoord end, in NexusChar character)
-    {
-        var bottomLeft = new NexusCoord(start.X, end.Y);
-        var topRight = new NexusCoord(end.X, start.Y);
-
-        DrawLine(start, bottomLeft, character);
-        DrawLine(start, topRight, character);
-        DrawLine(bottomLeft, end, character);
-        DrawLine(topRight, end, character);
-    }
-
-    private void DrawEllipse(in NexusCoord start, in NexusCoord end, in NexusChar character)
-    {
-        ThrowIfOutOfBounds(start);
-        ThrowIfOutOfBounds(end);
-        GetOrThrowColorIndex(character.Foreground, character.Background, nameof(character), out var foregroundColorIndex, out var backgroundColorIndex);
-
-        var glyph = new Glyph(character.Value, foregroundColorIndex, backgroundColorIndex);
-
-        var width = end.X - start.X;
-        var height = end.Y - start.Y;
-
-        var centerX = width / 2;
-        var centerY = height / 2;
-
-        var radiusX = start.X + centerX;
-        var radiusY = start.Y + centerY;
-
-        var x = 0;
-        var y = centerY;
-
-        var d1 = centerY * centerY - centerX * centerX * centerY;
-        var dx = 2 * centerY * centerY * x;
-        var dy = 2 * centerX * centerX * y;
-
-        while (dx < dy)
-        {
-            SetGlyph(new NexusCoord(x + radiusX, y + radiusY), glyph);
-            SetGlyph(new NexusCoord(-x + radiusX, y + radiusY), glyph);
-            SetGlyph(new NexusCoord(x + radiusX, -y + radiusY), glyph);
-            SetGlyph(new NexusCoord(-x + radiusX, -y + radiusY), glyph);
-
-            if (d1 < 0)
-            {
-                x++;
-                dx += 2 * centerY * centerY;
-                d1 = d1 + dx + centerY * centerY;
-            }
-            else
-            {
-                x++;
-                y--;
-                dx += 2 * centerY * centerY;
-                dy -= 2 * centerX * centerX;
-                d1 = d1 + dx - dy + centerY * centerY;
-            }
-        }
-
-        var d2 = centerY * centerY * ((x + 0.5) * (x + 0.5)) + centerX * centerX * ((y - 1) * (y - 1)) - centerX * centerX * centerY * centerY;
-
-        while (y >= 0)
-        {
-            SetGlyph(new NexusCoord(x + radiusX, y + radiusY), glyph);
-            SetGlyph(new NexusCoord(-x + radiusX, y + radiusY), glyph);
-            SetGlyph(new NexusCoord(x + radiusX, -y + radiusY), glyph);
-            SetGlyph(new NexusCoord(-x + radiusX, -y + radiusY), glyph);
-
-            if (d2 > 0)
-            {
-                y--;
-                dy -= 2 * centerX * centerX;
-                d2 = d2 + centerX * centerX - dy;
-            }
-            else
-            {
-                y--;
-                x++;
-                dx += 2 * centerY * centerY;
-                dy -= 2 * centerX * centerX;
-                d2 = d2 + dx - dy + centerX * centerX;
-            }
-        }
-    }
-
-    private void FillRectangle(in NexusCoord start, in NexusCoord end, in NexusChar character)
-    {
-        for (int y = start.Y; y <= end.Y; y++)
-        {
-            DrawLine(new NexusCoord(start.X, y), new NexusCoord(end.X, y), character);
-        }
-    }
-
-    private void SetGlyph(in NexusCoord coord, in Glyph glyph)
-    {
-        glyphBuffer[coord.X, coord.Y] = glyph;
-        _console.Buffer.SetBuffer(coord, glyph);
-    }
-
-    private void ThrowIfOutOfBounds(in NexusCoord coord)
-    {
-        if (!glyphBuffer.IsInRange(coord))
-            throw new ArgumentOutOfRangeException(nameof(coord), "The coordinate is not in bounds of the console buffer");
-    }
-
-    private void GetOrThrowColorIndex(in NexusColor foreground, in NexusColor? background, string paramName, out int foregroundColorIndex, out int backgroundColorIndex)
-    {
-        foregroundColorIndex = GetColorIndex(foreground);
-        backgroundColorIndex = background is null ? BackgroundIndex : GetColorIndex(background.Value);
-
-        if (foregroundColorIndex is -1 || backgroundColorIndex is -1)
-            throw new ArgumentException("The color is not in the color palette", paramName);
-    }
-
-    private Glyph GetClearGlyph() => new(char.MinValue, BackgroundIndex, BackgroundIndex);
-
-    private int GetColorIndex(in NexusColor color)
-        => _settings.ColorPalette.Colors.GetKey(color);
 }

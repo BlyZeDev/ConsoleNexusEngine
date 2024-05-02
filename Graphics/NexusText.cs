@@ -1,21 +1,23 @@
 ﻿namespace ConsoleNexusEngine.Graphics;
 
-using ConsoleNexusEngine.Internal;
-
 /// <summary>
 /// Represents a text in the console
 /// </summary>
-public sealed record NexusText : INexusColored
+public sealed record NexusText
 {
     /// <summary>
     /// The text itself
     /// </summary>
     public string Value { get; }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// The foreground color of the text
+    /// </summary>
     public NexusColor Foreground { get; }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// The background color of the text, <see langword="null"/> if the console background color should be used
+    /// </summary>
     public NexusColor? Background { get; }
 
     /// <summary>
@@ -30,7 +32,7 @@ public sealed record NexusText : INexusColored
     /// <param name="foreground">The foreground color of the text</param>
     /// <param name="background">The background color of the text, <see langword="null"/> if the console background color should be used</param>
     /// <param name="textDirection">The flow direction of the text</param>
-    public NexusText(string value, NexusColor foreground, NexusColor? background = null, NexusTextDirection textDirection = NexusTextDirection.Horizontal)
+    public NexusText(string value, in NexusColor foreground, in NexusColor? background = null, in NexusTextDirection textDirection = NexusTextDirection.Horizontal)
     {
         Value = value;
         Foreground = foreground;
@@ -45,6 +47,6 @@ public sealed record NexusText : INexusColored
     /// <param name="foreground">The foreground color of the text</param>
     /// <param name="background">The background color of the text, <see langword="null"/> if the console background color should be used</param>
     /// <param name="textDirection">The flow direction of the text</param>
-    public NexusText(object value, NexusColor foreground, NexusColor? background = null, NexusTextDirection textDirection = NexusTextDirection.Horizontal)
+    public NexusText(object? value, in NexusColor foreground, in NexusColor? background = null, in NexusTextDirection textDirection = NexusTextDirection.Horizontal)
         : this(value?.ToString() ?? "", foreground, background, textDirection) { }
 }

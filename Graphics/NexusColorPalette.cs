@@ -123,22 +123,22 @@ public sealed partial class NexusColorPalette : IEnumerable<NexusColor>, IEquata
     /// <param name="color15">15th Color of the Palette</param>
     /// <param name="color16">16th Color of the Palette</param>
     public NexusColorPalette(
-        NexusColor color1,
-        NexusColor color2,
-        NexusColor color3,
-        NexusColor color4,
-        NexusColor color5,
-        NexusColor color6,
-        NexusColor color7,
-        NexusColor color8,
-        NexusColor color9,
-        NexusColor color10,
-        NexusColor color11,
-        NexusColor color12,
-        NexusColor color13,
-        NexusColor color14,
-        NexusColor color15,
-        NexusColor color16)
+        in NexusColor color1,
+        in NexusColor color2,
+        in NexusColor color3,
+        in NexusColor color4,
+        in NexusColor color5,
+        in NexusColor color6,
+        in NexusColor color7,
+        in NexusColor color8,
+        in NexusColor color9,
+        in NexusColor color10,
+        in NexusColor color11,
+        in NexusColor color12,
+        in NexusColor color13,
+        in NexusColor color14,
+        in NexusColor color15,
+        in NexusColor color16)
         : this([color1, color2, color3, color4, color5, color6, color7, color8, color9, color10, color11, color12, color13, color14, color15, color16]) { }
 
     /// <summary>
@@ -146,7 +146,7 @@ public sealed partial class NexusColorPalette : IEnumerable<NexusColor>, IEquata
     /// </summary>
     /// <param name="color">The color to check for</param>
     /// <returns><see langword="true"/> if the color is in the color palette, otherwise <see langword="false"/></returns>
-    public bool Contains(NexusColor color)
+    public bool Contains(in NexusColor color)
         => Colors.GetKey(color) is not -1;
 
     /// <summary>
@@ -154,7 +154,7 @@ public sealed partial class NexusColorPalette : IEnumerable<NexusColor>, IEquata
     /// </summary>
     /// <param name="index">The index of the color [0-15]</param>
     /// <returns><see cref="NexusColor"/></returns>
-    public NexusColor this[int index] => Colors[(ConsoleColor)index];
+    public NexusColor this[in int index] => Colors[(ConsoleColor)index];
 
     /// <inheritdoc/>
     public IEnumerator<NexusColor> GetEnumerator() => Colors.Values.GetEnumerator();

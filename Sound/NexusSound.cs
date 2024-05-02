@@ -57,7 +57,7 @@ public sealed record NexusSound : IDisposable
     /// <param name="filePath">The path to the file that should be played</param>
     /// <param name="volume">The volume of the played sound</param>
     /// <param name="shouldLoop"><see langword="true"/> if the sound should be looped, otherwise <see langword="false"/></param>
-    public NexusSound(string filePath, NexusVolume volume, bool shouldLoop = false)
+    public NexusSound(string filePath, in NexusVolume volume, in bool shouldLoop = false)
     {
         _wave = new WaveOutEvent();
         _wave.PlaybackStopped += OnFinish;
@@ -123,32 +123,32 @@ public sealed record NexusSound : IDisposable
     /// Rewinds the sound by the given period
     /// </summary>
     /// <param name="period">The period to rewind</param>
-    public void Rewind(TimeSpan period) => Rewind((int)period.TotalSeconds);
+    public void Rewind(in TimeSpan period) => Rewind((int)period.TotalSeconds);
 
     /// <summary>
     /// Rewinds the sound by the given period
     /// </summary>
     /// <param name="seconds">The period to rewind in seconds</param>
-    public void Rewind(int seconds) => ChangePos(-seconds);
+    public void Rewind(in int seconds) => ChangePos(-seconds);
 
     /// <summary>
     /// Forwards the sound by the given period
     /// </summary>
     /// <param name="period">The period to forward</param>
-    public void Forward(TimeSpan period) => Forward((int)period.TotalSeconds);
+    public void Forward(in TimeSpan period) => Forward((int)period.TotalSeconds);
 
     /// <summary>
     /// Forwards the sound by the given period
     /// </summary>
     /// <param name="seconds">The period to forward in seconds</param>
-    public void Forward(int seconds) => ChangePos(seconds);
+    public void Forward(in int seconds) => ChangePos(seconds);
 
     /// <summary>
     /// Jumps to a specific position
     /// </summary>
     /// <remarks><paramref name="position"/> is clamped to be in range of the sound</remarks>
     /// <param name="position">The position to jump to</param>
-    public void Seek(TimeSpan position)
+    public void Seek(in TimeSpan position)
         => Position = TimeSpan.FromTicks(Math.Clamp(position.Ticks, TimeSpan.Zero.Ticks, Length.Ticks));
 
     /// <inheritdoc/>
@@ -165,7 +165,7 @@ public sealed record NexusSound : IDisposable
         GC.SuppressFinalize(this);
     }
 
-    private void InitWave(NexusVolume volume)
+    private void InitWave(in NexusVolume volume)
     {
         stream = new LoopStream(new AudioFileReader(FilePath), IsLooped)
         {
@@ -175,7 +175,7 @@ public sealed record NexusSound : IDisposable
         _wave.Init(stream);
     }
 
-    private void ChangePos(int seconds) => stream.Skip(seconds);
+    private void ChangePos(in int seconds) => stream.Skip(seconds);
 
     private void OnFinish(object? sender, StoppedEventArgs e) => Stop();
 }

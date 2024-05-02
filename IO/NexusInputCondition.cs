@@ -52,6 +52,6 @@ public sealed class NexusInputCondition
     /// <returns><see cref="NexusInputCondition"/></returns>
     public static NexusInputCondition All(params NexusKey[] keys) => new((toCheck) => keys.All(x => x == toCheck));
 
-    internal bool Check(NexusKey key) => _keyPressCondition(key);
-    internal bool Check(NexusCoord mousePos) => _mousePosCondition(mousePos);
+    internal bool Check(in NexusKey key) => _keyPressCondition(key);
+    internal bool Check(in NexusCoord mousePos) => _mousePosCondition(mousePos);
 }

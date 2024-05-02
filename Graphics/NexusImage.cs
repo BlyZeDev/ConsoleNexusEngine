@@ -19,12 +19,15 @@ public readonly struct NexusImage
     /// <summary>
     /// The width of the image
     /// </summary>
-    public int Width => _pixels.Width;
+    public readonly int Width => _pixels.Width;
 
     /// <summary>
     /// The height of the image
     /// </summary>
-    public int Height => _pixels.Height;
+    public readonly int Height => _pixels.Height;
+
+    internal NexusImage(Bitmap bitmap, NexusImageProcessor imageProcessor, in NexusSize? size)
+        => _pixels = InitializePixels(bitmap, imageProcessor, size);
 
     /// <summary>
     /// Initializes a new NexusImage
@@ -40,7 +43,7 @@ public readonly struct NexusImage
     /// <param name="bitmap">The bitmap</param>
     /// <param name="imageProcessor">The image processor that should be used</param>
     public NexusImage(Bitmap bitmap, NexusImageProcessor imageProcessor)
-        : this(bitmap, imageProcessor, Size.Empty) { }
+        : this(bitmap, imageProcessor, null) { }
 
     /// <summary>
     /// Initializes a new NexusImage
@@ -48,7 +51,7 @@ public readonly struct NexusImage
     /// <param name="filepath">The path to the image file</param>
     /// <param name="imageProcessor">The image processor that should be used</param>
     /// <param name="percentage">The desired percentage size of the bitmap</param>
-    public NexusImage(string filepath, NexusImageProcessor imageProcessor, float percentage)
+    public NexusImage(string filepath, NexusImageProcessor imageProcessor, in float percentage)
         : this((Bitmap)Image.FromFile(filepath), imageProcessor, percentage) { }
 
     /// <summary>
@@ -57,7 +60,7 @@ public readonly struct NexusImage
     /// <param name="bitmap">The bitmap</param>
     /// <param name="imageProcessor">The image processor that should be used</param>
     /// <param name="percentage">The desired percentage size of the bitmap</param>
-    public NexusImage(Bitmap bitmap, NexusImageProcessor imageProcessor, float percentage)
+    public NexusImage(Bitmap bitmap, NexusImageProcessor imageProcessor, in float percentage)
         : this(bitmap, imageProcessor, ImageHelper.GetSize(bitmap.Width, bitmap.Height, percentage)) { }
 
     /// <summary>
@@ -66,7 +69,7 @@ public readonly struct NexusImage
     /// <param name="filepath">The path to the image file</param>
     /// <param name="imageProcessor">The image processor that should be used</param>
     /// <param name="size">The desired size of the bitmap</param>
-    public NexusImage(string filepath, NexusImageProcessor imageProcessor, Size size)
+    public NexusImage(string filepath, NexusImageProcessor imageProcessor, in NexusSize size)
         : this((Bitmap)Image.FromFile(filepath), imageProcessor, size) { }
 
     /// <summary>
@@ -75,7 +78,7 @@ public readonly struct NexusImage
     /// <param name="bitmap">The bitmap</param>
     /// <param name="imageProcessor">The image processor that should be used</param>
     /// <param name="size">The desired size of the bitmap</param>
-    public NexusImage(Bitmap bitmap, NexusImageProcessor imageProcessor, Size size)
+    public NexusImage(Bitmap bitmap, NexusImageProcessor imageProcessor, in NexusSize size)
         => _pixels = InitializePixels(bitmap, imageProcessor, size);
 
     /// <summary>
@@ -88,18 +91,17 @@ public readonly struct NexusImage
     {
         using (var client = new HttpClient())
         {
-            using (var stream = TaskHelper.RunSync(() => client.GetStreamAsync(url)))
+            using (var stream = TaskHelper.RunSync(() => client.GetStreamAsync(url))
+                ?? throw new HttpRequestException("Couldn't read the image"))
             {
-                return stream is null
-                    ? throw new HttpRequestException("Couldn't read the image")
-                    : new NexusImage(new Bitmap(stream), imageProcessor);
+                return new NexusImage(new Bitmap(stream), imageProcessor);
             }
         }
     }
 
     internal NexusChar this[in int x, in int y] => _pixels[x, y];
 
-    private static ReadOnlyMemory2D<NexusChar> InitializePixels(Bitmap bitmap, NexusImageProcessor processor, Size size)
+    private static ReadOnlyMemory2D<NexusChar> InitializePixels(Bitmap bitmap, NexusImageProcessor processor, in NexusSize? size)
     {
         var resized = ImageHelper.Resize(bitmap, size);
 

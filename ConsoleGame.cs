@@ -65,6 +65,11 @@ public abstract class ConsoleGame : IDisposable
     public int TotalFrameCount { get; private set; }
 
     /// <summary>
+    /// The time elapsed since the last frame in milliseconds
+    /// </summary>
+    public double DeltaTime { get; private set; }
+
+    /// <summary>
     /// The current FPS count
     /// </summary>
     public NexusFramerate FramesPerSecond { get; private set; }
@@ -108,7 +113,7 @@ public abstract class ConsoleGame : IDisposable
 
         Settings = ConsoleGameSettings.Default;
         Graphic = new(_console, Settings);
-        Controller = new(_console);
+        Controller = new();
         Utility = new(Settings);
 
         _game.Priority = Settings.Priority;
@@ -171,7 +176,7 @@ public abstract class ConsoleGame : IDisposable
 
     /// <summary>
     /// Called once before the start of the game.<br/>
-    /// Import game files and resources here.
+    /// Import game files and load resources here.
     /// </summary>
     protected abstract void Load();
 
@@ -206,22 +211,25 @@ public abstract class ConsoleGame : IDisposable
         var currentTime = GetHighResolutionTimestamp();
         var accumulator = 0d;
 
+        double targetFrameTime;
+        double currentFrameTime;
         double newTime;
-        double frameTime;
         double sleepTime;
 
         while (!Settings.TargetFramerate.IsUnlimited && IsRunning)
         {
-            var targetFrameTime = 1d / (int)Settings.TargetFramerate;
+            targetFrameTime = 1d / (int)Settings.TargetFramerate;
 
             newTime = GetHighResolutionTimestamp();
-            frameTime = newTime - currentTime;
+            currentFrameTime = newTime - currentTime;
             currentTime = newTime;
 
-            accumulator += frameTime;
+            accumulator += currentFrameTime;
 
             while (accumulator >= targetFrameTime)
             {
+                DeltaTime = targetFrameTime;
+
                 unchecked { TotalFrameCount++; }
 
                 Update(_console.ReadInput(Settings.StopGameKey, Settings.AllowInputs));
@@ -237,8 +245,16 @@ public abstract class ConsoleGame : IDisposable
 
     private void GameLoopUnlimited()
     {
+        var currentTime = GetHighResolutionTimestamp();
+
+        double newTime;
+
         while (Settings.TargetFramerate.IsUnlimited && IsRunning)
         {
+            newTime = GetHighResolutionTimestamp();
+            DeltaTime = newTime - currentTime;
+            currentTime = newTime;
+
             unchecked { TotalFrameCount++; }
 
             Update(_console.ReadInput(Settings.StopGameKey, Settings.AllowInputs));

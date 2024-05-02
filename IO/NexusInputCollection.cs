@@ -24,9 +24,9 @@ public readonly record struct NexusInputCollection
     /// </summary>
     public NexusInputCollection() : this(NexusCoord.MinValue, []) { }
 
-    internal NexusInputCollection(NexusCoord mousePosition) : this(mousePosition, []) { }
+    internal NexusInputCollection(in NexusCoord mousePosition) : this(mousePosition, []) { }
 
-    internal NexusInputCollection(NexusCoord mousePosition, ImmutableArray<NexusKey> keys)
+    internal NexusInputCollection(in NexusCoord mousePosition, in ImmutableArray<NexusKey> keys)
     {
         MousePosition = mousePosition;
         Keys = keys;

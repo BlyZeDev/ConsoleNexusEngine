@@ -18,7 +18,4 @@ internal static partial class Native
     [LibraryImport(Kernel32)]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static partial bool FlushConsoleInputBuffer(nint hConsoleInput);
-
-    [DllImport(Kernel32)]
-    public static extern bool WriteConsoleInput(nint hConsoleInput, [In] INPUT_RECORD[] lpBuffer, uint nLength, out uint lpNumberOfEventsWritten);
 }

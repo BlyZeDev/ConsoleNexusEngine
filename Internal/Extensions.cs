@@ -4,7 +4,7 @@ using System.Collections;
 
 internal static class Extensions
 {
-    public static int GetKey(this IReadOnlyDictionary<ConsoleColor, NexusColor> dictionary, NexusColor color)
+    public static int GetKey(this IReadOnlyDictionary<ConsoleColor, NexusColor> dictionary, in NexusColor color)
     {
         foreach (var pair in dictionary)
         {
@@ -32,7 +32,7 @@ internal static class Extensions
         return false;
     }
 
-    public static bool IsInRange<T>(this Memory2D<T> memory, NexusCoord coord) where T : struct
+    public static bool IsInRange<T>(this Memory2D<T> memory, in NexusCoord coord) where T : struct
         => coord.X >= 0 && coord.X < memory.Width && coord.Y >= 0 && coord.Y < memory.Height;
 
     public static IReadOnlyCollection<T> AsReadOnly<T>(this ICollection<T> source)
