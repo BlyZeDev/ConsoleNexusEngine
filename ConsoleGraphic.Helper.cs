@@ -7,9 +7,28 @@ public sealed partial class ConsoleGraphic
 {
     private void DrawShape(in NexusCoord start, INexusShape shape, in Glyph glyph)
     {
+        switch (shape)
+        {
+            case NexusRectangle rectangle: DrawRectangle(start, rectangle, glyph); return;
+            case NexusEllipse ellipse: DrawEllipse(start, ellipse, glyph); return;
+        }
+
+        var drawable = shape.Draw();
+
+        for (int x = 0; x < drawable.GetLength(0); x++)
+        {
+            for (int y = 0; y < drawable.GetLength(1); y++)
+            {
+                if (drawable[x, y]) SetGlyph(x + start.X, y + start.Y, glyph);
+            }
+        }
+    }
+
+    private void DrawRectangle(in NexusCoord start, in NexusRectangle rectangle, in Glyph glyph)
+    {
         unsafe
         {
-            var data = shape.LockBitsReadOnly();
+            var data = rectangle.LockBitsReadOnly();
             var pixelSize = Image.GetPixelFormatSize(PixelFormat.Format16bppRgb555) / 8;
 
             var scan0 = (byte*)data.Scan0;
@@ -28,7 +47,34 @@ public sealed partial class ConsoleGraphic
                 }
             }
 
-            shape.UnlockBits(data);
+            rectangle.UnlockBits(data);
+        }
+    }
+
+    private void DrawEllipse(in NexusCoord start, in NexusEllipse ellipse, in Glyph glyph)
+    {
+        unsafe
+        {
+            var data = ellipse.LockBitsReadOnly();
+            var pixelSize = Image.GetPixelFormatSize(PixelFormat.Format16bppRgb555) / 8;
+
+            var scan0 = (byte*)data.Scan0;
+
+            byte* row;
+            byte* pixel;
+            for (var y = 0; y < data.Height; y++)
+            {
+                row = scan0 + y * data.Stride;
+
+                for (var x = 0; x < data.Width; x++)
+                {
+                    pixel = row + x * pixelSize;
+
+                    if ((pixel[1] & 0b01111100) >> 2 is 31) SetGlyph(x + start.X, y + start.Y, glyph);
+                }
+            }
+
+            ellipse.UnlockBits(data);
         }
     }
 

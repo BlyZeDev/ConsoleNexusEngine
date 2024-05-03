@@ -1,7 +1,6 @@
 ﻿namespace ConsoleNexusEngine.Graphics;
 
 using System.Drawing;
-using System.Drawing.Imaging;
 
 /// <summary>
 /// Represents an interface for a shape
@@ -26,16 +25,8 @@ public interface INexusShape
     public bool Fill { get; }
 
     /// <summary>
-    /// Draws on the bitmap and returns it
+    /// Draws on the 2D array and returns it
     /// </summary>
-    /// <returns><see cref="Bitmap"/></returns>
-    public Bitmap Draw();
-
-    /// <inheritdoc cref="Bitmap.LockBits(Rectangle, ImageLockMode, PixelFormat)"/>
-    /// <returns><see cref="BitmapData"/></returns>
-    public BitmapData LockBitsReadOnly();
-
-    /// <inheritdoc cref="Bitmap.UnlockBits(BitmapData)"/>
-    /// <param name="data">The data of the locked bitmap</param>
-    public void UnlockBits(BitmapData data);
+    /// <returns><see cref="bool"/>[,]</returns>
+    public bool[,] Draw();
 }

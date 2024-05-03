@@ -51,12 +51,39 @@ public readonly struct NexusRectangle : INexusShape
         : this(new NexusSize(end.X - start.X, end.Y - start.Y), character, fill) { }
 
     /// <inheritdoc/>
-    public readonly Bitmap Draw() => _bitmap;
+    public readonly bool[,] Draw()
+    {
+        unsafe
+        {
+            var data = LockBitsReadOnly();
+            var pixelSize = Image.GetPixelFormatSize(PixelFormat.Format16bppRgb555) / 8;
 
-    /// <inheritdoc/>
-    public readonly BitmapData LockBitsReadOnly()
+            var drawing = new bool[data.Width, data.Height];
+
+            var scan0 = (byte*)data.Scan0;
+
+            byte* row;
+            byte* pixel;
+            for (var y = 0; y < data.Height; y++)
+            {
+                row = scan0 + y * data.Stride;
+
+                for (var x = 0; x < data.Width; x++)
+                {
+                    pixel = row + x * pixelSize;
+
+                    drawing[x, y] = (pixel[1] & 0b01111100) >> 2 is 31;
+                }
+            }
+
+            UnlockBits(data);
+
+            return drawing;
+        }
+    }
+
+    internal readonly BitmapData LockBitsReadOnly()
         => _bitmap.LockBits(new Rectangle(0, 0, _bitmap.Width, _bitmap.Height), ImageLockMode.ReadOnly, PixelFormat.Format16bppRgb555);
 
-    /// <inheritdoc/>
-    public readonly void UnlockBits(BitmapData data) => _bitmap.UnlockBits(data);
+    internal readonly void UnlockBits(BitmapData data) => _bitmap.UnlockBits(data);
 }
