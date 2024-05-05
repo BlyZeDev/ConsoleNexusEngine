@@ -57,6 +57,12 @@ public readonly record struct NexusSize
         Height = Math.Clamp(height, 0, int.MaxValue);
     }
 
+    /// <summary>
+    /// Converts this object to a <see cref="NexusCoord"/>
+    /// </summary>
+    /// <returns><see cref="NexusCoord"/></returns>
+    public readonly NexusCoord ToCoord() => new NexusCoord(Width, Height);
+
     /// <inheritdoc/>
     public readonly void Deconstruct(out int width, out int height)
     {

@@ -58,13 +58,10 @@ public readonly record struct NexusCoord
     }
 
     /// <summary>
-    /// Returns <see langword="true"/> if the coordinate is in range of <paramref name="from"/> and <paramref name="to"/>, otherwise <see langword="false"/>
+    /// Converts this object to a <see cref="NexusSize"/>
     /// </summary>
-    /// <param name="from">The coordinate where the range starts</param>
-    /// <param name="to">The coordinate where the range ends</param>
-    /// <returns><see cref="bool"/></returns>
-    public readonly bool IsInRange(in NexusCoord from, in NexusCoord to)
-        => X >= from.X && X <= to.X && Y >= from.Y && Y <= to.Y;
+    /// <returns><see cref="NexusSize"/></returns>
+    public readonly NexusSize ToSize() => new NexusSize(X, Y);
 
     /// <inheritdoc/>
     public readonly void Deconstruct(out int x, out int y)
