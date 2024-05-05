@@ -114,7 +114,7 @@ public abstract class ConsoleGame : IDisposable
         Settings = ConsoleGameSettings.Default;
         Graphic = new(_console, Settings);
         Controller = new();
-        Utility = new(Settings);
+        Utility = new(_console, Settings);
 
         _game.Priority = Settings.Priority;
 

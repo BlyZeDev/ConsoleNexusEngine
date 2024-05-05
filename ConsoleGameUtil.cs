@@ -11,9 +11,14 @@ public sealed class ConsoleGameUtil
 
     static ConsoleGameUtil() => _specialChars = Enum.GetValues<NexusSpecialChar>();
 
+    private readonly CmdConsole _console;
     private readonly ConsoleGameSettings _settings;
 
-    internal ConsoleGameUtil(ConsoleGameSettings settings) => _settings = settings;
+    internal ConsoleGameUtil(CmdConsole console, ConsoleGameSettings settings)
+    {
+        _console = console;
+        _settings = settings;
+    }
 
     /// <summary>
     /// Generate a pseudo or strong random color
@@ -23,7 +28,7 @@ public sealed class ConsoleGameUtil
     /// <returns><see cref="NexusColor"/></returns>
     public NexusColor GetRandomColor(in bool onlyColorPalette, in bool pseudoRandom = true)
     {
-        if (onlyColorPalette) return _settings.ColorPalette[GetRandomNumber(16, pseudoRandom)];
+        if (onlyColorPalette) return _settings.ColorPalette[GetRandomNumber(_settings.ColorPalette.Colors.Count, pseudoRandom)];
 
         Span<byte> rgb = stackalloc byte[3];
 
@@ -42,11 +47,66 @@ public sealed class ConsoleGameUtil
     /// <summary>
     /// Generate a pseudo or strong random coordinate
     /// </summary>
-    /// <param name="maxSize">Exclusive maximum size</param>
+    /// <param name="inBufferArea"><see langword="false"/> if the coordinate should be in range of the buffer area</param>
     /// <param name="pseudoRandom"><see langword="false"/> if it should be generated as a strong random</param>
     /// <returns><see cref="NexusCoord"/></returns>
-    public NexusCoord GetRandomCoord(in NexusSize maxSize, in bool pseudoRandom = true)
-        => new(GetRandomNumber(maxSize.Width, pseudoRandom), GetRandomNumber(maxSize.Height, pseudoRandom));
+    public NexusCoord GetRandomCoord(in bool inBufferArea, in bool pseudoRandom = true)
+        => inBufferArea ? GetRandomCoord(new NexusCoord(_console.Buffer.Width, _console.Buffer.Height), pseudoRandom) : new NexusCoord(GetRandomNumber(pseudoRandom), GetRandomNumber(pseudoRandom));
+
+    /// <summary>
+    /// Generate a pseudo or strong random coordinate
+    /// </summary>
+    /// <param name="maxCoord">The exclusive maximum coordinate</param>
+    /// <param name="pseudoRandom"><see langword="false"/> if it should be generated as a strong random</param>
+    /// <returns><see cref="NexusCoord"/></returns>
+    public NexusCoord GetRandomCoord(in NexusCoord maxCoord, in bool pseudoRandom = true)
+        => GetRandomCoord(NexusCoord.MinValue, maxCoord, pseudoRandom);
+
+    /// <summary>
+    /// Generate a pseudo or strong random coordinate
+    /// </summary>
+    /// <param name="minCoord">The inclusive minimum coordinate</param>
+    /// <param name="maxCoord">The exclusive maximum coordinate</param>
+    /// <param name="pseudoRandom"><see langword="false"/> if it should be generated as a strong random</param>
+    /// <returns><see cref="NexusCoord"/></returns>
+    public NexusCoord GetRandomCoord(in NexusCoord minCoord, in NexusCoord maxCoord, in bool pseudoRandom = true)
+        => new(GetRandomNumber(minCoord.X, maxCoord.X, pseudoRandom), GetRandomNumber(minCoord.Y, maxCoord.Y, pseudoRandom));
+
+    /// <summary>
+    /// Generate a pseudo or strong random coordinate
+    /// </summary>
+    /// <param name="inBufferArea"><see langword="false"/> if the coordinate should be in range of the buffer area</param>
+    /// <param name="pseudoRandom"><see langword="false"/> if it should be generated as a strong random</param>
+    /// <returns><see cref="NexusSize"/></returns>
+    public NexusSize GetRandomSize(in bool inBufferArea, in bool pseudoRandom = true)
+        => inBufferArea ? GetRandomSize(new NexusSize(_console.Buffer.Width, _console.Buffer.Height), pseudoRandom) : new NexusSize(GetRandomNumber(pseudoRandom), GetRandomNumber(pseudoRandom));
+
+    /// <summary>
+    /// Generate a pseudo or strong random coordinate
+    /// </summary>
+    /// <param name="maxSize">The exclusive maximum coordinate</param>
+    /// <param name="pseudoRandom"><see langword="false"/> if it should be generated as a strong random</param>
+    /// <returns><see cref="NexusSize"/></returns>
+    public NexusSize GetRandomSize(in NexusSize maxSize, in bool pseudoRandom = true)
+        => GetRandomSize(NexusSize.MinValue, maxSize, pseudoRandom);
+
+    /// <summary>
+    /// Generate a pseudo or strong random coordinate
+    /// </summary>
+    /// <param name="minSize">The inclusive minimum coordinate</param>
+    /// <param name="maxSize">The exclusive maximum coordinate</param>
+    /// <param name="pseudoRandom"><see langword="false"/> if it should be generated as a strong random</param>
+    /// <returns><see cref="NexusSize"/></returns>
+    public NexusSize GetRandomSize(in NexusSize minSize, in NexusSize maxSize, in bool pseudoRandom = true)
+        => new(GetRandomNumber(minSize.Width, maxSize.Width, pseudoRandom), GetRandomNumber(minSize.Height, maxSize.Height, pseudoRandom));
+
+    /// <summary>
+    /// Generate a pseudo or strong random number
+    /// </summary>
+    /// <param name="pseudoRandom"><see langword="false"/> if it should be generated as a strong random</param>
+    /// <returns><see cref="int"/></returns>
+    public int GetRandomNumber(in bool pseudoRandom = true)
+        => GetRandomNumber(0, int.MaxValue, pseudoRandom);
 
     /// <summary>
     /// Generate a pseudo or strong random number
