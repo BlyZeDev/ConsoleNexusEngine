@@ -202,6 +202,7 @@ public abstract class ConsoleGame : IDisposable
         while (IsRunning)
         {
             GameLoopUnlimited();
+            GameLoopPaused();
             GameLoopCapped();
         }
     }
@@ -216,7 +217,7 @@ public abstract class ConsoleGame : IDisposable
         double newTime;
         double sleepTime;
 
-        while (!Settings.TargetFramerate.IsUnlimited && IsRunning)
+        while (Settings.TargetFramerate.Value > 0 && IsRunning)
         {
             targetFrameTime = 1d / (int)Settings.TargetFramerate;
 
@@ -241,6 +242,11 @@ public abstract class ConsoleGame : IDisposable
 
             if (sleepTime > 0) Thread.Sleep((int)(sleepTime * 1000));
         }
+    }
+
+    private void GameLoopPaused()
+    {
+        while (Settings.TargetFramerate.IsPaused && IsRunning) { }
     }
 
     private void GameLoopUnlimited()

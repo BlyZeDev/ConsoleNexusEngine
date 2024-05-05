@@ -1,7 +1,7 @@
 ﻿namespace ConsoleNexusEngine;
 
 /// <summary>
-/// Represents Frames per seconds
+/// Represents frames per seconds
 /// </summary>
 public readonly record struct NexusFramerate
 {
@@ -19,6 +19,11 @@ public readonly record struct NexusFramerate
     /// <see langword="true"/> if <see cref="Value"/> is -1, otherwise <see langword="false"/>
     /// </summary>
     public readonly bool IsUnlimited => Value is -1;
+
+    /// <summary>
+    /// <see langword="true"/> if <see cref="Value"/> is 0, otherwise <see langword="false"/>
+    /// </summary>
+    public readonly bool IsPaused => Value is 0;
 
     /// <summary>
     /// Initializes 30 Frames per second
