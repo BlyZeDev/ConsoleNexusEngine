@@ -52,6 +52,22 @@ public sealed class NexusInputCondition
     /// <returns><see cref="NexusInputCondition"/></returns>
     public static NexusInputCondition All(params NexusKey[] keys) => new((toCheck) => keys.All(x => x == toCheck));
 
+    /// <summary>
+    /// Checks if the mouse position is in range of <paramref name="start"/> and <paramref name="end"/>
+    /// </summary>
+    /// <param name="start">The start coordinate</param>
+    /// <param name="end">The end coordinate</param>
+    /// <returns><see cref="NexusInputCondition"/></returns>
+    public static NexusInputCondition IsInRange(NexusCoord start, NexusCoord end) => new((toCheck) => toCheck.IsInRange(start, end));
+
+    /// <summary>
+    /// Checks if the mouse position is in range of <paramref name="start"/> and <paramref name="range"/>
+    /// </summary>
+    /// <param name="start">The start coordinate</param>
+    /// <param name="range">The range size</param>
+    /// <returns><see cref="NexusInputCondition"/></returns>
+    public static NexusInputCondition IsInRange(NexusCoord start, NexusSize range) => new((toCheck) => toCheck.IsInRange(start, range));
+
     internal bool Check(in NexusKey key) => _keyPressCondition(key);
     internal bool Check(in NexusCoord mousePos) => _mousePosCondition(mousePos);
 }

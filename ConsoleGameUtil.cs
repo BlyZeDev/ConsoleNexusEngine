@@ -21,6 +21,24 @@ public sealed class ConsoleGameUtil
     }
 
     /// <summary>
+    /// <see langword="true"/> if <paramref name="coord"/> is in range of <paramref name="start"/> and <paramref name="end"/>
+    /// </summary>
+    /// <param name="coord">The coordinate to check for</param>
+    /// <param name="start">The start coordinate</param>
+    /// <param name="end">The end coordinate</param>
+    /// <returns><see cref="bool"/></returns>
+    public bool IsInRange(in NexusCoord coord, in NexusCoord start, in NexusCoord end) => coord.IsInRange(start, end);
+
+    /// <summary>
+    /// <see langword="true"/> if <paramref name="coord"/> is in range of <paramref name="start"/> and <paramref name="range"/>
+    /// </summary>
+    /// <param name="coord">The coordinate to check for</param>
+    /// <param name="start">The start coordinate</param>
+    /// <param name="range">The range size</param>
+    /// <returns><see cref="bool"/></returns>
+    public bool IsInRange(in NexusCoord coord, in NexusCoord start, in NexusSize range) => coord.IsInRange(start, range);
+
+    /// <summary>
     /// Generate a pseudo or strong random color
     /// </summary>
     /// <param name="onlyColorPalette"><see langword="true"/> if only colors from the current <see cref="NexusColorPalette"/> should be included</param>
