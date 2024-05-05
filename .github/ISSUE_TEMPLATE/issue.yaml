@@ -20,23 +20,11 @@ body:
       value: "Steps to reproduce:\n\n1. Use this...\n2. Then do this...\n3. Error happens!"
     validations:
       required: true
-  - type: dropdown
+  - type: input
     id: version
     attributes:
-      label: Version
-      description: What version are you using?
-      options:
-        - 5.0.0
-        - 3.0.0
-        - 2.4.0
-        - 2.3.0
-        - 2.2.0
-        - 2.1.0
-        - 2.0.0
-        - 1.3.0
-        - 1.2.0
-        - 1.1.0
-        - 1.0.0
+      label: Engine Version
+      description: The version(s) of the engine
     validations:
       required: true
   - type: checkboxes
