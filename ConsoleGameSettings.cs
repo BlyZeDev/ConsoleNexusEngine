@@ -11,7 +11,6 @@ public sealed record ConsoleGameSettings
 
     private string title;
     private NexusFont font;
-    private NexusFramerate targetFramerate;
     private NexusColorPalette colorPalette;
     private NexusKey stopGameKey;
     private ThreadPriority priority;
@@ -40,19 +39,6 @@ public sealed record ConsoleGameSettings
         {
             font = value;
             Update(nameof(Font));
-        }
-    }
-
-    /// <summary>
-    /// The Framerate the Console game tries to run at
-    /// </summary>
-    public NexusFramerate TargetFramerate
-    {
-        get => targetFramerate;
-        set
-        {
-            targetFramerate = value;
-            Update(nameof(TargetFramerate));
         }
     }
 
@@ -114,7 +100,6 @@ public sealed record ConsoleGameSettings
     {
         title = "ConsoleGame";
         font = new TerminalFont(10);
-        targetFramerate = 60;
         colorPalette = NexusColorPalette.Default;
         stopGameKey = NexusKey.Escape;
         priority = ThreadPriority.Normal;

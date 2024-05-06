@@ -20,26 +20,15 @@ public readonly record struct NexusSize
     /// <inheritdoc/>
     public static NexusSize MaxValue => new(int.MaxValue, int.MaxValue);
 
-    private readonly int width;
-    private readonly int height;
-
     /// <summary>
     /// The width
     /// </summary>
-    public int Width
-    {
-        readonly get => width;
-        init => width = Math.Clamp(value, 0, int.MaxValue);
-    }
+    public readonly int Width { get; }
 
     /// <summary>
     /// The height
     /// </summary>
-    public int Height
-    {
-        readonly get => height;
-        init => height = Math.Clamp(value, 0, int.MaxValue);
-    }
+    public readonly int Height { get; }
 
     /// <summary>
     /// Initializes a new <see cref="NexusSize"/>
@@ -49,6 +38,9 @@ public readonly record struct NexusSize
     /// <summary>
     /// Initializes a new <see cref="NexusSize"/>
     /// </summary>
+    /// <remarks>
+    /// The size is clamped between 0 and <see cref="int.MaxValue"/>
+    /// </remarks>
     /// <param name="width">The width</param>
     /// <param name="height">The height</param>
     public NexusSize(in int width, in int height)

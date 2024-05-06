@@ -140,7 +140,6 @@ public abstract class ConsoleGame : IDisposable
         {
             FramesPerSecond = TotalFrameCount - lastTotalFrameCount;
             lastTotalFrameCount = TotalFrameCount;
-            FixedUpdate();
         });
 
         SpinWait.SpinUntil(() => _console.stopGameKeyPressed);
@@ -187,11 +186,6 @@ public abstract class ConsoleGame : IDisposable
     protected abstract void Update(in NexusInputCollection inputs);
 
     /// <summary>
-    /// Called every second
-    /// </summary>
-    protected abstract void FixedUpdate();
-
-    /// <summary>
     /// Called once after stopping the game.<br/>
     /// Clean up used files or stop music here.
     /// </summary>
@@ -199,63 +193,11 @@ public abstract class ConsoleGame : IDisposable
 
     private void GameLoop()
     {
+        var currentTime = GetHighResolutionTimestamp();
+
+        double newTime;
+
         while (IsRunning)
-        {
-            GameLoopUnlimited();
-            GameLoopPaused();
-            GameLoopCapped();
-        }
-    }
-
-    private void GameLoopCapped()
-    {
-        var currentTime = GetHighResolutionTimestamp();
-        var accumulator = 0d;
-
-        double targetFrameTime;
-        double currentFrameTime;
-        double newTime;
-        double sleepTime;
-
-        while (Settings.TargetFramerate.Value > 0 && IsRunning)
-        {
-            targetFrameTime = 1d / (int)Settings.TargetFramerate;
-
-            newTime = GetHighResolutionTimestamp();
-            currentFrameTime = newTime - currentTime;
-            currentTime = newTime;
-
-            accumulator += currentFrameTime;
-
-            while (accumulator >= targetFrameTime)
-            {
-                DeltaTime = targetFrameTime;
-
-                unchecked { TotalFrameCount++; }
-
-                Update(_console.ReadInput(Settings.StopGameKey, Settings.AllowInputs));
-
-                accumulator -= targetFrameTime;
-            }
-
-            sleepTime = targetFrameTime - accumulator;
-
-            if (sleepTime > 0) Thread.Sleep((int)(sleepTime * 1000));
-        }
-    }
-
-    private void GameLoopPaused()
-    {
-        while (Settings.TargetFramerate.IsPaused && IsRunning) { }
-    }
-
-    private void GameLoopUnlimited()
-    {
-        var currentTime = GetHighResolutionTimestamp();
-
-        double newTime;
-
-        while (Settings.TargetFramerate.IsUnlimited && IsRunning)
         {
             newTime = GetHighResolutionTimestamp();
             DeltaTime = newTime - currentTime;

@@ -20,26 +20,15 @@ public readonly record struct NexusCoord
     /// <inheritdoc/>
     public static NexusCoord MaxValue => new(int.MaxValue, int.MaxValue);
 
-    private readonly int x;
-    private readonly int y;
-
     /// <summary>
     /// The X coordinate
     /// </summary>
-    public int X
-    {
-        readonly get => x;
-        init => x = Math.Clamp(value, 0, int.MaxValue);
-    }
+    public readonly int X { get; }
 
     /// <summary>
     /// The Y coordinate
     /// </summary>
-    public int Y
-    {
-        readonly get => y;
-        init => y = Math.Clamp(value, 0, int.MaxValue);
-    }
+    public readonly int Y { get; }
 
     /// <summary>
     /// Initializes a new <see cref="NexusCoord"/>
@@ -49,6 +38,9 @@ public readonly record struct NexusCoord
     /// <summary>
     /// Initializes a new <see cref="NexusCoord"/>
     /// </summary>
+    /// <remarks>
+    /// The coordinate is clamped between 0 and <see cref="int.MaxValue"/>
+    /// </remarks>
     /// <param name="x">The X coordinate</param>
     /// <param name="y">The Y coordinate</param>
     public NexusCoord(in int x, in int y)

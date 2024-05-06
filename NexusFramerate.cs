@@ -1,14 +1,16 @@
 ﻿namespace ConsoleNexusEngine;
 
+using System.Numerics;
+
 /// <summary>
 /// Represents frames per seconds
 /// </summary>
-public readonly record struct NexusFramerate
+public readonly record struct NexusFramerate : IMinMaxValue<NexusFramerate>
 {
-    /// <summary>
-    /// <see cref="Value"/> set to -1 which means unlimited
-    /// </summary>
-    public static NexusFramerate Unlimited => new(-1);
+    /// <inheritdoc/>
+    public static NexusFramerate MaxValue => new NexusFramerate(int.MaxValue);
+    /// <inheritdoc/>
+    public static NexusFramerate MinValue => new NexusFramerate(0);
 
     /// <summary>
     /// Frames per second
@@ -16,29 +18,18 @@ public readonly record struct NexusFramerate
     public readonly int Value { get; }
 
     /// <summary>
-    /// <see langword="true"/> if <see cref="Value"/> is -1, otherwise <see langword="false"/>
+    /// Initializes 60 Frames per second
     /// </summary>
-    public readonly bool IsUnlimited => Value is -1;
+    public NexusFramerate() : this(60) { }
 
     /// <summary>
-    /// <see langword="true"/> if <see cref="Value"/> is 0, otherwise <see langword="false"/>
-    /// </summary>
-    public readonly bool IsPaused => Value is 0;
-
-    /// <summary>
-    /// Initializes 30 Frames per second
-    /// </summary>
-    public NexusFramerate() : this(30) { }
-
-    /// <summary>
-    /// Initializes a new Framerate. Framerate can't be lower than -1 (unlimited)
+    /// Initializes a new Framerate. Framerate can't be lower than 0
     /// </summary>
     /// <param name="framerate">Frames per second</param>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
     public NexusFramerate(in int framerate)
     {
-        if (framerate < -1)
-            throw new ArgumentOutOfRangeException(nameof(framerate), "The framerate can't be lower than -1 (unlimited)");
+        ArgumentOutOfRangeException.ThrowIfLessThan(framerate, 0, nameof(framerate));
 
         Value = framerate;
     }
