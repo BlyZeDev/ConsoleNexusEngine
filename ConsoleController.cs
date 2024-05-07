@@ -3,29 +3,20 @@
 /// <summary>
 /// A controller for <see cref="ConsoleGame"/>
 /// </summary>
-/// <remarks>Provides useful input themed functions like a global controller</remarks>
+/// <remarks>Provides useful input functions like a global controller</remarks>
 public sealed class ConsoleController
 {
     private readonly GlobalController _controller;
 
     internal ConsoleController() => _controller = new GlobalController();
 
-    /// <summary>
-    /// Adds a control to the global controller
-    /// </summary>
-    /// <param name="condition">The condition that has to be met</param>
-    /// <param name="action">The action that should be invoked</param>
+    /// <inheritdoc cref="NexusController.AddControl(NexusInputCondition, Action)"/>
     public void AddControl(NexusInputCondition condition, Action action)
-        => _controller.Controls.Add(condition, action);
+        => _controller.AddControl(condition, action);
 
-    /// <summary>
-    /// Adds multiple controls to the global controller
-    /// </summary>
-    /// <param name="controls">The controls to add</param>
-    public void AddControls(IDictionary<NexusInputCondition, Action> controls)
-    {
-        foreach (var control in controls) AddControl(control.Key, control.Value);
-    }
+    /// <inheritdoc cref="NexusController.RemoveControl(NexusInputCondition)"/>
+    public bool RemoveControl(NexusInputCondition condition)
+        => _controller.RemoveControl(condition);
 
     /// <summary>
     /// Invokes all registered controls

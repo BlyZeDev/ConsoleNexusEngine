@@ -193,9 +193,9 @@ public abstract class ConsoleGame : IDisposable
 
     private void GameLoop()
     {
-        var currentTime = GetHighResolutionTimestamp();
-
         double newTime;
+
+        var currentTime = GetHighResolutionTimestamp();
 
         while (IsRunning)
         {
