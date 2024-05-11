@@ -7,7 +7,7 @@ using System.Security.Cryptography;
 /// </summary>
 public sealed class ConsoleGameUtil
 {
-    private static readonly IReadOnlyList<NexusSpecialChar> _specialChars;
+    private static readonly ReadOnlyMemory<NexusSpecialChar> _specialChars;
 
     static ConsoleGameUtil() => _specialChars = Enum.GetValues<NexusSpecialChar>();
 
@@ -151,7 +151,7 @@ public sealed class ConsoleGameUtil
     /// <param name="pseudoRandom"><see langword="false"/> if it should be generated as a strong random</param>
     /// <returns><see cref="NexusSpecialChar"/></returns>
     public NexusSpecialChar GetRandomSpecialChar(in bool pseudoRandom = true)
-        => _specialChars[GetRandomNumber(_specialChars.Count, pseudoRandom)];
+        => _specialChars.Span[GetRandomNumber(_specialChars.Length, pseudoRandom)];
 
     /// <summary>
     /// Generate a pseudo or strong random character

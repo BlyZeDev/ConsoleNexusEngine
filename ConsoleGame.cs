@@ -8,6 +8,10 @@ using System.Threading;
 /// </summary>
 public abstract class ConsoleGame : IDisposable
 {
+    private const double Second = 1;
+    private const double Minute = 60;
+    private const double Hour = 3600;
+
     private static bool hasInstance;
 
     /// <summary>
@@ -65,7 +69,7 @@ public abstract class ConsoleGame : IDisposable
     public int TotalFrameCount { get; private set; }
 
     /// <summary>
-    /// The time elapsed since the last frame in milliseconds
+    /// The time elapsed since the last frame in total seconds
     /// </summary>
     public double DeltaTime { get; private set; }
 
@@ -190,6 +194,51 @@ public abstract class ConsoleGame : IDisposable
     /// Clean up used files or stop music here.
     /// </summary>
     protected abstract void CleanUp();
+
+    /// <summary>
+    /// Invokes <paramref name="action"/> every <paramref name="interval"/>
+    /// </summary>
+    /// <param name="timeSince">The time since the last call</param>
+    /// <param name="interval">The interval to invoke <paramref name="action"/></param>
+    /// <param name="action">The action to invoke</param>
+    protected void DoEvery(ref double timeSince, in TimeSpan interval, Action action)
+        => DoEvery(ref timeSince, interval.TotalSeconds, action);
+
+    /// <summary>
+    /// Invokes <paramref name="action"/> every second
+    /// </summary>
+    /// <param name="timeSince">The time since the last call</param>
+    /// <param name="action">The action to invoke</param>
+    protected void DoEverySecond(ref double timeSince, Action action)
+        => DoEvery(ref timeSince, Second, action);
+
+    /// <summary>
+    /// Invokes <paramref name="action"/> every minute
+    /// </summary>
+    /// <param name="timeSince">The time since the last call</param>
+    /// <param name="action">The action to invoke</param>
+    protected void DoEveryMinute(ref double timeSince, Action action)
+        => DoEvery(ref timeSince, Minute, action);
+
+    /// <summary>
+    /// Invokes <paramref name="action"/> every hour
+    /// </summary>
+    /// <param name="timeSince">The time since the last call</param>
+    /// <param name="action">The action to invoke</param>
+    protected void DoEveryHour(ref double timeSince, Action action)
+        => DoEvery(ref timeSince, Hour, action);
+
+    private void DoEvery(ref double timeSince, in double secondsInterval, Action action)
+    {
+        timeSince += DeltaTime;
+
+        if (timeSince >= secondsInterval)
+        {
+            timeSince -= secondsInterval;
+
+            action();
+        }
+    }
 
     private void GameLoop()
     {
