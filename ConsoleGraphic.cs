@@ -2,6 +2,7 @@
 
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Runtime.InteropServices;
 
 /// <summary>
 /// The graphics engine for <see cref="ConsoleGame"/>
@@ -106,12 +107,12 @@ public sealed partial class ConsoleGraphic
     /// <param name="text">The text to draw</param>
     public void DrawText(in NexusCoord coordinate, NexusFiggleText text)
     {
-        ThrowIfOutOfBounds(coordinate + new NexusCoord(text._longestStringLength, text.Value.Length - 1));
+        ThrowIfOutOfBounds(coordinate + new NexusCoord(text._longestStringLength, text.Value.Count - 1));
         GetOrThrowColorIndex(text.Foreground, text.Background, nameof(text), out var foregroundColorIndex, out var backgroundColorIndex);
-
+        
         var posX = -1;
         var posY = -1;
-        foreach (var letters in text.Value.AsSpan())
+        foreach (var letters in text._value.AsSpan())
         {
             posY++;
             foreach (var letter in letters.AsSpan())

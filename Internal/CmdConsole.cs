@@ -133,8 +133,8 @@ internal sealed class CmdConsole
         fontInfo.cbSize = (uint)Marshal.SizeOf(fontInfo);
         fontInfo.nFont = 0;
         
-        fontInfo.dwFontSize.X = (short)font.Width;
-        fontInfo.dwFontSize.Y = (short)font.Height;
+        fontInfo.dwFontSize.X = (short)font.Size.Width;
+        fontInfo.dwFontSize.Y = (short)font.Size.Height;
         fontInfo.FaceName = font.Name;
 
         Native.SetCurrentConsoleFontEx(_standardOutput, false, ref fontInfo);
@@ -155,8 +155,8 @@ internal sealed class CmdConsole
         fontInfo.cbSize = (uint)Marshal.SizeOf(fontInfo);
         fontInfo.nFont = 0;
 
-        fontInfo.dwFontSize.X = (short)settings.Font.Width;
-        fontInfo.dwFontSize.Y = (short)settings.Font.Height;
+        fontInfo.dwFontSize.X = (short)settings.Font.Size.Width;
+        fontInfo.dwFontSize.Y = (short)settings.Font.Size.Height;
         fontInfo.FaceName = settings.Font.Name;
 
         Native.SetCurrentConsoleFontEx(_standardOutput, false, ref fontInfo);

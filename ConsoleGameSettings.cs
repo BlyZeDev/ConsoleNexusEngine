@@ -99,7 +99,7 @@ public sealed record ConsoleGameSettings
     private ConsoleGameSettings()
     {
         title = "ConsoleGame";
-        font = new TerminalFont(10);
+        font = new TerminalFont(new NexusSize(10));
         colorPalette = NexusColorPalette.Default;
         stopGameKey = NexusKey.Escape;
         priority = ThreadPriority.Normal;

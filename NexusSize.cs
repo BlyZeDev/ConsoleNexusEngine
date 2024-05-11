@@ -50,6 +50,15 @@ public readonly record struct NexusSize
     }
 
     /// <summary>
+    /// Initializes a new <see cref="NexusSize"/>
+    /// </summary>
+    /// <remarks>
+    /// The size is clamped between 0 and <see cref="int.MaxValue"/>
+    /// </remarks>
+    /// <param name="dimensions">The width and height</param>
+    public NexusSize(in int dimensions) : this(dimensions, dimensions) { }
+
+    /// <summary>
     /// Converts this object to a <see cref="NexusCoord"/>
     /// </summary>
     /// <returns><see cref="NexusCoord"/></returns>

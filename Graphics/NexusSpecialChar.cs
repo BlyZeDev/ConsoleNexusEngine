@@ -1,7 +1,7 @@
 ﻿namespace ConsoleNexusEngine.Graphics;
 
 /// <summary>
-/// Represents special characters
+/// Represents some special characters
 /// </summary>
 public enum NexusSpecialChar
 {

@@ -1,7 +1,7 @@
 ﻿namespace ConsoleNexusEngine.Graphics;
 
 /// <summary>
-/// Represents a direction where text goes
+/// Represents a text direction
 /// </summary>
 public enum NexusTextDirection
 {

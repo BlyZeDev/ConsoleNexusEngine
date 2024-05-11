@@ -182,7 +182,7 @@ public sealed class ConsoleGameUtil
         => GetRandomChar(char.MinValue, char.MaxValue, pseudoRandom);
 
     /// <summary>
-    /// 
+    /// Generate a pseudo or strong random color palette
     /// </summary>
     /// <param name="pseudoRandom"><see langword="false"/> if it should be generated as a strong random</param>
     /// <returns><see cref="NexusColorPalette"/></returns>

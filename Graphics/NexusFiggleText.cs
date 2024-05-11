@@ -9,11 +9,12 @@ using System.Linq;
 public sealed record NexusFiggleText
 {
     internal readonly int _longestStringLength;
+    internal readonly string[] _value;
 
     /// <summary>
     /// The text lines itself
     /// </summary>
-    public string[] Value { get; }
+    public IReadOnlyCollection<string> Value => _value.AsReadOnly();
 
     /// <summary>
     /// The foreground color of the text
@@ -39,7 +40,7 @@ public sealed record NexusFiggleText
     /// <param name="background">The background color of the text, <see langword="null"/> if the console background color should be used</param>
     public NexusFiggleText(string value, FiggleFont figgleFont, in NexusColor foreground, in NexusColor? background = null)
     {
-        (Value, _longestStringLength) = InitText(value, figgleFont);
+        _longestStringLength = InitText(value, figgleFont, out _value);
         Foreground = foreground;
         Background = background;
         FiggleFont = figgleFont;
@@ -65,10 +66,10 @@ public sealed record NexusFiggleText
     public NexusFiggleText(object? value, FiggleFont figgleFont, in NexusColor foreground, in NexusColor? background = null)
         : this(value?.ToString() ?? "", figgleFont, foreground, background) { }
 
-    private static (string[], int) InitText(string value, FiggleFont font)
+    private static int InitText(string value, FiggleFont font, out string[] values)
     {
-        var values = font.Render(value).Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+        values = font.Render(value).Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
 
-        return (values, values.Aggregate("", (max, val) => val.Length > max.Length ? val : max).Length);
+        return values.Aggregate("", (max, val) => val.Length > max.Length ? val : max).Length;
     }
 }
