@@ -2,6 +2,7 @@
 
 using System.Collections.Immutable;
 using System.Runtime.InteropServices;
+using System.Text;
 
 internal sealed class CmdConsole
 {
@@ -14,6 +15,8 @@ internal sealed class CmdConsole
     private readonly nint _standardOutput;
     private readonly HashSet<NexusKey> _currentPressedKeys;
 
+    private readonly DefaultConsole _defaultConsole;
+
     private NexusCoord currentMousePos;
 
     internal bool stopGameKeyPressed;
@@ -23,16 +26,28 @@ internal sealed class CmdConsole
     public CmdConsole(ConsoleGameSettings settings)
     {
         _handle = Native.GetConsoleWindow();
+
+        var needsAllocation = _handle == nint.Zero;
+        if (needsAllocation)
+        {
+            Native.AllocConsole();
+
+            _handle = Native.GetConsoleWindow();
+        }
+
         _standardInput = Native.GetStdHandle(-10);
         _standardOutput = Native.GetStdHandle(-11);
 
         _currentPressedKeys = [];
+
+        _defaultConsole = SaveDefaultConsole(needsAllocation);
+
         currentMousePos = NexusCoord.MaxValue;
         stopGameKeyPressed = false;
 
-        var dimensions = Initialize(settings);
+        var size = Initialize(settings);
 
-        Buffer = new ConsoleBuffer(dimensions.X, dimensions.Y);
+        Buffer = new ConsoleBuffer(size.Width, size.Height);
     }
 
     public NexusInputCollection ReadInput(in NexusKey stopGameKey, in bool inputAllowed)
@@ -142,7 +157,70 @@ internal sealed class CmdConsole
         AdjustBufferSize();
     }
 
-    private NexusCoord Initialize(ConsoleGameSettings settings)
+    public void ResetToDefault()
+    {
+        if (_defaultConsole.NewlyAllocated)
+        {
+            Native.FreeConsole();
+            _ = Native.ShowWindow(_handle, 0);
+            return;
+        }
+        
+        var cursorInfo = _defaultConsole.CursorInfo;
+        Native.SetConsoleCursorInfo(_standardOutput, ref cursorInfo);
+
+        var fontInfo = _defaultConsole.FontInfo;
+        Native.SetCurrentConsoleFontEx(_standardOutput, false, ref fontInfo);
+
+        Native.SetConsoleMode(_standardInput, _defaultConsole.Mode);
+
+        _ = Native.SetWindowLong(_handle, -16, _defaultConsole.WindowLong);
+
+        var csbe = _defaultConsole.BufferInfo;
+        Native.SetConsoleScreenBufferInfoEx(_standardOutput, ref csbe);
+
+        var rect = _defaultConsole.WindowRect;
+        Native.SetWindowPos(
+            _handle,
+            -2,
+            rect.Left, rect.Top,
+            rect.Right - rect.Left, rect.Bottom - rect.Top,
+            0x0040);
+
+        Native.SetWindowText(_handle, _defaultConsole.WindowTitle);
+    }
+
+    private DefaultConsole SaveDefaultConsole(in bool newlyAllocated)
+    {
+        Native.GetConsoleCursorInfo(_standardOutput, out var cursorInfo);
+        Native.GetCurrentConsoleFontEx(_standardOutput, false, out var fontInfo);
+        Native.GetConsoleMode(_standardInput, out var mode);
+        var windowLong = Native.GetWindowLong(_handle, -16);
+
+        var csbe = new CONSOLE_SCREEN_BUFFER_INFO_EX();
+        csbe.cbSize = Marshal.SizeOf(csbe);
+        Native.GetConsoleScreenBufferInfoEx(_standardOutput, ref csbe);
+
+        var rect = new RECT();
+        Native.GetWindowRect(_handle, ref rect);
+
+        var titleBuilder = new StringBuilder(Native.GetWindowTextLength(_handle) + 1);
+        _ = Native.GetWindowText(_handle, titleBuilder, titleBuilder.Capacity);
+
+        return new DefaultConsole
+        {
+            NewlyAllocated = newlyAllocated,
+            BufferInfo = csbe,
+            CursorInfo = cursorInfo,
+            FontInfo = fontInfo,
+            Mode = mode,
+            WindowLong = windowLong,
+            WindowRect = rect,
+            WindowTitle = titleBuilder.ToString()
+        };
+    }
+
+    private NexusSize Initialize(ConsoleGameSettings settings)
     {
         var cursorInfo = new CONSOLE_CURSOR_INFO
         {
@@ -214,7 +292,7 @@ internal sealed class CmdConsole
 
         Native.SetForegroundWindow(_handle);
 
-        return new NexusCoord(csbe.dwSize.X, csbe.dwSize.Y);
+        return new NexusSize(csbe.dwSize.X, csbe.dwSize.Y);
     }
 
     private void AdjustBufferSize()

@@ -15,19 +15,13 @@ public abstract class ConsoleGame : IDisposable
     private static bool hasInstance;
 
     /// <summary>
-    /// The width of the primary screen in pixeln
+    /// The size of the primary screen in pixels
     /// </summary>
-    public static int ScreenWidth { get; }
-
-    /// <summary>
-    /// The height of the primary screen in pixeln
-    /// </summary>
-    public static int ScreenHeight { get; }
+    public static NexusSize ScreenSize { get; }
 
     static ConsoleGame()
     {
-        ScreenWidth = Native.GetSystemMetrics(0);
-        ScreenHeight = Native.GetSystemMetrics(1);
+        ScreenSize = new NexusSize(Native.GetSystemMetrics(0), Native.GetSystemMetrics(1));
 
         hasInstance = false;
     }
@@ -84,14 +78,9 @@ public abstract class ConsoleGame : IDisposable
     public DateTime StartTime { get; private set; }
 
     /// <summary>
-    /// The width of the console in characters
+    /// The size of the console in characters
     /// </summary>
-    public int BufferWidth => _console.Buffer.Width;
-
-    /// <summary>
-    /// The height of the console in characters
-    /// </summary>
-    public int BufferHeight => _console.Buffer.Height;
+    public NexusSize BufferSize => new NexusSize(_console.Buffer.Width, _console.Buffer.Height);
 
     /// <summary>
     /// The background color of the whole console
@@ -163,6 +152,8 @@ public abstract class ConsoleGame : IDisposable
         CleanUp();
 
         _game.Join();
+
+        _console.ResetToDefault();
     }
 
     /// <inheritdoc/>
