@@ -68,7 +68,7 @@ internal sealed class CmdConsole
 
         Native.PeekConsoleInput(_standardInput, buffer, numEventsRead, out _);
         Native.FlushConsoleInputBuffer(_standardInput);
-
+        
         foreach (var input in buffer.AsSpan())
         {
             switch (input.EventType)
@@ -77,8 +77,9 @@ internal sealed class CmdConsole
                     if (input.KeyEvent.KeyDown)
                     {
                         var key = (NexusKey)input.KeyEvent.VirtualKeyCode;
-                        _currentPressedKeys.Add(key);
 
+                         _currentPressedKeys.Add(key);
+                        
                         stopGameKeyPressed = key == stopGameKey;
                     }
                     break;
@@ -97,6 +98,7 @@ internal sealed class CmdConsole
                     foreach (var mouseKey in mouseKeys)
                     {
                         stopGameKeyPressed = mouseKey == stopGameKey;
+
                         _currentPressedKeys.Add(mouseKey);
                     }
                     break;
@@ -188,6 +190,8 @@ internal sealed class CmdConsole
             0x0040);
 
         Native.SetWindowText(_handle, _defaultConsole.WindowTitle);
+
+        Console.Clear();
     }
 
     private DefaultConsole SaveDefaultConsole(in bool newlyAllocated)
