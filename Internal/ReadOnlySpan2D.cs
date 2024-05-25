@@ -18,9 +18,9 @@ internal readonly ref struct ReadOnlySpan2D<T> where T : struct
 
     public ReadOnlySpan2D(in int width, in int height) : this(new T[width * height], width, height) { }
 
-    public readonly T this[in int i] => _span[i];
+    public ref readonly T this[in int i] => ref _span[i];
 
-    public readonly T this[in int x, in int y] => _span[Width * y + x];
+    public ref readonly T this[in int x, in int y] => ref _span[Width * y + x];
 
     public ReadOnlySpan2D<T> Resize(in int width, in int height)
     {

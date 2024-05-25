@@ -1,9 +1,5 @@
 ﻿namespace ConsoleNexusEngine;
 
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.Runtime.InteropServices;
-
 /// <summary>
 /// The graphics engine for <see cref="ConsoleGame"/>
 /// </summary>

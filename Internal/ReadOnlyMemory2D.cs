@@ -20,9 +20,9 @@ internal readonly struct ReadOnlyMemory2D<T> where T : struct
 
     public ReadOnlyMemory2D(in int width, in int height) : this(new T[width * height], width, height) { }
 
-    public readonly T this[in int i] => _memory.Span[i];
+    public ref readonly T this[in int i] => ref _memory.Span[i];
 
-    public readonly T this[in int x, in int y] => _memory.Span[Width * y + x];
+    public ref readonly T this[in int x, in int y] => ref _memory.Span[Width * y + x];
 
     public ReadOnlyMemory2D<T> Resize(in int width, in int height)
     {

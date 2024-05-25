@@ -6,6 +6,9 @@ using System.Text;
 
 internal sealed class CmdConsole
 {
+    private const int STD_INPUT = -10;
+    private const int STD_OUTPUT = -11;
+
     private const int MOUSE_MOVED = 0x0001;
     private const int MOUSE_WHEELED = 0x0004;
     private const int MOUSE_HWHEELED = 0x0008;
@@ -35,8 +38,8 @@ internal sealed class CmdConsole
             _handle = Native.GetConsoleWindow();
         }
 
-        _standardInput = Native.GetStdHandle(-10);
-        _standardOutput = Native.GetStdHandle(-11);
+        _standardInput = Native.GetStdHandle(STD_INPUT);
+        _standardOutput = Native.GetStdHandle(STD_OUTPUT);
 
         _currentPressedKeys = [];
 
@@ -47,7 +50,7 @@ internal sealed class CmdConsole
 
         var size = Initialize(settings);
 
-        Buffer = new ConsoleBuffer(size.Width, size.Height);
+        Buffer = new ConsoleBuffer(_standardOutput, size.Width, size.Height);
     }
 
     public NexusInputCollection ReadInput(in NexusKey stopGameKey, in bool inputAllowed)

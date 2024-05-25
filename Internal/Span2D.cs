@@ -18,19 +18,11 @@ internal readonly ref struct Span2D<T> where T : struct
 
     public Span2D(in int width, in int height) : this(new T[width * height], width, height) { }
 
-    public T this[in int i]
-    {
-        readonly get => _span[i];
-        set => _span[i] = value;
-    }
+    public readonly ref T this[in int i] => ref _span[i];
 
-    public T this[in int x, in int y]
-    {
-        readonly get => _span[Width * y + x];
-        set => _span[Width * y + x] = value;
-    }
+    public readonly ref T this[in int x, in int y] => ref _span[Width * y + x];
 
-    public Span2D<T> Resize(in int width, in int height)
+    public readonly Span2D<T> Resize(in int width, in int height)
     {
         var newSpan = new T[width * height].AsSpan();
 
@@ -39,7 +31,7 @@ internal readonly ref struct Span2D<T> where T : struct
         return new Span2D<T>(newSpan, width, height);
     }
 
-    public ReadOnlySpan2D<T> ToReadOnly()
+    public readonly ReadOnlySpan2D<T> ToReadOnly()
     {
         var readOnly = new ReadOnlySpan2D<T>(_span, Width, Height);
         return readOnly;

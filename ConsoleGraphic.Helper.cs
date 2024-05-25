@@ -84,7 +84,7 @@ public sealed partial class ConsoleGraphic
     private void SetGlyph(in int x, in int y, in Glyph glyph)
     {
         glyphBuffer[x, y] = glyph;
-        _console.Buffer.SetBuffer(x, y, glyph);
+        _console.Buffer.SetGlyph(x, y, glyph);
     }
 
     private void ThrowIfOutOfBounds(in NexusCoord coord)

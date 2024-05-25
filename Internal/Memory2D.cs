@@ -20,19 +20,11 @@ internal readonly struct Memory2D<T> where T : struct
 
     public Memory2D(in int width, in int height) : this(new T[width * height], width, height) { }
 
-    public readonly T this[in int i]
-    {
-        get => _memory.Span[i];
-        set => _memory.Span[i] = value;
-    }
+    public readonly ref T this[in int i] => ref _memory.Span[i];
 
-    public readonly T this[in int x, in int y]
-    {
-        get => _memory.Span[Width * y + x];
-        set => _memory.Span[Width * y + x] = value;
-    }
+    public readonly ref T this[in int x, in int y] => ref _memory.Span[Width * y + x];
 
-    public Memory2D<T> Resize(in int width, in int height)
+    public readonly Memory2D<T> Resize(in int width, in int height)
     {
         var newMemory = new T[width * height].AsMemory();
 
@@ -41,5 +33,5 @@ internal readonly struct Memory2D<T> where T : struct
         return new Memory2D<T>(newMemory, width, height);
     }
 
-    public ReadOnlyMemory2D<T> ToReadOnly() => new(_memory, Width, Height);
+    public readonly ReadOnlyMemory2D<T> ToReadOnly() => new(_memory, Width, Height);
 }

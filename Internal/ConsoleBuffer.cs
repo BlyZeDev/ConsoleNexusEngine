@@ -2,7 +2,7 @@
 
 internal sealed unsafe class ConsoleBuffer
 {
-    private readonly nint _fileHandle;
+    private readonly nint _standardOutput;
 
     private CHAR_INFO[] charInfoBuffer;
 
@@ -11,17 +11,12 @@ internal sealed unsafe class ConsoleBuffer
 
     public event EventHandler? Updated;
 
-    public ConsoleBuffer(in int width, in int height)
+    public ConsoleBuffer(in nint standardOutput, in int width, in int height)
     {
+        _standardOutput = standardOutput;
+
         Width = (short)width;
         Height = (short)height;
-
-        fixed (char* fileNameP = "CONOUT$")
-        {
-            _fileHandle = Native.CreateFile(fileNameP, 0x40000000, 2, nint.Zero, 3, 0, nint.Zero);
-        }
-        
-        if (_fileHandle == nint.Zero) throw new NexusEngineException("The file handle for the console buffer is invalid");
 
         charInfoBuffer = new CHAR_INFO[Width * Height];
     }
@@ -61,7 +56,7 @@ internal sealed unsafe class ConsoleBuffer
         }
     }
 
-    public void SetBuffer(in int x, in int y, in Glyph glyph)
+    public void SetGlyph(in int x, in int y, in Glyph glyph)
     {
         var index = y * Width + x;
 
@@ -82,7 +77,7 @@ internal sealed unsafe class ConsoleBuffer
         fixed (CHAR_INFO* arrayP = &charInfoBuffer[0])
         {
             Native.WriteConsoleOutputW(
-                _fileHandle,
+                _standardOutput,
                 arrayP,
                 new COORD
                 {
