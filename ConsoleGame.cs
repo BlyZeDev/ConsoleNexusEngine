@@ -8,10 +8,6 @@ using System.Threading;
 /// </summary>
 public abstract class ConsoleGame : IDisposable
 {
-    private const double Second = 1;
-    private const double Minute = 60;
-    private const double Hour = 3600;
-
     private static bool hasInstance;
 
     /// <summary>
@@ -43,9 +39,9 @@ public abstract class ConsoleGame : IDisposable
     protected ConsoleGraphic Graphic { get; }
 
     /// <summary>
-    /// Input handler and controller
+    /// Global controller
     /// </summary>
-    protected ConsoleController Controller { get; }
+    protected GlobalController GlobalController { get; }
 
     /// <summary>
     /// Useful utility functions
@@ -61,11 +57,6 @@ public abstract class ConsoleGame : IDisposable
     /// The total amount of rendered frames
     /// </summary>
     public int TotalFrameCount { get; private set; }
-
-    /// <summary>
-    /// The time elapsed since the last frame in total seconds
-    /// </summary>
-    public double DeltaTime { get; private set; }
 
     /// <summary>
     /// The current FPS count
@@ -106,7 +97,7 @@ public abstract class ConsoleGame : IDisposable
 
         Settings = ConsoleGameSettings.Default;
         Graphic = new(_console, Settings);
-        Controller = new();
+        GlobalController = new();
         Utility = new(_console, Settings);
 
         _game.Priority = Settings.Priority;
@@ -178,7 +169,8 @@ public abstract class ConsoleGame : IDisposable
     /// Called every frame
     /// </summary>
     /// <param name="inputs">The inputs made during the last frame</param>
-    protected abstract void Update(in NexusInputCollection inputs);
+    /// <param name="deltaTime">The time elapsed since the last frame in total seconds</param>
+    protected abstract void Update(in NexusInputCollection inputs, in double deltaTime);
 
     /// <summary>
     /// Called once after stopping the game.<br/>
@@ -186,66 +178,22 @@ public abstract class ConsoleGame : IDisposable
     /// </summary>
     protected abstract void CleanUp();
 
-    /// <summary>
-    /// Invokes <paramref name="action"/> every <paramref name="interval"/>
-    /// </summary>
-    /// <param name="timeSince">The time since the last call</param>
-    /// <param name="interval">The interval to invoke <paramref name="action"/></param>
-    /// <param name="action">The action to invoke</param>
-    protected void DoEvery(ref double timeSince, in TimeSpan interval, Action action)
-        => DoEvery(ref timeSince, interval.TotalSeconds, action);
-
-    /// <summary>
-    /// Invokes <paramref name="action"/> every second
-    /// </summary>
-    /// <param name="timeSince">The time since the last call</param>
-    /// <param name="action">The action to invoke</param>
-    protected void DoEverySecond(ref double timeSince, Action action)
-        => DoEvery(ref timeSince, Second, action);
-
-    /// <summary>
-    /// Invokes <paramref name="action"/> every minute
-    /// </summary>
-    /// <param name="timeSince">The time since the last call</param>
-    /// <param name="action">The action to invoke</param>
-    protected void DoEveryMinute(ref double timeSince, Action action)
-        => DoEvery(ref timeSince, Minute, action);
-
-    /// <summary>
-    /// Invokes <paramref name="action"/> every hour
-    /// </summary>
-    /// <param name="timeSince">The time since the last call</param>
-    /// <param name="action">The action to invoke</param>
-    protected void DoEveryHour(ref double timeSince, Action action)
-        => DoEvery(ref timeSince, Hour, action);
-
-    private void DoEvery(ref double timeSince, in double secondsInterval, Action action)
-    {
-        timeSince += DeltaTime;
-
-        if (timeSince >= secondsInterval)
-        {
-            timeSince -= secondsInterval;
-
-            action();
-        }
-    }
-
     private void GameLoop()
     {
         double newTime;
+        double deltaTime;
 
         var currentTime = GetHighResolutionTimestamp();
 
         while (IsRunning)
         {
             newTime = GetHighResolutionTimestamp();
-            DeltaTime = newTime - currentTime;
+            deltaTime = newTime - currentTime;
             currentTime = newTime;
 
             unchecked { TotalFrameCount++; }
 
-            Update(_console.ReadInput(Settings.StopGameKey, Settings.AllowInputs));
+            Update(_console.ReadInput(Settings.StopGameKey, Settings.AllowInputs), deltaTime);
         }
     }
 

@@ -99,7 +99,9 @@ public readonly struct NexusImage
         }
     }
 
-    internal NexusChar this[in int x, in int y] => _pixels[x, y];
+    internal readonly NexusChar this[in int x, in int y] => _pixels[x, y];
+
+    internal readonly ReadOnlyMemory2D<NexusChar> CopyPixels() => new ReadOnlyMemory2D<NexusChar>(_pixels.Span.ToArray(), Width, Height);
 
     private static ReadOnlyMemory2D<NexusChar> InitializePixels(Bitmap bitmap, NexusImageProcessor processor, in NexusSize? size)
     {

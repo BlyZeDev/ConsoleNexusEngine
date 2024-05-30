@@ -20,13 +20,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="Icon.ico" />
+    <Content Include="Icon.ico"/>
   </ItemGroup>
 
 	<ItemGroup>
+		<Using Include="ConsoleNexusEngine.Helpers" />
 		<Using Include="ConsoleNexusEngine.Internal" />
-		<Using Include="ConsoleNexusEngine.IO" />
 		<Using Include="ConsoleNexusEngine.Internal.WIN" />
+		<Using Include="ConsoleNexusEngine.IO" />
 		<Using Include="ConsoleNexusEngine.Graphics" />
 		<Using Include="ConsoleNexusEngine.Sound" />
 		<Using Include="System" />

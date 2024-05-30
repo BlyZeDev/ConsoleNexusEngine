@@ -27,7 +27,7 @@ public readonly struct NexusEllipse : INexusShape
     /// <param name="fill"><see langword="true"/> if the shape is filled, otherwise <see langword="false"/></param>
     public NexusEllipse(in NexusSize size, in NexusChar character, in bool fill)
     {
-        _bitmap = new Bitmap(size.Width + 1, size.Height + 1, PixelFormat.Format16bppRgb555);
+        _bitmap = new Bitmap(size.Width, size.Height, PixelFormat.Format16bppRgb555);
 
         Size = size;
         Character = character;
@@ -35,8 +35,8 @@ public readonly struct NexusEllipse : INexusShape
 
         using (var graphics = Graphics.FromImage(_bitmap))
         {
-            graphics.DrawEllipse(INexusShape.Red, 0, 0, size.Width, size.Height);
-            if (Fill) graphics.FillEllipse(INexusShape.Red.Brush, 0, 0, size.Width, size.Height);
+            graphics.DrawEllipse(INexusShape.Red, 0, 0, size.Width - 1, size.Height - 1);
+            if (Fill) graphics.FillEllipse(INexusShape.Red.Brush, 0, 0, size.Width - 1, size.Height - 1);
         }
     }
 

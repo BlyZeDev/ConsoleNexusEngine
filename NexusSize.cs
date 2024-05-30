@@ -3,7 +3,7 @@
 using System.Numerics;
 
 /// <summary>
-/// Represents a width and height
+/// Represents width and height
 /// </summary>
 public readonly record struct NexusSize
     : IAdditionOperators<NexusSize, NexusSize, NexusSize>,

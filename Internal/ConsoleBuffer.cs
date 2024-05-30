@@ -44,14 +44,15 @@ internal sealed unsafe class ConsoleBuffer
 
     public void SetBackgroundBuffer(in Memory2D<Glyph> glyphBuffer, in int background)
     {
-        Glyph current;
+        var glyphs = glyphBuffer.Span;
+        var shiftedBg = background << 4;
 
-        for (int i = 0; i < glyphBuffer.Length; i++)
+        for (int i = 0; i < glyphs.Length; i++)
         {
-            current = glyphBuffer[i];
+            ref var current = ref glyphs[i];
 
             charInfoBuffer[i].Attributes =
-                    (short)(current.ForegroundIndex | (current.Value == char.MinValue ? background << 4 : current.BackgroundIndex << 4));
+                    (short)(current.ForegroundIndex | (current.Value is char.MinValue ? shiftedBg : current.BackgroundIndex << 4));
             charInfoBuffer[i].UnicodeChar = current.Value;
         }
     }

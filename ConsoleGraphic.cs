@@ -132,15 +132,15 @@ public sealed partial class ConsoleGraphic
         ThrowIfOutOfBounds(new NexusCoord(image.Width - 1, image.Height - 1));
 
         NexusChar currentPixel;
-        for (int x = 0, xCord = coordinate.X; x < image.Width; x++, xCord++)
+        for (int x = 0; x < image.Width; x++)
         {
-            for (int y = 0, yCord = coordinate.Y; y < image.Height; y++, yCord++)
+            for (int y = 0; y < image.Height; y++)
             {
                 currentPixel = image[x, y];
 
                 GetOrThrowColorIndex(currentPixel.Foreground, currentPixel.Background, nameof(image), out var foregroundColorIndex, out var backgroundColorIndex);
 
-                SetGlyph(xCord, yCord, new Glyph(currentPixel.Value, foregroundColorIndex, backgroundColorIndex));
+                SetGlyph(x + coordinate.X, y + coordinate.Y, new Glyph(currentPixel.Value, foregroundColorIndex, backgroundColorIndex));
             }
         }
     }
