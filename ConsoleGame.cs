@@ -41,7 +41,7 @@ public abstract class ConsoleGame : IDisposable
     /// <summary>
     /// Controls all object that are registered
     /// </summary>
-    protected ConsoleController Controller { get; }
+    protected GlobalController Controller { get; }
 
     /// <summary>
     /// Useful utility functions

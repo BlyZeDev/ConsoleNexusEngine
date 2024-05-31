@@ -79,7 +79,7 @@ public readonly struct NexusImage
     /// <param name="imageProcessor">The image processor that should be used</param>
     /// <param name="size">The desired size of the bitmap</param>
     public NexusImage(Bitmap bitmap, NexusImageProcessor imageProcessor, in NexusSize size)
-        => _pixels = InitializePixels(bitmap, imageProcessor, size);
+        : this(bitmap, imageProcessor, new NexusSize?(size)) { }
 
     /// <summary>
     /// Initializes a new NexusImage

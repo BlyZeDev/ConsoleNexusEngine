@@ -45,11 +45,7 @@ public readonly record struct NexusChar
     /// <param name="foreground">The foreground color of the character</param>
     /// <param name="background">The background color of the character, <see langword="null"/> if the console background color should be used</param>
     public NexusChar(in NexusSpecialChar value, in NexusColor foreground, in NexusColor? background = null)
-    {
-        Value = (char)value;
-        Foreground = foreground;
-        Background = background;
-    }
+        : this((char)value, foreground, background) { }
 
     internal static NexusChar FromGlyph(in Glyph glyph, NexusColorPalette colorPalette)
         => new(glyph.Value, colorPalette[glyph.ForegroundIndex], colorPalette[glyph.BackgroundIndex]);
