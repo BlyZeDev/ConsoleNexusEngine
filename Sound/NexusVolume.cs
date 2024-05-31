@@ -3,7 +3,7 @@
 using System.Numerics;
 
 /// <summary>
-/// Represents volume from 0 - 100
+/// Represents volume between 0 - 100
 /// </summary>
 public readonly record struct NexusVolume
     : IAdditionOperators<NexusVolume, NexusVolume, NexusVolume>,
@@ -15,9 +15,9 @@ public readonly record struct NexusVolume
     IIncrementOperators<NexusVolume>
 {
     /// <inheritdoc/>
-    public static NexusVolume MinValue { get; }
+    public static NexusVolume MinValue => (NexusVolume)0;
     /// <inheritdoc/>
-    public static NexusVolume MaxValue { get; }
+    public static NexusVolume MaxValue => (NexusVolume)100;
 
     internal readonly float _value;
 
@@ -31,12 +31,6 @@ public readonly record struct NexusVolume
     /// Returns <see langword="true"/> if the volume is muted, otherwise <see langword="false"/>
     /// </summary>
     public readonly bool IsMute => Value is 0;
-
-    static NexusVolume()
-    {
-        MinValue = (NexusVolume)0;
-        MaxValue = (NexusVolume)100;
-    }
 
     /// <summary>
     /// Initializes a Volume instance with <see cref="Value"/> 50

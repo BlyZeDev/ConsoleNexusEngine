@@ -99,7 +99,7 @@ public sealed class NexusAnimation
         if (images.Length is 0) throw new ArgumentException("The images should be at least 1");
 
         _images = new ReadOnlyMemory<NexusImage>(images);
-
+        
         currentFrameIndex = -1;
     }
 
