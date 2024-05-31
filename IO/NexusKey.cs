@@ -1,7 +1,7 @@
 ﻿namespace ConsoleNexusEngine.IO;
 
 /// <summary>
-/// Virtual key codes for keyboard and mouse buttons
+/// Represents keyboard and mouse buttons
 /// </summary>
 public enum NexusKey
 {

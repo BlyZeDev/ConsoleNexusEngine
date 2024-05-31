@@ -39,9 +39,9 @@ public abstract class ConsoleGame : IDisposable
     protected ConsoleGraphic Graphic { get; }
 
     /// <summary>
-    /// Global controller
+    /// Controls all object that are registered
     /// </summary>
-    protected GlobalController GlobalController { get; }
+    protected ConsoleController Controller { get; }
 
     /// <summary>
     /// Useful utility functions
@@ -57,6 +57,11 @@ public abstract class ConsoleGame : IDisposable
     /// The total amount of rendered frames
     /// </summary>
     public int TotalFrameCount { get; private set; }
+
+    /// <summary>
+    /// The time elapsed since the last frame in total seconds
+    /// </summary>
+    public double DeltaTime { get; private set; }
 
     /// <summary>
     /// The current FPS count
@@ -97,7 +102,7 @@ public abstract class ConsoleGame : IDisposable
 
         Settings = ConsoleGameSettings.Default;
         Graphic = new(_console, Settings);
-        GlobalController = new();
+        Controller = new();
         Utility = new(_console, Settings);
 
         _game.Priority = Settings.Priority;
@@ -169,8 +174,7 @@ public abstract class ConsoleGame : IDisposable
     /// Called every frame
     /// </summary>
     /// <param name="inputs">The inputs made during the last frame</param>
-    /// <param name="deltaTime">The time elapsed since the last frame in total seconds</param>
-    protected abstract void Update(in NexusInputCollection inputs, in double deltaTime);
+    protected abstract void Update(in NexusInputCollection inputs);
 
     /// <summary>
     /// Called once after stopping the game.<br/>
@@ -181,19 +185,18 @@ public abstract class ConsoleGame : IDisposable
     private void GameLoop()
     {
         double newTime;
-        double deltaTime;
 
         var currentTime = GetHighResolutionTimestamp();
 
         while (IsRunning)
         {
             newTime = GetHighResolutionTimestamp();
-            deltaTime = newTime - currentTime;
+            DeltaTime = newTime - currentTime;
             currentTime = newTime;
 
             unchecked { TotalFrameCount++; }
 
-            Update(_console.ReadInput(Settings.StopGameKey, Settings.AllowInputs), deltaTime);
+            Update(_console.ReadInput(Settings.StopGameKey, Settings.AllowInputs));
         }
     }
 
