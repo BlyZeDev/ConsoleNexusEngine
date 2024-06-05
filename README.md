@@ -9,4 +9,4 @@
 
 ### Documentation
 [![Wiki](https://img.shields.io/badge/Github_Wiki-black?style=for-the-badge&logo=bookstack&logoColor=white&logoSize=auto&labelColor=%23101010&color=white
-)](https://github.com/BlyZeYT/ConsoleNexusEngine/wikiWiki)
+)](https://github.com/BlyZeYT/ConsoleNexusEngine/wiki)
