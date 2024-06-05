@@ -8,8 +8,14 @@ public interface INexusInputCondition
     /// <summary>
     /// <see langword="true"/> if the condition is met, otherwise <see langword="false"/>
     /// </summary>
-    /// <typeparam name="T">The type of the input</typeparam>
-    /// <param name="toCheck">The input to check</param>
+    /// <param name="key">The key to check</param>
     /// <returns><see cref="bool"/></returns>
-    public bool Check<T>(T toCheck) where T : struct;
+    public bool Check(in NexusKey key);
+
+    /// <summary>
+    /// <see langword="true"/> if the condition is met, otherwise <see langword="false"/>
+    /// </summary>
+    /// <param name="mousePosition">The mouse position to check</param>
+    /// <returns><see cref="bool"/></returns>
+    public bool Check(in NexusCoord mousePosition);
 }

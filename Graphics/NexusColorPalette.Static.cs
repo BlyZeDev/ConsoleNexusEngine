@@ -10,6 +10,11 @@ public sealed partial class NexusColorPalette
     internal static readonly NexusColorPalette[] _presets;
 
     /// <summary>
+    /// The maximum amount of different colors that can be in a color palette
+    /// </summary>
+    public const int MaxColorCount = 16;
+
+    /// <summary>
     /// The default windows console color palette<br/>
     /// </summary>
     public static NexusColorPalette Default => _presets[0];

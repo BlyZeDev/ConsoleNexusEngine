@@ -19,6 +19,8 @@ public readonly struct NexusMouseInputCondition : INexusInputCondition
     public NexusMouseInputCondition(in NexusCoord mousePosition) => _mousePos = mousePosition;
 
     /// <inheritdoc/>
-    public bool Check<T>(T toCheck) where T : struct
-        => toCheck is NexusCoord coord && _mousePos == coord;
+    public bool Check(in NexusKey key) => false;
+
+    /// <inheritdoc/>
+    public bool Check(in NexusCoord mousePosition) => _mousePos == mousePosition;
 }

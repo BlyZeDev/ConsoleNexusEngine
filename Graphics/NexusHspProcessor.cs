@@ -16,7 +16,7 @@ public sealed class NexusHspProcessor : NexusImageProcessor
     /// <inheritdoc/>
     public NexusHspProcessor(NexusColorPalette colorPalette) : base(colorPalette)
     {
-        var builder = ImmutableArray.CreateBuilder<HSP>(16);
+        var builder = ImmutableArray.CreateBuilder<HSP>(NexusColorPalette.MaxColorCount);
 
         foreach (var color in _colorPalette) builder.Add(RgbToHsp(color));
 
