@@ -196,7 +196,7 @@ public abstract class ConsoleGame : IDisposable
 
             unchecked { TotalFrameCount++; }
 
-            Update(_console.ReadInput(Settings.StopGameKey, Settings.AllowInputs));
+            Update(_console.ReadInput(Settings.StopGameKey, Settings.InputTypes));
         }
     }
 

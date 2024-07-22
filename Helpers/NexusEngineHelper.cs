@@ -26,4 +26,12 @@ public static class NexusEngineHelper
             UseShellExecute = false
         });
     }
+
+    /// <summary>
+    /// <see langword="true"/> if the button is pressed, otherwise <see langword="false"/>
+    /// </summary>
+    /// <param name="buttons">The pressed button</param>
+    /// <param name="button">The button that should be checked</param>
+    /// <returns><see cref="bool"/></returns>
+    public static bool Contains(this NexusXInput buttons, NexusXInput button) => (buttons & button) != 0;
 }

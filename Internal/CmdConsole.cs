@@ -13,10 +13,13 @@ internal sealed class CmdConsole
     private const int MOUSE_WHEELED = 0x0004;
     private const int MOUSE_HWHEELED = 0x0008;
 
+    private const int BATTERY_DEVICE_GAMEPAD = 0x00;
+
     private readonly nint _handle;
     private readonly nint _standardInput;
     private readonly nint _standardOutput;
     private readonly HashSet<NexusKey> _currentPressedKeys;
+    private readonly NexusGamepad[] _gamepads;
 
     private readonly DefaultConsole _defaultConsole;
 
@@ -42,6 +45,7 @@ internal sealed class CmdConsole
         _standardOutput = Native.GetStdHandle(STD_OUTPUT);
 
         _currentPressedKeys = [];
+        _gamepads = [ NexusGamepad.Empty, NexusGamepad.Empty, NexusGamepad.Empty, NexusGamepad.Empty ];
 
         _defaultConsole = SaveDefaultConsole(needsAllocation);
 
@@ -53,19 +57,35 @@ internal sealed class CmdConsole
         Buffer = new ConsoleBuffer(_standardOutput, size.Width, size.Height);
     }
 
-    public NexusInputCollection ReadInput(in NexusKey stopGameKey, in bool inputAllowed)
+    public NexusInputCollection ReadInput(in NexusKey stopGameKey, in NexusInputType inputType)
     {
-        if (!inputAllowed)
+        if (inputType is NexusInputType.None)
         {
             Native.FlushConsoleInputBuffer(_standardInput);
             return NexusInputCollection.Empty;
+        }
+
+        if (inputType.FastHasFlag(NexusInputType.Gamepad))
+        {
+            _gamepads[0] = GetGamepadState(0);
+            _gamepads[1] = GetGamepadState(1);
+            _gamepads[2] = GetGamepadState(2);
+            _gamepads[3] = GetGamepadState(3);
+        }
+        else
+        {
+            _gamepads[0] = NexusGamepad.Empty;
+            _gamepads[1] = NexusGamepad.Empty;
+            _gamepads[2] = NexusGamepad.Empty;
+            _gamepads[3] = NexusGamepad.Empty;
         }
 
         _currentPressedKeys.RemoveWhere(key => !IsKeyPressed(key));
 
         Native.GetNumberOfConsoleInputEvents(_standardInput, out var numEventsRead);
 
-        if (numEventsRead is 0 && _currentPressedKeys.Count is 0) return new NexusInputCollection(currentMousePos);
+        if (numEventsRead is 0 && _currentPressedKeys.Count is 0)
+            return new NexusInputCollection(currentMousePos, [], _gamepads[0], _gamepads[1], _gamepads[2], _gamepads[3]);
 
         var buffer = new INPUT_RECORD[numEventsRead];
 
@@ -77,7 +97,7 @@ internal sealed class CmdConsole
             switch (input.EventType)
             {
                 case 1:
-                    if (input.KeyEvent.KeyDown)
+                    if (inputType.FastHasFlag(NexusInputType.Keyboard) && input.KeyEvent.KeyDown)
                     {
                         var key = (NexusKey)input.KeyEvent.VirtualKeyCode;
 
@@ -88,27 +108,33 @@ internal sealed class CmdConsole
                     break;
 
                 case 2:
-                    currentMousePos = NexusCoord.FromCOORD(input.MouseEvent.MousePosition);
-
-                    var mouseKeys = input.MouseEvent.EventFlags switch
+                    if (inputType.FastHasFlag(NexusInputType.Mouse))
                     {
-                        MOUSE_MOVED => [],
-                        MOUSE_WHEELED => [input.MouseEvent.ButtonState >> 31 is 1 ? NexusKey.MouseWheelDown : NexusKey.MouseWheelUp],
-                        MOUSE_HWHEELED => [input.MouseEvent.ButtonState >> 31 is 1 ? NexusKey.MouseWheelLeft : NexusKey.MouseWheelRight],
-                        _ => GetMouseButtons(input.MouseEvent.ButtonState)
-                    };
+                        currentMousePos = NexusCoord.FromCOORD(input.MouseEvent.MousePosition);
 
-                    foreach (var mouseKey in mouseKeys)
-                    {
-                        stopGameKeyPressed = mouseKey == stopGameKey;
+                        var mouseKeys = input.MouseEvent.EventFlags switch
+                        {
+                            MOUSE_MOVED => [],
+                            MOUSE_WHEELED => [input.MouseEvent.ButtonState >> 31 is 1 ? NexusKey.MouseWheelDown : NexusKey.MouseWheelUp],
+                            MOUSE_HWHEELED => [input.MouseEvent.ButtonState >> 31 is 1 ? NexusKey.MouseWheelLeft : NexusKey.MouseWheelRight],
+                            _ => GetMouseButtons(input.MouseEvent.ButtonState)
+                        };
 
-                        _currentPressedKeys.Add(mouseKey);
+                        foreach (var mouseKey in mouseKeys)
+                        {
+                            stopGameKeyPressed = mouseKey == stopGameKey;
+
+                            _currentPressedKeys.Add(mouseKey);
+                        }
                     }
                     break;
             }
         }
 
-        return new NexusInputCollection(currentMousePos, _currentPressedKeys.Count is 0 ? [] : _currentPressedKeys.ToImmutableArray());
+        return new NexusInputCollection(
+            currentMousePos,
+            _currentPressedKeys.Count is 0 ? [] : _currentPressedKeys.ToImmutableArray(),
+            _gamepads[0], _gamepads[1], _gamepads[2], _gamepads[3]);
     }
 
     public void UpdateTitle(string title) => Native.SetWindowText(_handle, title);
@@ -347,5 +373,29 @@ internal sealed class CmdConsole
         if ((buttonState & 0b0100) is not 0) builder.Append(NexusKey.MouseMiddle);
 
         return builder.AsReadOnlySpan();
+    }
+
+    private static NexusGamepad GetGamepadState(in uint index)
+    {
+        var capabilites = new XINPUT_CAPABILITIES();
+        _ = Native.XInputGetCapabilities(index, 0, ref capabilites);
+
+        var battery = new XINPUT_BATTERY_INFORMATION();
+        _ = Native.XInputGetBatteryInformation(index, BATTERY_DEVICE_GAMEPAD, ref battery);
+        
+        var state = new XINPUT_STATE();
+        _ = Native.XInputGetState(index, ref state);
+
+        var gamepad = state.Gamepad;
+
+        return new NexusGamepad(
+            (int)index,
+            (NexusGamepadType)capabilites.SubType,
+            (NexusBatteryType)battery.BatteryType,
+            (NexusBatteryLevel)battery.BatteryLevel,
+            (NexusXInput)gamepad.wButtons,
+            gamepad.bLeftTrigger is byte.MaxValue,
+            gamepad.bRightTrigger is byte.MaxValue,
+            gamepad.sThumbLX, gamepad.sThumbLY, gamepad.sThumbRX, gamepad.sThumbRY);
     }
 }

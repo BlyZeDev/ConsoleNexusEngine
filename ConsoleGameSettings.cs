@@ -14,7 +14,7 @@ public sealed record ConsoleGameSettings
     private NexusColorPalette colorPalette;
     private NexusKey stopGameKey;
     private ThreadPriority priority;
-    private bool allowInputs;
+    private NexusInputType inputTypes;
 
     /// <summary>
     /// The title the console should have
@@ -84,13 +84,13 @@ public sealed record ConsoleGameSettings
     /// <summary>
     /// If <see langword="false"/> all inputs are ignored
     /// </summary>
-    public bool AllowInputs
+    public NexusInputType InputTypes
     {
-        get => allowInputs;
+        get => inputTypes;
         set
         {
-            allowInputs = value;
-            Update(nameof(AllowInputs));
+            inputTypes = value;
+            Update(nameof(InputTypes));
         }
     }
 
@@ -103,7 +103,7 @@ public sealed record ConsoleGameSettings
         colorPalette = NexusColorPalette.Default;
         stopGameKey = NexusKey.Escape;
         priority = ThreadPriority.Normal;
-        allowInputs = true;
+        inputTypes = NexusInputType.All;
     }
 
     private void Update(string propertyName) => Updated?.Invoke(this, propertyName);
