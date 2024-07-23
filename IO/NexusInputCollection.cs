@@ -20,39 +20,24 @@ public readonly record struct NexusInputCollection
     public readonly ImmutableArray<NexusKey> Keys { get; }
 
     /// <summary>
-    /// The state of the player 1 gamepad
+    /// The state of all gamepads
     /// </summary>
-    public readonly NexusGamepad Player1Gamepad { get; }
-
-    /// <summary>
-    /// The state of the player 2 gamepad
-    /// </summary>
-    public readonly NexusGamepad Player2Gamepad { get; }
-
-    /// <summary>
-    /// The state of the player 3 gamepad
-    /// </summary>
-    public readonly NexusGamepad Player3Gamepad { get; }
-
-    /// <summary>
-    /// The state of the player 4 gamepad
-    /// </summary>
-    public readonly NexusGamepad Player4Gamepad { get; }
+    /// <remarks>
+    /// This array ALWAYS contains 4 gamepads ordered by player number.<br/>Index 0 = player 1.
+    /// </remarks>
+    public readonly ImmutableArray<NexusGamepad> Gamepads { get; }
 
     /// <summary>
     /// Creates an empty <see cref="NexusInputCollection"/>
     /// </summary>
-    public NexusInputCollection() : this(NexusCoord.MinValue, [], NexusGamepad.Empty, NexusGamepad.Empty, NexusGamepad.Empty, NexusGamepad.Empty) { }
+    public NexusInputCollection() : this(NexusCoord.MinValue, [], [NexusGamepad.Empty, NexusGamepad.Empty, NexusGamepad.Empty, NexusGamepad.Empty]) { }
 
-    internal NexusInputCollection(in NexusCoord mousePosition) : this(mousePosition, [], NexusGamepad.Empty, NexusGamepad.Empty, NexusGamepad.Empty, NexusGamepad.Empty) { }
+    internal NexusInputCollection(in NexusCoord mousePosition) : this(mousePosition, [], [NexusGamepad.Empty, NexusGamepad.Empty, NexusGamepad.Empty, NexusGamepad.Empty]) { }
 
-    internal NexusInputCollection(in NexusCoord mousePosition, in ImmutableArray<NexusKey> keys, in NexusGamepad gamepad1, in NexusGamepad gamepad2, in NexusGamepad gamepad3, in NexusGamepad gamepad4)
+    internal NexusInputCollection(in NexusCoord mousePosition, in ImmutableArray<NexusKey> keys, in ImmutableArray<NexusGamepad> gamepads)
     {
         MousePosition = mousePosition;
         Keys = keys;
-        Player1Gamepad = gamepad1;
-        Player2Gamepad = gamepad2;
-        Player3Gamepad = gamepad3;
-        Player4Gamepad = gamepad4;
+        Gamepads = gamepads;
     }
 }

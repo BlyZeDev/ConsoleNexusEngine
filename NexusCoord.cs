@@ -39,7 +39,7 @@ public readonly record struct NexusCoord
     /// Initializes a new <see cref="NexusCoord"/>
     /// </summary>
     /// <remarks>
-    /// The coordinate is clamped between 0 and <see cref="int.MaxValue"/>
+    /// The coordinates are clamped between <see cref="MinValue"/> and <see cref="MaxValue"/>
     /// </remarks>
     /// <param name="x">The X coordinate</param>
     /// <param name="y">The Y coordinate</param>

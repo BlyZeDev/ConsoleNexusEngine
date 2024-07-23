@@ -30,8 +30,11 @@ public static class NexusEngineHelper
     /// <summary>
     /// <see langword="true"/> if the button is pressed, otherwise <see langword="false"/>
     /// </summary>
-    /// <param name="buttons">The pressed button</param>
+    /// <remarks>
+    /// Basically a better <see cref="Enum.HasFlag(Enum)"/> for <see cref="NexusXInput"/> in every way
+    /// </remarks>
+    /// <param name="buttons">The pressed buttons</param>
     /// <param name="button">The button that should be checked</param>
     /// <returns><see cref="bool"/></returns>
-    public static bool Contains(this NexusXInput buttons, NexusXInput button) => (buttons & button) != 0;
+    public static bool IsPressed(this NexusXInput buttons, NexusXInput button) => (buttons & button) != 0;
 }

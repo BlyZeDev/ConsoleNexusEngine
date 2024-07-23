@@ -85,7 +85,7 @@ internal sealed class CmdConsole
         Native.GetNumberOfConsoleInputEvents(_standardInput, out var numEventsRead);
 
         if (numEventsRead is 0 && _currentPressedKeys.Count is 0)
-            return new NexusInputCollection(currentMousePos, [], _gamepads[0], _gamepads[1], _gamepads[2], _gamepads[3]);
+            return new NexusInputCollection(currentMousePos, [], _gamepads.ToImmutableArray());
 
         var buffer = new INPUT_RECORD[numEventsRead];
 
@@ -134,7 +134,7 @@ internal sealed class CmdConsole
         return new NexusInputCollection(
             currentMousePos,
             _currentPressedKeys.Count is 0 ? [] : _currentPressedKeys.ToImmutableArray(),
-            _gamepads[0], _gamepads[1], _gamepads[2], _gamepads[3]);
+            _gamepads.ToImmutableArray());
     }
 
     public void UpdateTitle(string title) => Native.SetWindowText(_handle, title);

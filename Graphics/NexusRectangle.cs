@@ -6,7 +6,7 @@ using System.Drawing.Imaging;
 /// <summary>
 /// Represents a rectangle shape
 /// </summary>
-public readonly struct NexusRectangle : INexusShape
+public readonly struct NexusRectangle : INexusShape, ILockablePixels
 {
     private readonly Bitmap _bitmap;
 
@@ -77,13 +77,17 @@ public readonly struct NexusRectangle : INexusShape
             }
 
             UnlockBits(data);
-
+            
             return drawing;
         }
     }
 
-    internal readonly BitmapData LockBitsReadOnly()
+    internal BitmapData LockBitsReadOnly()
         => _bitmap.LockBits(new Rectangle(0, 0, _bitmap.Width, _bitmap.Height), ImageLockMode.ReadOnly, PixelFormat.Format16bppRgb555);
+    
+    internal void UnlockBits(BitmapData data) => _bitmap.UnlockBits(data);
 
-    internal readonly void UnlockBits(BitmapData data) => _bitmap.UnlockBits(data);
+    BitmapData ILockablePixels.LockBitsReadOnly() => LockBitsReadOnly();
+
+    void ILockablePixels.UnlockBits(BitmapData data) => UnlockBits(data);
 }

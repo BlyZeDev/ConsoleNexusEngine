@@ -39,11 +39,6 @@ public abstract class ConsoleGame : IDisposable
     protected ConsoleGraphic Graphic { get; }
 
     /// <summary>
-    /// Controls all object that are registered
-    /// </summary>
-    protected GlobalController Controller { get; }
-
-    /// <summary>
     /// Useful utility functions
     /// </summary>
     protected ConsoleGameUtil Utility { get; }
@@ -102,7 +97,6 @@ public abstract class ConsoleGame : IDisposable
 
         Settings = ConsoleGameSettings.Default;
         Graphic = new(_console, Settings);
-        Controller = new();
         Utility = new(_console, Settings);
 
         _game.Priority = Settings.Priority;

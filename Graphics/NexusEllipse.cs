@@ -6,7 +6,7 @@ using System.Drawing.Imaging;
 /// <summary>
 /// Represents an ellipse shape
 /// </summary>
-public readonly struct NexusEllipse : INexusShape
+public readonly struct NexusEllipse : INexusShape, ILockablePixels
 {
     private readonly Bitmap _bitmap;
 
@@ -86,4 +86,8 @@ public readonly struct NexusEllipse : INexusShape
         => _bitmap.LockBits(new Rectangle(0, 0, _bitmap.Width, _bitmap.Height), ImageLockMode.ReadOnly, PixelFormat.Format16bppRgb555);
 
     internal readonly void UnlockBits(BitmapData data) => _bitmap.UnlockBits(data);
+
+    BitmapData ILockablePixels.LockBitsReadOnly() => LockBitsReadOnly();
+
+    void ILockablePixels.UnlockBits(BitmapData data) => UnlockBits(data);
 }
