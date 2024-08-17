@@ -39,9 +39,14 @@ public abstract class ConsoleGame : IDisposable
     protected ConsoleGraphic Graphic { get; }
 
     /// <summary>
-    /// Useful utility functions
+    /// Provides useful utility functions
     /// </summary>
     protected ConsoleGameUtil Utility { get; }
+
+    /// <summary>
+    /// Provides useful system monitoring functions
+    /// </summary>
+    protected NexusSystemMonitor Monitor { get; }
 
     /// <summary>
     /// <see langword="true"/> if the game is running, otherwise <see langword="false"/>
@@ -98,6 +103,7 @@ public abstract class ConsoleGame : IDisposable
         Settings = ConsoleGameSettings.Default;
         Graphic = new(_console, Settings);
         Utility = new(_console, Settings);
+        Monitor = new();
 
         _game.Priority = Settings.Priority;
 
@@ -152,6 +158,7 @@ public abstract class ConsoleGame : IDisposable
         if (IsRunning) Stop();
 
         _fpsTimer.Dispose();
+        Monitor.Dispose();
 
         GC.SuppressFinalize(this);
 
@@ -201,6 +208,7 @@ public abstract class ConsoleGame : IDisposable
             case nameof(ConsoleGameSettings.Title): _console.UpdateTitle(Settings.Title); break;
             case nameof(ConsoleGameSettings.ColorPalette): _console.UpdateColorPalette(Settings.ColorPalette); break;
             case nameof(ConsoleGameSettings.Font): _console.UpdateFont(Settings.Font); break;
+            case nameof(ConsoleGameSettings.EnableMonitoring): Monitor.IsEnabled = Settings.EnableMonitoring; break;
         }
     }
 

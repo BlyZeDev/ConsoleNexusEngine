@@ -1,4 +1,4 @@
-﻿namespace ConsoleNexusEngine.Internal.WIN;
+﻿namespace ConsoleNexusEngine.Internal;
 
 using System.Runtime.InteropServices;
 

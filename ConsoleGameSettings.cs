@@ -3,7 +3,7 @@
 using System.Threading;
 
 /// <summary>
-/// Initial configuration for <see cref="ConsoleGame"/>
+/// The settings for <see cref="ConsoleGame"/>
 /// </summary>
 public sealed record ConsoleGameSettings
 {
@@ -15,6 +15,7 @@ public sealed record ConsoleGameSettings
     private NexusKey stopGameKey;
     private ThreadPriority priority;
     private NexusInputType inputTypes;
+    private bool enableMonitoring;
 
     /// <summary>
     /// The title the console should have
@@ -82,7 +83,7 @@ public sealed record ConsoleGameSettings
     }
 
     /// <summary>
-    /// If <see langword="false"/> all inputs are ignored
+    /// The allowed inputs types
     /// </summary>
     public NexusInputType InputTypes
     {
@@ -91,6 +92,19 @@ public sealed record ConsoleGameSettings
         {
             inputTypes = value;
             Update(nameof(InputTypes));
+        }
+    }
+
+    /// <summary>
+    /// <see langword="true"/> if monitoring should be enabled, otherwise <see langword="false"/>
+    /// </summary>
+    public bool EnableMonitoring
+    {
+        get => enableMonitoring;
+        set
+        {
+            enableMonitoring = value;
+            Update(nameof(EnableMonitoring));
         }
     }
 
@@ -104,6 +118,7 @@ public sealed record ConsoleGameSettings
         stopGameKey = NexusKey.Escape;
         priority = ThreadPriority.Normal;
         inputTypes = NexusInputType.All;
+        enableMonitoring = false;
     }
 
     private void Update(string propertyName) => Updated?.Invoke(this, propertyName);

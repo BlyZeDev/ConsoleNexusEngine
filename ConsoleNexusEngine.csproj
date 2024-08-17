@@ -23,7 +23,6 @@
 	<ItemGroup>
 		<Using Include="ConsoleNexusEngine.Helpers" />
 		<Using Include="ConsoleNexusEngine.Internal" />
-		<Using Include="ConsoleNexusEngine.Internal.WIN" />
 		<Using Include="ConsoleNexusEngine.IO" />
 		<Using Include="ConsoleNexusEngine.Graphics" />
 		<Using Include="ConsoleNexusEngine.Sound" />
@@ -35,7 +34,7 @@
     <PackageReference Include="BlyZe.BackgroundTimer" Version="4.0.2" />
     <PackageReference Include="Figgle" Version="0.5.1" />
     <PackageReference Include="NAudio" Version="2.2.1" />
-    <PackageReference Include="System.Drawing.Common" Version="8.0.4" />
+    <PackageReference Include="System.Drawing.Common" Version="8.0.7" />
   </ItemGroup>
 
   <ItemGroup>

@@ -3,7 +3,7 @@
 using System.Security.Cryptography;
 
 /// <summary>
-/// Useful functions for <see cref="ConsoleGame"/>
+/// Provides useful functions for <see cref="ConsoleGame"/>
 /// </summary>
 public sealed class ConsoleGameUtil
 {

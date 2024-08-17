@@ -3,6 +3,9 @@
 /// <summary>
 /// Represents allowed input types
 /// </summary>
+/// <remarks>
+/// This enum has flags
+/// </remarks>
 [Flags]
 public enum NexusInputType
 {

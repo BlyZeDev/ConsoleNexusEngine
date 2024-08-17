@@ -1,7 +1,9 @@
 ﻿namespace ConsoleNexusEngine.Helpers;
 
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Security.Principal;
 
 /// <summary>
 /// Useful helper methods for <see cref="ConsoleNexusEngine"/>
@@ -9,22 +11,45 @@ using System.IO;
 public static class NexusEngineHelper
 {
     /// <summary>
-    /// <see langword="true"/> if the console window is a conhost.exe process, otherwise <see langword="false"/>
+    /// <see langword="true"/> if the console window is a supported console, otherwise <see langword="false"/>
     /// </summary>
     /// <returns><see cref="bool"/></returns>
-    public static bool IsConsoleHost() => Native.GetWindowLong(Native.GetConsoleWindow(), -16) > 0;
+    public static bool IsSupportedConsole() => Native.GetWindowLong(Native.GetConsoleWindow(), -16) > 0;
 
     /// <summary>
-    /// Starts the program in a new conhost.exe window
+    /// <see langword="true"/> if the program has administrator privileges, otherwise <see langword="false"/>
     /// </summary>
-    public static void StartAppInConhost()
+    /// <returns></returns>
+    public static bool IsRunAsAdmin()
     {
-        Process.Start(new ProcessStartInfo
+        var principal = new WindowsPrincipal(WindowsIdentity.GetCurrent());
+        return principal.IsInRole(WindowsBuiltInRole.Administrator);
+    }
+
+    /// <summary>
+    /// Starts the program in a supported console window.<br/>
+    /// Only returns <see langword="false"/> if <paramref name="runAsAdmin"/> was set to <see langword="true"/> and the user declined to start as admin. Otherwise returns <see langword="true"/>
+    /// </summary>
+    /// <param name="runAsAdmin"><see langword="true"/> if the program should be run as administrator, otherwise <see langword="false"/></param>
+    /// <returns><see cref="bool"/></returns>
+    public static bool StartInSupportedConsole(in bool runAsAdmin = false)
+    {
+        try
         {
-            FileName = Path.Combine(Environment.SystemDirectory, "conhost.exe"),
-            Arguments = Environment.ProcessPath ?? throw new FileNotFoundException("The .exe path of the process couldn't be found"),
-            UseShellExecute = false
-        });
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = Path.Combine(Environment.SystemDirectory, "conhost.exe"),
+                Arguments = Environment.ProcessPath ?? throw new FileNotFoundException("The .exe path of the process couldn't be found"),
+                UseShellExecute = true,
+                Verb = runAsAdmin ? "runas" : ""
+            });
+
+            return true;
+        }
+        catch (Win32Exception)
+        {
+            return false;
+        }
     }
 
     /// <summary>
