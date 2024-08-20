@@ -42,9 +42,9 @@ internal sealed unsafe class ConsoleBuffer
         }
     }
 
-    public void SetBackgroundBuffer(in Memory2D<Glyph> glyphBuffer, in int background)
+    public void SetBackgroundBuffer(in Memory2D<NexusChar> charBuffer, in int background)
     {
-        var glyphs = glyphBuffer.Span;
+        var glyphs = charBuffer.Span;
         var shiftedBg = background << 4;
 
         for (int i = 0; i < glyphs.Length; i++)
@@ -52,17 +52,17 @@ internal sealed unsafe class ConsoleBuffer
             ref var current = ref glyphs[i];
 
             charInfoBuffer[i].Attributes =
-                    (short)(current.ForegroundIndex | (current.Value is char.MinValue ? shiftedBg : current.BackgroundIndex << 4));
+                    (short)(current.Foreground | (current.Value is char.MinValue ? shiftedBg : current.Background << 4));
             charInfoBuffer[i].UnicodeChar = current.Value;
         }
     }
 
-    public void SetGlyph(in int x, in int y, in Glyph glyph)
+    public void SetChar(in int x, in int y, in NexusChar character)
     {
-        var index = y * Width + x;
+        var index = MathHelper.GetIndex(x, y, Width);
 
-        charInfoBuffer[index].Attributes = (short)(glyph.ForegroundIndex | glyph.BackgroundIndex << 4);
-        charInfoBuffer[index].UnicodeChar = glyph.Value;
+        charInfoBuffer[index].Attributes = (short)(character.Foreground | character.Background << 4);
+        charInfoBuffer[index].UnicodeChar = character.Value;
     }
 
     public void RenderBuffer()

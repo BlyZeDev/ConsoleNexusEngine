@@ -3,17 +3,20 @@
 using System.Collections;
 
 /// <summary>
-/// Represents a color palette for the console
+/// Represents a color palette with 16 unique colors for the console
 /// </summary>
 public sealed partial class NexusColorPalette : IEnumerable<NexusColor>, IEquatable<NexusColorPalette>
 {
-    private readonly Dictionary<ConsoleColor, NexusColor> _colors;
+    private readonly UniqueDictionary<ConsoleColor, NexusColor> _colors;
 
     internal IReadOnlyDictionary<ConsoleColor, NexusColor> Colors => _colors.AsReadOnly();
 
     /// <summary>
     /// 1st Color of the Palette
     /// </summary>
+    /// <remarks>
+    /// This color is always the background color
+    /// </remarks>
     public NexusColor Color1 => Colors[0];
 
     /// <summary>
@@ -122,6 +125,9 @@ public sealed partial class NexusColorPalette : IEnumerable<NexusColor>, IEquata
     /// <param name="color14">14th Color of the Palette</param>
     /// <param name="color15">15th Color of the Palette</param>
     /// <param name="color16">16th Color of the Palette</param>
+    /// <remarks>
+    /// No duplicate colors are allowed
+    /// </remarks>
     public NexusColorPalette(
         in NexusColor color1,
         in NexusColor color2,
@@ -142,19 +148,19 @@ public sealed partial class NexusColorPalette : IEnumerable<NexusColor>, IEquata
         : this([color1, color2, color3, color4, color5, color6, color7, color8, color9, color10, color11, color12, color13, color14, color15, color16]) { }
 
     /// <summary>
-    /// Checks if the Color Palette contains the given Color
+    /// Get the index of the specified color or <see cref="NexusColorIndex.Invalid"/> if not found
     /// </summary>
     /// <param name="color">The color to check for</param>
-    /// <returns><see langword="true"/> if the color is in the color palette, otherwise <see langword="false"/></returns>
-    public bool Contains(in NexusColor color)
-        => Colors.GetKey(color) is not -1;
+    /// <returns><see cref="NexusColorIndex"/></returns>
+    public NexusColorIndex GetIndex(in NexusColor color)
+        => NexusColorIndex.UnClamped(Colors.GetKey(color));
 
     /// <summary>
     /// Get the color at a specific index
     /// </summary>
     /// <param name="index">The index of the color [0-15]</param>
     /// <returns><see cref="NexusColor"/></returns>
-    public NexusColor this[in int index] => Colors[(ConsoleColor)index];
+    public NexusColor this[in NexusColorIndex index] => this[index.Index];
 
     /// <inheritdoc/>
     public IEnumerator<NexusColor> GetEnumerator() => Colors.Values.GetEnumerator();
@@ -185,4 +191,6 @@ public sealed partial class NexusColorPalette : IEnumerable<NexusColor>, IEquata
     public override int GetHashCode() => HashCode.Combine(Colors);
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+    internal NexusColor this[in int index] => Colors[(ConsoleColor)index];
 }

@@ -22,7 +22,7 @@ internal readonly struct Memory2D<T> where T : struct
 
     public readonly ref T this[in int i] => ref _memory.Span[i];
 
-    public readonly ref T this[in int x, in int y] => ref _memory.Span[Width * y + x];
+    public readonly ref T this[in int x, in int y] => ref _memory.Span[MathHelper.GetIndex(x, y, Width)];
 
     public readonly Memory2D<T> Resize(in int width, in int height)
     {

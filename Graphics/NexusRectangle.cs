@@ -6,12 +6,14 @@ using System.Drawing.Imaging;
 /// <summary>
 /// Represents a rectangle shape
 /// </summary>
-public readonly struct NexusRectangle : INexusShape, ILockablePixels
+public readonly struct NexusRectangle : INexusShape, ISprite
 {
-    private readonly Bitmap _bitmap;
+    private readonly ReadOnlyMemory2D<NexusChar> _sprite;
+
+    readonly ReadOnlyMemory2D<NexusChar> ISprite.Sprite => _sprite;
 
     /// <inheritdoc/>
-    public NexusSize Size { get; }
+    public readonly NexusSize Size { get; }
 
     /// <inheritdoc/>
     public readonly NexusChar Character { get; }
@@ -27,17 +29,19 @@ public readonly struct NexusRectangle : INexusShape, ILockablePixels
     /// <param name="fill"><see langword="true"/> if the shape is filled, otherwise <see langword="false"/></param>
     public NexusRectangle(in NexusSize size, in NexusChar character, in bool fill)
     {
-        _bitmap = new Bitmap(size.Width, size.Height, PixelFormat.Format16bppRgb555);
+        var bitmap = new Bitmap(size.Width, size.Height, PixelFormat.Format16bppRgb555);
 
         Size = size;
         Character = character;
         Fill = fill;
 
-        using (var graphics = Graphics.FromImage(_bitmap))
+        using (var graphics = Graphics.FromImage(bitmap))
         {
             graphics.DrawRectangle(INexusShape.Red, 0, 0, size.Width - 1, size.Height - 1);
             if (Fill) graphics.FillRectangle(INexusShape.Red.Brush, 0, 0, size.Width - 1, size.Height - 1);
         }
+
+        _sprite = CreateSprite(bitmap, Character);
     }
 
     /// <summary>
@@ -53,12 +57,27 @@ public readonly struct NexusRectangle : INexusShape, ILockablePixels
     /// <inheritdoc/>
     public readonly bool[,] Draw()
     {
+        var result = new bool[Size.Width, Size.Height];
+
+        for (int y = 0; y < Size.Height; y++)
+        {
+            for (int x = 0; x < Size.Width; x++)
+            {
+                result[x, y] = _sprite.Span[MathHelper.GetIndex(x, y, Size.Width)] != NexusChar.Empty;
+            }
+        }
+
+        return result;
+    }
+
+    private static ReadOnlyMemory2D<NexusChar> CreateSprite(Bitmap bitmap, in NexusChar character)
+    {
+        var sprite = new Memory2D<NexusChar>(bitmap.Width, bitmap.Height);
+
         unsafe
         {
-            var data = LockBitsReadOnly();
+            var data = bitmap.LockBitsReadOnly();
             var pixelSize = Image.GetPixelFormatSize(PixelFormat.Format16bppRgb555) / 8;
-
-            var drawing = new bool[data.Width, data.Height];
 
             var scan0 = (byte*)data.Scan0;
 
@@ -72,22 +91,13 @@ public readonly struct NexusRectangle : INexusShape, ILockablePixels
                 {
                     pixel = row + x * pixelSize;
 
-                    drawing[x, y] = (pixel[1] & 0b01111100) >> 2 is 31;
+                    sprite[x, y] = ((pixel[1] & 0b01111100) >> 2 is 31) ? character : NexusChar.Empty;
                 }
             }
 
-            UnlockBits(data);
-            
-            return drawing;
+            bitmap.UnlockBits(data);
         }
+
+        return sprite.ToReadOnly();
     }
-
-    internal BitmapData LockBitsReadOnly()
-        => _bitmap.LockBits(new Rectangle(0, 0, _bitmap.Width, _bitmap.Height), ImageLockMode.ReadOnly, PixelFormat.Format16bppRgb555);
-    
-    internal void UnlockBits(BitmapData data) => _bitmap.UnlockBits(data);
-
-    BitmapData ILockablePixels.LockBitsReadOnly() => LockBitsReadOnly();
-
-    void ILockablePixels.UnlockBits(BitmapData data) => UnlockBits(data);
 }

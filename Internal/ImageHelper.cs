@@ -1,9 +1,15 @@
 ﻿namespace ConsoleNexusEngine.Internal;
 
 using System.Drawing;
+using System.Drawing.Imaging;
 
 internal static class ImageHelper
 {
+    public static BitmapData LockBitsReadOnly(this Bitmap bitmap)
+        => bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, PixelFormat.Format16bppRgb555);
+
+    public static void UnlockBits(this Bitmap bitmap, BitmapData data) => bitmap.UnlockBits(data);
+
     public static Bitmap Resize(Bitmap bitmap, in NexusSize? size)
     {
         if (!size.HasValue) return bitmap;

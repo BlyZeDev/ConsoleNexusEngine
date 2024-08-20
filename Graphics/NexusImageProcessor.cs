@@ -8,7 +8,7 @@ public abstract class NexusImageProcessor
     /// <summary>
     /// The color palette used
     /// </summary>
-    internal protected readonly NexusColorPalette _colorPalette;
+    protected readonly NexusColorPalette _colorPalette;
 
     /// <summary>
     /// Initializes an Image Processor
@@ -17,9 +17,9 @@ public abstract class NexusImageProcessor
     protected NexusImageProcessor(NexusColorPalette colorPalette) => _colorPalette = colorPalette;
 
     /// <summary>
-    /// The process to calculate the color
+    /// The process to calculate the color index
     /// </summary>
     /// <param name="targetColor">The color to process</param>
     /// <returns><see cref="NexusColor"/></returns>
-    public abstract NexusColor Process(in NexusColor targetColor);
+    public abstract NexusColorIndex Process(in NexusColor targetColor);
 }

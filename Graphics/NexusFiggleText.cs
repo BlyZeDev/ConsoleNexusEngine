@@ -1,30 +1,32 @@
 ﻿namespace ConsoleNexusEngine.Graphics;
 
 using Figgle;
+using System.Collections.Immutable;
 using System.Linq;
 
 /// <summary>
 /// Represents a figgle text in the console
 /// </summary>
-public sealed record NexusFiggleText
+public sealed record NexusFiggleText : ISprite
 {
-    internal readonly int _longestStringLength;
-    internal readonly string[] _value;
+    private readonly ReadOnlyMemory2D<NexusChar> _sprite;
+
+    ReadOnlyMemory2D<NexusChar> ISprite.Sprite => _sprite;
 
     /// <summary>
     /// The text lines itself
     /// </summary>
-    public IReadOnlyCollection<string> Value => _value.AsReadOnly();
+    public ImmutableArray<string> Value { get; }
 
     /// <summary>
     /// The foreground color of the text
     /// </summary>
-    public NexusColor Foreground { get; }
+    public NexusColorIndex Foreground { get; }
 
     /// <summary>
-    /// The background color of the text, <see langword="null"/> if the console background color should be used
+    /// The background color of the text
     /// </summary>
-    public NexusColor? Background { get; }
+    public NexusColorIndex Background { get; }
 
     /// <summary>
     /// The figgle font of the text
@@ -37,13 +39,17 @@ public sealed record NexusFiggleText
     /// <param name="value">The text itself</param>
     /// <param name="figgleFont">The Figgle Font that is used on the <paramref name="value"/></param>
     /// <param name="foreground">The foreground color of the text</param>
-    /// <param name="background">The background color of the text, <see langword="null"/> if the console background color should be used</param>
-    public NexusFiggleText(string value, FiggleFont figgleFont, in NexusColor foreground, in NexusColor? background = null)
+    /// <param name="background">The background color of the text</param>
+    public NexusFiggleText(string value, FiggleFont figgleFont, in NexusColorIndex foreground, in NexusColorIndex background)
     {
-        _longestStringLength = InitText(value, figgleFont, out _value);
+        var text = RenderText(value, figgleFont, out var longestLength);
+        
+        Value = ImmutableArray.Create(text);
         Foreground = foreground;
         Background = background;
         FiggleFont = figgleFont;
+
+        _sprite = CreateSprite(text, foreground, background, new NexusSize(longestLength, text.Length));
     }
 
     /// <summary>
@@ -52,8 +58,17 @@ public sealed record NexusFiggleText
     /// <param name="value">The text itself</param>
     /// <param name="figgleFont">The Figgle Font that is used on the <paramref name="value"/></param>
     /// <param name="foreground">The foreground color of the text</param>
-    /// <param name="background">The background color of the text, <see langword="null"/> if the console background color should be used</param>
-    public NexusFiggleText(in char value, FiggleFont figgleFont, in NexusColor foreground, in NexusColor? background = null)
+    public NexusFiggleText(string value, FiggleFont figgleFont, in NexusColorIndex foreground)
+        : this(value, figgleFont, foreground, NexusColorIndex.Background) { }
+
+    /// <summary>
+    /// Initializes a new console text in figgle font
+    /// </summary>
+    /// <param name="value">The text itself</param>
+    /// <param name="figgleFont">The Figgle Font that is used on the <paramref name="value"/></param>
+    /// <param name="foreground">The foreground color of the text</param>
+    /// <param name="background">The background color of the text</param>
+    public NexusFiggleText(in char value, FiggleFont figgleFont, in NexusColorIndex foreground, in NexusColorIndex background)
         : this(value.ToString(), figgleFont, foreground, background) { }
 
     /// <summary>
@@ -62,14 +77,49 @@ public sealed record NexusFiggleText
     /// <param name="value">The text itself</param>
     /// <param name="figgleFont">The Figgle Font that is used on the <paramref name="value"/></param>
     /// <param name="foreground">The foreground color of the text</param>
-    /// <param name="background">The background color of the text, <see langword="null"/> if the console background color should be used</param>
-    public NexusFiggleText(object? value, FiggleFont figgleFont, in NexusColor foreground, in NexusColor? background = null)
+    public NexusFiggleText(in char value, FiggleFont figgleFont, in NexusColorIndex foreground)
+        : this(value.ToString(), figgleFont, foreground, NexusColorIndex.Background) { }
+
+    /// <summary>
+    /// Initializes a new console text in figgle font
+    /// </summary>
+    /// <param name="value">The text itself</param>
+    /// <param name="figgleFont">The Figgle Font that is used on the <paramref name="value"/></param>
+    /// <param name="foreground">The foreground color of the text</param>
+    /// <param name="background">The background color of the text</param>
+    public NexusFiggleText(object? value, FiggleFont figgleFont, in NexusColorIndex foreground, in NexusColorIndex background)
         : this(value?.ToString() ?? "", figgleFont, foreground, background) { }
 
-    private static int InitText(string value, FiggleFont font, out string[] values)
-    {
-        values = font.Render(value).Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+    /// <summary>
+    /// Initializes a new console text in figgle font
+    /// </summary>
+    /// <param name="value">The text itself</param>
+    /// <param name="figgleFont">The Figgle Font that is used on the <paramref name="value"/></param>
+    /// <param name="foreground">The foreground color of the text</param>
+    public NexusFiggleText(object? value, FiggleFont figgleFont, in NexusColorIndex foreground)
+        : this(value?.ToString() ?? "", figgleFont, foreground, NexusColorIndex.Background) { }
 
-        return values.Aggregate("", (max, val) => val.Length > max.Length ? val : max).Length;
+    private static ReadOnlySpan<string> RenderText(string value, FiggleFont font, out int longestLength)
+    {
+        var values = font.Render(value).Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+
+        longestLength = values.Aggregate("", (max, val) => val.Length > max.Length ? val : max).Length;
+
+        return values;
+    }
+
+    private static ReadOnlyMemory2D<NexusChar> CreateSprite(in ReadOnlySpan<string> text, in NexusColorIndex foreground, in NexusColorIndex background, in NexusSize size)
+    {
+        var sprite = new Memory2D<NexusChar>(size.Width, size.Height);
+
+        for (int x = 0; x < sprite.Width; x++)
+        {
+            for (int y = 0; y < sprite.Height; y++)
+            {
+                sprite[x, y] = new NexusChar(text[y][x], foreground, background);
+            }
+        }
+
+        return sprite.ToReadOnly();
     }
 }

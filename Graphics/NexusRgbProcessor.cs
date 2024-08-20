@@ -16,7 +16,7 @@ public sealed class NexusRgbProcessor : NexusImageProcessor
     }
 
     /// <inheritdoc/>
-    public override NexusColor Process(in NexusColor targetColor)
+    public override NexusColorIndex Process(in NexusColor targetColor)
     {
         var nearestColorIndex = 0;
         var minDistance = CalculateRgbDistance(targetColor, _colors[0]);
@@ -32,7 +32,7 @@ public sealed class NexusRgbProcessor : NexusImageProcessor
             }
         }
 
-        return _colorPalette[nearestColorIndex];
+        return new NexusColorIndex(nearestColorIndex);
     }
 
     private static double CalculateRgbDistance(in NexusColor color1, in NexusColor color2)

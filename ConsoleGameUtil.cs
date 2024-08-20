@@ -187,5 +187,5 @@ public sealed class ConsoleGameUtil
     /// <param name="pseudoRandom"><see langword="false"/> if it should be generated as a strong random</param>
     /// <returns><see cref="NexusColorPalette"/></returns>
     public NexusColorPalette GetRandomColorPalette(in bool pseudoRandom = true)
-        => NexusColorPalette._presets[GetRandomNumber(NexusColorPalette._presets.Length, pseudoRandom)];
+        => NexusColorPalette._presets.Span[GetRandomNumber(NexusColorPalette._presets.Length, pseudoRandom)];
 }

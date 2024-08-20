@@ -6,12 +6,19 @@
 public enum NexusTextDirection
 {
     /// <summary>
-    /// Text flows from left to right
+    /// Text flows horizontally
     /// </summary>
-    Horizontal = 1,
-
+    Horizontal,
     /// <summary>
-    /// Text flows from top to bottom
+    /// Text flows vertically
     /// </summary>
     Vertical,
+    /// <summary>
+    /// Text flows horizontally but backwards
+    /// </summary>
+    HorizontalRightToLeft,
+    /// <summary>
+    /// Text flows vertically but backwards
+    /// </summary>
+    VerticalRightToLeft
 }

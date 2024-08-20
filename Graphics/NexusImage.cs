@@ -7,27 +7,29 @@ using System.Net.Http;
 /// <summary>
 /// Represents an image that can be rendered in the console
 /// </summary>
-public readonly struct NexusImage
+public readonly struct NexusImage : ISprite
 {
     private const char LightBlock = (char)NexusSpecialChar.LightBlock;
     private const char MiddleBlock = (char)NexusSpecialChar.MiddleBlock;
     private const char DarkBlock = (char)NexusSpecialChar.DarkBlock;
     private const char FullBlock = (char)NexusSpecialChar.FullBlock;
 
-    private readonly ReadOnlyMemory2D<NexusChar> _pixels;
+    private readonly ReadOnlyMemory2D<NexusChar> _sprite;
+
+    ReadOnlyMemory2D<NexusChar> ISprite.Sprite => _sprite;
 
     /// <summary>
     /// The width of the image
     /// </summary>
-    public readonly int Width => _pixels.Width;
+    public readonly int Width => _sprite.Width;
 
     /// <summary>
     /// The height of the image
     /// </summary>
-    public readonly int Height => _pixels.Height;
+    public readonly int Height => _sprite.Height;
 
     internal NexusImage(Bitmap bitmap, NexusImageProcessor imageProcessor, in NexusSize? size)
-        => _pixels = InitializePixels(bitmap, imageProcessor, size);
+        => _sprite = CreateSprite(bitmap, imageProcessor, size);
 
     /// <summary>
     /// Initializes a new NexusImage
@@ -99,11 +101,11 @@ public readonly struct NexusImage
         }
     }
 
-    internal readonly NexusChar this[in int x, in int y] => _pixels[x, y];
+    internal readonly NexusChar this[in int x, in int y] => _sprite[x, y];
 
-    internal readonly ReadOnlyMemory2D<NexusChar> CopyPixels() => new ReadOnlyMemory2D<NexusChar>(_pixels.Span.ToArray(), Width, Height);
+    internal readonly ReadOnlyMemory2D<NexusChar> CopyPixels() => new ReadOnlyMemory2D<NexusChar>(_sprite.Span.ToArray(), Width, Height);
 
-    private static ReadOnlyMemory2D<NexusChar> InitializePixels(Bitmap bitmap, NexusImageProcessor processor, in NexusSize? size)
+    private static ReadOnlyMemory2D<NexusChar> CreateSprite(Bitmap bitmap, NexusImageProcessor processor, in NexusSize? size)
     {
         var resized = ImageHelper.Resize(bitmap, size);
 

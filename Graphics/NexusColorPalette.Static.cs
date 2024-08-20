@@ -7,7 +7,7 @@ using System.Net.Http;
 
 public sealed partial class NexusColorPalette
 {
-    internal static readonly NexusColorPalette[] _presets;
+    internal static readonly ReadOnlyMemory<NexusColorPalette> _presets;
 
     /// <summary>
     /// The maximum amount of different colors that can be in a color palette
@@ -17,58 +17,58 @@ public sealed partial class NexusColorPalette
     /// <summary>
     /// The default windows console color palette<br/>
     /// </summary>
-    public static NexusColorPalette Default => _presets[0];
+    public static NexusColorPalette Default => _presets.Span[0];
 
     /// <summary>
     /// The color palette of IBM's original Color Graphics Adapter<br/>
     /// <see href="https://en.wikipedia.org/wiki/Color_Graphics_Adapter"/>
     /// </summary>
-    public static NexusColorPalette CGA => _presets[1];
+    public static NexusColorPalette CGA => _presets.Span[1];
 
     /// <summary>
     /// The color palette of the ZX Spectrum computer series (only 15 colors)<br/>
     /// <see href="https://en.wikipedia.org/wiki/ZX_Spectrum"/>
     /// </summary>
-    public static NexusColorPalette ZXSpectrum => _presets[2];
+    public static NexusColorPalette ZXSpectrum => _presets.Span[2];
 
     /// <summary>
     /// The color palette of the Atari ST<br/>
     /// <see href="https://en.wikipedia.org/wiki/Atari_ST"/>
     /// </summary>
-    public static NexusColorPalette AtariST => _presets[3];
+    public static NexusColorPalette AtariST => _presets.Span[3];
 
     /// <summary>
     /// The color palette of the MSX (only 15 colors)<br/>
     /// <see href="https://en.wikipedia.org/wiki/MSX2"/>
     /// </summary>
-    public static NexusColorPalette MSX => _presets[4];
+    public static NexusColorPalette MSX => _presets.Span[4];
 
     /// <summary>
     /// A grayscale color palette
     /// </summary>
-    public static NexusColorPalette Grayscale => _presets[5];
+    public static NexusColorPalette Grayscale => _presets.Span[5];
 
     /// <summary>
     /// The color palette of the Pico-8<br/>
     /// <see href="https://de.wikipedia.org/wiki/Pico-8"/>
     /// </summary>
-    public static NexusColorPalette Pico8 => _presets[6];
+    public static NexusColorPalette Pico8 => _presets.Span[6];
 
     /// <summary>
     /// The color palette of the old Windows<br/>
     /// <see href="https://de.wikipedia.org/wiki/Microsoft_Windows_1.0"/>
     /// </summary>
-    public static NexusColorPalette Windows => _presets[7];
+    public static NexusColorPalette Windows => _presets.Span[7];
 
     /// <summary>
     /// The color palette of the Commodore 64<br/>
     /// <see href="https://de.wikipedia.org/wiki/Commodore_64"/>
     /// </summary>
-    public static NexusColorPalette Commodore64 => _presets[8];
+    public static NexusColorPalette Commodore64 => _presets.Span[8];
 
     static NexusColorPalette()
     {
-        _presets =
+        _presets = new ReadOnlyMemory<NexusColorPalette>(
         [
             new NexusColorPalette(
                 new NexusColor(0x000000),
@@ -122,7 +122,7 @@ public sealed partial class NexusColorPalette
                 new NexusColor(0xFFFF00),
                 new NexusColor(0xD8D8D8),
                 new NexusColor(0xFFFFFF),
-                new NexusColor()),
+                new NexusColor(0xF0F0F0)),
 
             new NexusColorPalette(
                 new NexusColor(0x000000),
@@ -158,7 +158,7 @@ public sealed partial class NexusColorPalette
                 new NexusColor(0x7E75F0),
                 new NexusColor(0x64DAEE),
                 new NexusColor(0xB565B3),
-                new NexusColor()),
+                new NexusColor(0xF0F0F0)),
 
             new NexusColorPalette(
                 new NexusColor(0x000000),
@@ -231,7 +231,7 @@ public sealed partial class NexusColorPalette
                 new NexusColor(0x887ECB),
                 new NexusColor(0x50459B),
                 new NexusColor(0xA057A3))
-        ];
+        ]);
     }
 
     /// <summary>

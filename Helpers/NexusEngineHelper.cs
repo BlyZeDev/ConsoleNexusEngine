@@ -61,5 +61,16 @@ public static class NexusEngineHelper
     /// <param name="buttons">The pressed buttons</param>
     /// <param name="button">The button that should be checked</param>
     /// <returns><see cref="bool"/></returns>
-    public static bool IsPressed(this NexusXInput buttons, NexusXInput button) => (buttons & button) != 0;
+    public static bool IsPressed(this NexusXInput buttons, in NexusXInput button) => (buttons & button) != 0;
+
+    /// <summary>
+    /// <see langword="true"/> if the direction is present, otherwise <see langword="false"/>
+    /// </summary>
+    /// <remarks>
+    /// Basically a better <see cref="Enum.HasFlag(Enum)"/> for <see cref="NexusDirection"/> in every way
+    /// </remarks>
+    /// <param name="directions">The directions</param>
+    /// <param name="direction">The direction that should be checked</param>
+    /// <returns><see cref="bool"/></returns>
+    public static bool HasDirection(this NexusDirection directions, in NexusDirection direction) => (directions & direction) != 0;
 }

@@ -1,78 +1,54 @@
 ﻿namespace ConsoleNexusEngine;
 
-using System.Drawing;
-using System.Drawing.Imaging;
-
 public sealed partial class ConsoleGraphic
 {
-    private void DrawShape(in NexusCoord start, INexusShape shape, in Glyph glyph)
+    private void DrawSprite(in NexusCoord start, ISprite sprite)
     {
-        if (shape is ILockablePixels lockable) DrawLockable(start, lockable, glyph);
+        ThrowIfOutOfBounds(start);
+        ThrowIfOutOfBounds(start.X + sprite.Sprite.Width, start.Y + sprite.Sprite.Height);
 
+        for (int x = 0; x < sprite.Sprite.Width; x++)
+        {
+            for (int y = 0; y < sprite.Sprite.Height; y++)
+            {
+                SetChar(start.X + x, start.Y + y, sprite.Sprite[x, y]);
+            }
+        }
+    }
+
+    private void DrawShape(in NexusCoord start, INexusShape shape, in NexusChar character)
+    {
         var drawable = shape.Draw();
 
-        for (int x = 0; x < drawable.GetLength(0); x++)
+        for (int x = 0; x < shape.Size.Width; x++)
         {
-            for (int y = 0; y < drawable.GetLength(1); y++)
+            for (int y = 0; y < shape.Size.Height; y++)
             {
-                if (drawable[x, y]) SetGlyph(x + start.X, y + start.Y, glyph);
+                if (drawable[x, y]) SetChar(start.X + x, start.Y + y, character);
             }
         }
     }
 
-    private void DrawLockable(in NexusCoord start, in ILockablePixels lockable, in Glyph glyph)
+    private void SetChar(in int x, in int y, in NexusChar character)
     {
-        unsafe
-        {
-            var data = lockable.LockBitsReadOnly();
-            var pixelSize = Image.GetPixelFormatSize(PixelFormat.Format16bppRgb555) / 8;
-
-            var scan0 = (byte*)data.Scan0;
-
-            byte* row;
-            byte* pixel;
-            for (var y = 0; y < data.Height; y++)
-            {
-                row = scan0 + y * data.Stride;
-
-                for (var x = 0; x < data.Width; x++)
-                {
-                    pixel = row + x * pixelSize;
-
-                    if ((pixel[1] & 0b01111100) >> 2 is 31) SetGlyph(x + start.X, y + start.Y, glyph);
-                }
-            }
-
-            lockable.UnlockBits(data);
-        }
+        glyphBuffer[x, y] = character;
+        _console.Buffer.SetChar(x, y, character);
     }
 
-    private void SetGlyph(in NexusCoord coord, in Glyph glyph)
-        => SetGlyph(coord.X, coord.Y, glyph);
-
-    private void SetGlyph(in int x, in int y, in Glyph glyph)
-    {
-        glyphBuffer[x, y] = glyph;
-        _console.Buffer.SetGlyph(x, y, glyph);
-    }
+    private void SetChar(in NexusCoord coordinate, in NexusChar character)
+        => SetChar(coordinate.X, coordinate.Y, character);
 
     private void ThrowIfOutOfBounds(in NexusCoord coord)
+        => ThrowIfOutOfBounds(coord.X, coord.Y);
+
+    private void ThrowIfOutOfBounds(in int x, in int y)
     {
-        if (!glyphBuffer.IsInRange(coord))
-            throw new ArgumentOutOfRangeException(nameof(coord), "The coordinate is not in bounds of the console buffer");
+        var isInRange = glyphBuffer.IsInRange(x, y);
+
+        if (!isInRange.X)
+            throw new ArgumentOutOfRangeException(nameof(x), "The coordinate is not in bounds of the console buffer");
+
+        if (!isInRange.Y)
+            throw new ArgumentOutOfRangeException(nameof(y), "The coordinate is not in bounds of the console buffer");
     }
-
-    private void GetOrThrowColorIndex(in NexusColor foreground, in NexusColor? background, string paramName, out int foregroundColorIndex, out int backgroundColorIndex)
-    {
-        foregroundColorIndex = GetColorIndex(foreground);
-        backgroundColorIndex = background is null ? BackgroundIndex : GetColorIndex(background.Value);
-
-        if (foregroundColorIndex is -1 || backgroundColorIndex is -1)
-            throw new ArgumentException("The color is not in the color palette", paramName);
-    }
-
-    private Glyph GetClearGlyph() => new(char.MinValue, BackgroundIndex, BackgroundIndex);
-
-    private int GetColorIndex(in NexusColor color)
-        => _settings.ColorPalette.Colors.GetKey(color);
 }

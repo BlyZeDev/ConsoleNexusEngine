@@ -5,7 +5,7 @@
 /// </summary>
 /// <remarks>
 /// This enum has flags.<br/><br/>
-/// Use <see cref="NexusEngineHelper.IsPressed(NexusXInput, NexusXInput)"/> extension method instead of <c>xInput == NexusXInput.ButtonA</c> to check if a specific button is pressed.
+/// Use <see cref="NexusEngineHelper.IsPressed(NexusXInput, in NexusXInput)"/> extension method instead of <c>xInput == NexusXInput.ButtonA</c> to check if a specific button is pressed.
 /// </remarks>
 [Flags]
 public enum NexusXInput

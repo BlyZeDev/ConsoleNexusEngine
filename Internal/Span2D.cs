@@ -20,7 +20,7 @@ internal readonly ref struct Span2D<T> where T : struct
 
     public readonly ref T this[in int i] => ref _span[i];
 
-    public readonly ref T this[in int x, in int y] => ref _span[Width * y + x];
+    public readonly ref T this[in int x, in int y] => ref _span[MathHelper.GetIndex(x, y, Width)];
 
     public readonly Span2D<T> Resize(in int width, in int height)
     {

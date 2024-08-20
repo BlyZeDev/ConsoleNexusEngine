@@ -24,7 +24,7 @@ public sealed class NexusHspProcessor : NexusImageProcessor
     }
     
     /// <inheritdoc/>
-    public override NexusColor Process(in NexusColor targetColor)
+    public override NexusColorIndex Process(in NexusColor targetColor)
     {
         var nearestColorIndex = 0;
         
@@ -43,7 +43,7 @@ public sealed class NexusHspProcessor : NexusImageProcessor
             }
         }
 
-        return _colorPalette[nearestColorIndex];
+        return new NexusColorIndex(nearestColorIndex);
     }
 
     private static double CalculateHspDistance(in HSP hsp1, in HSP hsp2)

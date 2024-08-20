@@ -81,7 +81,7 @@ public abstract class ConsoleGame : IDisposable
     /// <summary>
     /// The background color of the whole console
     /// </summary>
-    public NexusColor Background => Settings.ColorPalette[Graphic.BackgroundIndex];
+    public NexusColor Background => Settings.ColorPalette.Color1;
 
     /// <summary>
     /// Initializes the <see cref="ConsoleGame"/>
