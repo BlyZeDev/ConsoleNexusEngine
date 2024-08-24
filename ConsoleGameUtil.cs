@@ -1,5 +1,7 @@
 ﻿namespace ConsoleNexusEngine;
 
+using System.Linq;
+using System.Reflection;
 using System.Security.Cryptography;
 
 /// <summary>
@@ -8,8 +10,24 @@ using System.Security.Cryptography;
 public sealed class ConsoleGameUtil
 {
     private static readonly ReadOnlyMemory<NexusSpecialChar> _specialChars;
+    private static readonly ReadOnlyMemory<NexusColorPalette> _colorPalettes;
 
-    static ConsoleGameUtil() => _specialChars = Enum.GetValues<NexusSpecialChar>();
+    static ConsoleGameUtil()
+    {
+        _specialChars = Enum.GetValues<NexusSpecialChar>();
+
+        var colorPalettes = new List<NexusColorPalette>();
+        var type = typeof(NexusColorPalette);
+
+        foreach (var cp in AppDomain.CurrentDomain.GetAssemblies()
+            .SelectMany(x => x.GetTypes())
+            .Where(x => x.IsClass && !x.IsAbstract && x.IsSubclassOf(type) && x.GetCustomAttribute<IgnoreColorPaletteAttribute>() is null))
+        {
+            colorPalettes.Add((NexusColorPalette)Activator.CreateInstance(cp)!);
+        }
+
+        _colorPalettes = new ReadOnlyMemory<NexusColorPalette>(colorPalettes.ToArray());
+    }
 
     private readonly CmdConsole _console;
     private readonly ConsoleGameSettings _settings;
@@ -46,7 +64,7 @@ public sealed class ConsoleGameUtil
     /// <returns><see cref="NexusColor"/></returns>
     public NexusColor GetRandomColor(in bool onlyColorPalette, in bool pseudoRandom = true)
     {
-        if (onlyColorPalette) return _settings.ColorPalette[GetRandomNumber(_settings.ColorPalette.Colors.Count, pseudoRandom)];
+        if (onlyColorPalette) return _settings.ColorPalette[GetRandomNumber(NexusColorPalette.MaxColorCount, pseudoRandom)];
 
         Span<byte> rgb = stackalloc byte[3];
 
@@ -187,5 +205,5 @@ public sealed class ConsoleGameUtil
     /// <param name="pseudoRandom"><see langword="false"/> if it should be generated as a strong random</param>
     /// <returns><see cref="NexusColorPalette"/></returns>
     public NexusColorPalette GetRandomColorPalette(in bool pseudoRandom = true)
-        => NexusColorPalette._presets.Span[GetRandomNumber(NexusColorPalette._presets.Length, pseudoRandom)];
+        => _colorPalettes.Span[GetRandomNumber(_colorPalettes.Length, pseudoRandom)];
 }

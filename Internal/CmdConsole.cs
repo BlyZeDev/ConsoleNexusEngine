@@ -1,6 +1,7 @@
 ﻿namespace ConsoleNexusEngine.Internal;
 
 using System.Collections.Immutable;
+using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -146,26 +147,26 @@ internal sealed class CmdConsole
 
         Native.GetConsoleScreenBufferInfoEx(_standardOutput, ref csbe);
 
-        foreach (var color in colorPalette.Colors)
+        for (int i = 0; i < NexusColorPalette.MaxColorCount; i++)
         {
-            switch (color.Key)
+            switch (i)
             {
-                case ConsoleColor.Black: csbe.black = new COLORREF(color.Value); break;
-                case ConsoleColor.DarkBlue: csbe.darkBlue = new COLORREF(color.Value); break;
-                case ConsoleColor.DarkGreen: csbe.darkGreen = new COLORREF(color.Value); break;
-                case ConsoleColor.DarkCyan: csbe.darkCyan = new COLORREF(color.Value); break;
-                case ConsoleColor.DarkRed: csbe.darkRed = new COLORREF(color.Value); break;
-                case ConsoleColor.DarkMagenta: csbe.darkMagenta = new COLORREF(color.Value); break;
-                case ConsoleColor.DarkYellow: csbe.darkYellow = new COLORREF(color.Value); break;
-                case ConsoleColor.Gray: csbe.gray = new COLORREF(color.Value); break;
-                case ConsoleColor.DarkGray: csbe.darkGray = new COLORREF(color.Value); break;
-                case ConsoleColor.Blue: csbe.blue = new COLORREF(color.Value); break;
-                case ConsoleColor.Green: csbe.green = new COLORREF(color.Value); break;
-                case ConsoleColor.Cyan: csbe.cyan = new COLORREF(color.Value); break;
-                case ConsoleColor.Red: csbe.red = new COLORREF(color.Value); break;
-                case ConsoleColor.Magenta: csbe.magenta = new COLORREF(color.Value); break;
-                case ConsoleColor.Yellow: csbe.yellow = new COLORREF(color.Value); break;
-                case ConsoleColor.White: csbe.white = new COLORREF(color.Value); break;
+                case 0: csbe.black = new COLORREF(colorPalette[i]); break;
+                case 1: csbe.darkBlue = new COLORREF(colorPalette[i]); break;
+                case 2: csbe.darkGreen = new COLORREF(colorPalette[i]); break;
+                case 3: csbe.darkCyan = new COLORREF(colorPalette[i]); break;
+                case 4: csbe.darkRed = new COLORREF(colorPalette[i]); break;
+                case 5: csbe.darkMagenta = new COLORREF(colorPalette[i]); break;
+                case 6: csbe.darkYellow = new COLORREF(colorPalette[i]); break;
+                case 7: csbe.gray = new COLORREF(colorPalette[i]); break;
+                case 8: csbe.darkGray = new COLORREF(colorPalette[i]); break;
+                case 9: csbe.blue = new COLORREF(colorPalette[i]); break;
+                case 10: csbe.green = new COLORREF(colorPalette[i]); break;
+                case 11: csbe.cyan = new COLORREF(colorPalette[i]); break;
+                case 12: csbe.red = new COLORREF(colorPalette[i]); break;
+                case 13: csbe.magenta = new COLORREF(colorPalette[i]); break;
+                case 14: csbe.yellow = new COLORREF(colorPalette[i]); break;
+                case 15: csbe.white = new COLORREF(colorPalette[i]); break;
             }
         }
 
@@ -281,26 +282,26 @@ internal sealed class CmdConsole
 
         Native.GetConsoleScreenBufferInfoEx(_standardOutput, ref csbe);
 
-        foreach (var color in settings.ColorPalette.Colors)
+        for (int i = 0; i < NexusColorPalette.MaxColorCount; i++)
         {
-            switch (color.Key)
+            switch (i)
             {
-                case ConsoleColor.Black: csbe.black = new COLORREF(color.Value); break;
-                case ConsoleColor.DarkBlue: csbe.darkBlue = new COLORREF(color.Value); break;
-                case ConsoleColor.DarkGreen: csbe.darkGreen = new COLORREF(color.Value); break;
-                case ConsoleColor.DarkCyan: csbe.darkCyan = new COLORREF(color.Value); break;
-                case ConsoleColor.DarkRed: csbe.darkRed = new COLORREF(color.Value); break;
-                case ConsoleColor.DarkMagenta: csbe.darkMagenta = new COLORREF(color.Value); break;
-                case ConsoleColor.DarkYellow: csbe.darkYellow = new COLORREF(color.Value); break;
-                case ConsoleColor.Gray: csbe.gray = new COLORREF(color.Value); break;
-                case ConsoleColor.DarkGray: csbe.darkGray = new COLORREF(color.Value); break;
-                case ConsoleColor.Blue: csbe.blue = new COLORREF(color.Value); break;
-                case ConsoleColor.Green: csbe.green = new COLORREF(color.Value); break;
-                case ConsoleColor.Cyan: csbe.cyan = new COLORREF(color.Value); break;
-                case ConsoleColor.Red: csbe.red = new COLORREF(color.Value); break;
-                case ConsoleColor.Magenta: csbe.magenta = new COLORREF(color.Value); break;
-                case ConsoleColor.Yellow: csbe.yellow = new COLORREF(color.Value); break;
-                case ConsoleColor.White: csbe.white = new COLORREF(color.Value); break;
+                case 0: csbe.black = new COLORREF(settings.ColorPalette[i]); break;
+                case 1: csbe.darkBlue = new COLORREF(settings.ColorPalette[i]); break;
+                case 2: csbe.darkGreen = new COLORREF(settings.ColorPalette[i]); break;
+                case 3: csbe.darkCyan = new COLORREF(settings.ColorPalette[i]); break;
+                case 4: csbe.darkRed = new COLORREF(settings.ColorPalette[i]); break;
+                case 5: csbe.darkMagenta = new COLORREF(settings.ColorPalette[i]); break;
+                case 6: csbe.darkYellow = new COLORREF(settings.ColorPalette[i]); break;
+                case 7: csbe.gray = new COLORREF(settings.ColorPalette[i]); break;
+                case 8: csbe.darkGray = new COLORREF(settings.ColorPalette[i]); break;
+                case 9: csbe.blue = new COLORREF(settings.ColorPalette[i]); break;
+                case 10: csbe.green = new COLORREF(settings.ColorPalette[i]); break;
+                case 11: csbe.cyan = new COLORREF(settings.ColorPalette[i]); break;
+                case 12: csbe.red = new COLORREF(settings.ColorPalette[i]); break;
+                case 13: csbe.magenta = new COLORREF(settings.ColorPalette[i]); break;
+                case 14: csbe.yellow = new COLORREF(settings.ColorPalette[i]); break;
+                case 15: csbe.white = new COLORREF(settings.ColorPalette[i]); break;
             }
         }
 

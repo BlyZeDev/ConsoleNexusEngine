@@ -1,7 +1,5 @@
 ﻿namespace ConsoleNexusEngine.Internal;
 
-using System.Collections;
-
 internal static class Extensions
 {
     public static bool FastHasFlag(this NexusInputType type, NexusInputType flag)
@@ -13,50 +11,16 @@ internal static class Extensions
     public static bool IsInRange(in this NexusCoord coord, in NexusCoord start, in NexusSize range)
         => coord.X >= start.X && coord.Y >= start.Y && coord.X <= start.X + range.Width && coord.Y <= start.Y + range.Height;
 
-    public static int GetKey(this IReadOnlyDictionary<ConsoleColor, NexusColor> dictionary, in NexusColor color)
+    public static int GetKey(this IReadOnlyList<NexusColor> colors, in NexusColor color)
     {
-        foreach (var pair in dictionary)
+        for (int i = 0; i < colors.Count; i++)
         {
-            if (pair.Value == color) return (int)pair.Key;
+            if (colors[i] == color) return i;
         }
 
         return -1;
     }
 
-    public static bool TryGetKey<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TValue? value, out TKey key) where TValue : notnull
-    {
-        if (value is not null)
-        {
-            foreach (var pair in dictionary)
-            {
-                if (pair.Value.Equals(value))
-                {
-                    key = pair.Key;
-                    return true;
-                }
-            }
-        }
-
-        key = default!;
-        return false;
-    }
-
     public static (bool X, bool Y) IsInRange<T>(this Memory2D<T> memory, in int x, in int y) where T : struct
         => (x >= 0 && x < memory.Width, y >= 0 && y < memory.Height);
-
-    public static IReadOnlyCollection<T> AsReadOnly<T>(this ICollection<T> source)
-        => source as IReadOnlyCollection<T> ?? new ReadOnlyCollectionAdapter<T>(source);
-
-    private sealed class ReadOnlyCollectionAdapter<T> : IReadOnlyCollection<T>
-    {
-        private readonly ICollection<T> _source;
-
-        public ReadOnlyCollectionAdapter(ICollection<T> source) => _source = source;
-
-        public int Count => _source.Count;
-
-        public IEnumerator<T> GetEnumerator() => _source.GetEnumerator();
-
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-    }
 }

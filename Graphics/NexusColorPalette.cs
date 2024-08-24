@@ -5,12 +5,18 @@ using System.Collections;
 /// <summary>
 /// Represents a color palette with 16 unique colors for the console
 /// </summary>
-public sealed partial class NexusColorPalette : IEnumerable<NexusColor>, IEquatable<NexusColorPalette>
+public abstract class NexusColorPalette : IEnumerable<NexusColor>
 {
-    private readonly UniqueDictionary<ConsoleColor, NexusColor> _colors;
+    /// <summary>
+    /// The maximum amount of different colors that can be in a color palette
+    /// </summary>
+    public const int MaxColorCount = 16;
 
-    internal IReadOnlyDictionary<ConsoleColor, NexusColor> Colors => _colors.AsReadOnly();
-
+    /// <summary>
+    /// The colors of the color palette sorted by index
+    /// </summary>
+    protected virtual IReadOnlyList<NexusColor> Colors { get; }
+    
     /// <summary>
     /// 1st Color of the Palette
     /// </summary>
@@ -22,130 +28,96 @@ public sealed partial class NexusColorPalette : IEnumerable<NexusColor>, IEquata
     /// <summary>
     /// 2nd Color of the Palette
     /// </summary>
-    public NexusColor Color2 => Colors[(ConsoleColor)1];
+    public NexusColor Color2 => Colors[1];
 
     /// <summary>
     /// 3rd Color of the Palette
     /// </summary>
-    public NexusColor Color3 => Colors[(ConsoleColor)2];
+    public NexusColor Color3 => Colors[2];
 
     /// <summary>
     /// 4th Color of the Palette
     /// </summary>
-    public NexusColor Color4 => Colors[(ConsoleColor)3];
+    public NexusColor Color4 => Colors[3];
 
     /// <summary>
     /// 5th Color of the Palette
     /// </summary>
-    public NexusColor Color5 => Colors[(ConsoleColor)4];
+    public NexusColor Color5 => Colors[4];
 
     /// <summary>
     /// 6th Color of the Palette
     /// </summary>
-    public NexusColor Color6 => Colors[(ConsoleColor)5];
+    public NexusColor Color6 => Colors[5];
 
     /// <summary>
     /// 7th Color of the Palette
     /// </summary>
-    public NexusColor Color7 => Colors[(ConsoleColor)6];
+    public NexusColor Color7 => Colors[6];
 
     /// <summary>
     /// 8th Color of the Palette
     /// </summary>
-    public NexusColor Color8 => Colors[(ConsoleColor)7];
+    public NexusColor Color8 => Colors[7];
 
     /// <summary>
     /// 9th Color of the Palette
     /// </summary>
-    public NexusColor Color9 => Colors[(ConsoleColor)8];
+    public NexusColor Color9 => Colors[8];
 
     /// <summary>
     /// 10th Color of the Palette
     /// </summary>
-    public NexusColor Color10 => Colors[(ConsoleColor)9];
+    public NexusColor Color10 => Colors[9];
 
     /// <summary>
     /// 11th Color of the Palette
     /// </summary>
-    public NexusColor Color11 => Colors[(ConsoleColor)10];
+    public NexusColor Color11 => Colors[10];
 
     /// <summary>
     /// 12th Color of the Palette
     /// </summary>
-    public NexusColor Color12 => Colors[(ConsoleColor)11];
+    public NexusColor Color12 => Colors[11];
 
     /// <summary>
     /// 13th Color of the Palette
     /// </summary>
-    public NexusColor Color13 => Colors[(ConsoleColor)12];
+    public NexusColor Color13 => Colors[12];
 
     /// <summary>
     /// 14th Color of the Palette
     /// </summary>
-    public NexusColor Color14 => Colors[(ConsoleColor)13];
+    public NexusColor Color14 => Colors[13];
 
     /// <summary>
     /// 15th Color of the Palette
     /// </summary>
-    public NexusColor Color15 => Colors[(ConsoleColor)14];
+    public NexusColor Color15 => Colors[14];
 
     /// <summary>
     /// 16th Color of the Palette
     /// </summary>
-    public NexusColor Color16 => Colors[(ConsoleColor)15];
-
-    internal NexusColorPalette(in ReadOnlySpan<NexusColor> colors)
-    {
-        if (colors.Length is not 16)
-            throw new ArgumentException("The color palette must contain exactly 16 colors");
-
-        _colors = [];
-        for (int i = 0; i < 16; i++)
-        {
-            _colors.Add((ConsoleColor)i, colors[i]);
-        }
-    }
+    public NexusColor Color16 => Colors[15];
 
     /// <summary>
-    /// Initializes a new Color Palette with 16 colors
+    /// Initializes a new <see cref="NexusColorPalette"/> with 16 colors
     /// </summary>
-    /// <param name="color1">1st Color of the Palette</param>
-    /// <param name="color2">2nd Color of the Palette</param>
-    /// <param name="color3">3rd Color of the Palette</param>
-    /// <param name="color4">4th Color of the Palette</param>
-    /// <param name="color5">5th Color of the Palette</param>
-    /// <param name="color6">6th Color of the Palette</param>
-    /// <param name="color7">7th Color of the Palette</param>
-    /// <param name="color8">8th Color of the Palette</param>
-    /// <param name="color9">9th Color of the Palette</param>
-    /// <param name="color10">10th Color of the Palette</param>
-    /// <param name="color11">11th Color of the Palette</param>
-    /// <param name="color12">12th Color of the Palette</param>
-    /// <param name="color13">13th Color of the Palette</param>
-    /// <param name="color14">14th Color of the Palette</param>
-    /// <param name="color15">15th Color of the Palette</param>
-    /// <param name="color16">16th Color of the Palette</param>
-    /// <remarks>
-    /// No duplicate colors are allowed
-    /// </remarks>
-    public NexusColorPalette(
-        in NexusColor color1,
-        in NexusColor color2,
-        in NexusColor color3,
-        in NexusColor color4,
-        in NexusColor color5,
-        in NexusColor color6,
-        in NexusColor color7,
-        in NexusColor color8,
-        in NexusColor color9,
-        in NexusColor color10,
-        in NexusColor color11,
-        in NexusColor color12,
-        in NexusColor color13,
-        in NexusColor color14,
-        in NexusColor color15,
-        in NexusColor color16)
-        : this([color1, color2, color3, color4, color5, color6, color7, color8, color9, color10, color11, color12, color13, color14, color15, color16]) { }
+    /// <param name="colors">The colors of the color palette</param>
+    /// <exception cref="InvalidOperationException"></exception>
+    protected NexusColorPalette(IReadOnlyList<NexusColor>? colors = null)
+    {
+        if (colors is not null) Colors = colors;
+
+        if (Colors is null)
+            throw new NullReferenceException($"{nameof(Colors)} was null");
+        
+        if (Colors.Count is not MaxColorCount)
+            throw new InvalidOperationException($"{nameof(Colors)} must contain exactly 16 unique colors");
+
+        if (new HashSet<NexusColor>(Colors).Count is not MaxColorCount)
+            throw new InvalidOperationException($"{nameof(Colors)} must contain exactly 16 unique colors");
+    }
 
     /// <summary>
     /// Get the index of the specified color or <see cref="NexusColorIndex.Invalid"/> if not found
@@ -163,26 +135,7 @@ public sealed partial class NexusColorPalette : IEnumerable<NexusColor>, IEquata
     public NexusColor this[in NexusColorIndex index] => this[index.Index];
 
     /// <inheritdoc/>
-    public IEnumerator<NexusColor> GetEnumerator() => Colors.Values.GetEnumerator();
-
-    /// <inheritdoc/>
-    public static bool operator ==(NexusColorPalette left, NexusColorPalette right) => left.Equals(right);
-
-    /// <inheritdoc/>
-    public static bool operator !=(NexusColorPalette left, NexusColorPalette right) => !(left == right);
-
-    /// <inheritdoc/>
-    public bool Equals(NexusColorPalette? other)
-    {
-        if (other is null) return false;
-
-        for (int i = 0; i < Colors.Count; i++)
-        {
-            if (this[i] != other[i]) return false;
-        }
-
-        return true;
-    }
+    public IEnumerator<NexusColor> GetEnumerator() => Colors.GetEnumerator();
 
     /// <inheritdoc/>
     public override bool Equals(object? obj) => obj is NexusColorPalette colorPalette && Equals(colorPalette);
@@ -192,5 +145,5 @@ public sealed partial class NexusColorPalette : IEnumerable<NexusColor>, IEquata
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-    internal NexusColor this[in int index] => Colors[(ConsoleColor)index];
+    internal NexusColor this[in int index] => Colors[index];
 }
