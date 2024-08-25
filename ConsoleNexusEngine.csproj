@@ -19,6 +19,21 @@
     <PackageReleaseNotes>Added XInput support for up to 4 devices. INexusInputCondition implementation for XInput is coming next version.</PackageReleaseNotes>
     <PackAsTool>False</PackAsTool>
   </PropertyGroup>
+	
+  <ItemGroup>
+    <EmbeddedResource Include="WinRing0.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="WinRing0.sys">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="WinRing0x64.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="WinRing0x64.sys">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
 
 	<ItemGroup>
 		<Using Include="ConsoleNexusEngine.Helpers" />

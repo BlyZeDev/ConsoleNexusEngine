@@ -6,8 +6,8 @@ internal static class Service
 {
     private const string ServiceName = "WinRing0_1_2_0";
 
-    private static readonly string _driverFileName = Native.Is64BitOS ? "WinRing0x64.sys" : "WinRing0.sys";
-    
+    private static readonly string _driverPath = Path.Combine(Environment.CurrentDirectory, Native.Is64BitOS ? "WinRing0x64.sys" : "WinRing0.sys");
+
     public static bool InstallAndStart()
     {
         var scm = Native.OpenSCManager(null!, null!, 0x0002);
@@ -22,7 +22,7 @@ internal static class Service
             0x00000001,
             0x00000003,
             0x00000001,
-            Path.Combine(Environment.CurrentDirectory, _driverFileName),
+            _driverPath,
             null!,
             nint.Zero,
             null!,

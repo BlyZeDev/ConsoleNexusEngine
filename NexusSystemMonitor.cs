@@ -76,7 +76,7 @@ public sealed class NexusSystemMonitor
         _updateTimer = BackgroundTimer.StartNew(TimeSpan.FromSeconds(1), Update);
         _cpuMonitor = ICpuMonitor.GetMonitor();
         _gpuMonitor = IGpuMonitor.GetMonitor();
-
+        
         CpuModel = _cpuMonitor.GetModel();
         GpuModel = _gpuMonitor.GetModel();
     }
