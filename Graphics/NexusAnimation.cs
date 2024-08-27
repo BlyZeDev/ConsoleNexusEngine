@@ -14,14 +14,9 @@ public sealed class NexusAnimation
     private int currentFrameIndex;
 
     /// <summary>
-    /// The width of the animation
+    /// The size of the animation
     /// </summary>
-    public int Width { get; }
-
-    /// <summary>
-    /// The height of the animation
-    /// </summary>
-    public int Height { get; }
+    public NexusSize Size { get; }
 
     private NexusAnimation(Bitmap animation, NexusImageProcessor imageProcessor, in NexusSize? size)
     {
@@ -30,10 +25,7 @@ public sealed class NexusAnimation
 
         _images = Initialize(animation, imageProcessor, size);
 
-        var span = _images.Span[0];
-
-        Width = span.Width;
-        Height = span.Height;
+        Size = _images.Span[0].Size;
 
         currentFrameIndex = -1;
     }

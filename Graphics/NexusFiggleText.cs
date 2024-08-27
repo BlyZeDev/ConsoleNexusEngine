@@ -14,6 +14,11 @@ public sealed record NexusFiggleText : ISprite
     ReadOnlyMemory2D<NexusChar> ISprite.Sprite => _sprite;
 
     /// <summary>
+    /// <inheritdoc/> figgle text
+    /// </summary>
+    public NexusSize Size => new NexusSize(_sprite.Width, _sprite.Height);
+
+    /// <summary>
     /// The text lines itself
     /// </summary>
     public ImmutableArray<string> Value { get; }

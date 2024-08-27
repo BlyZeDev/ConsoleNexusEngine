@@ -1,6 +1,5 @@
 ﻿namespace ConsoleNexusEngine.Graphics;
 
-using System;
 using System.Linq;
 
 /// <summary>
@@ -11,6 +10,11 @@ public sealed record NexusText : ISprite
     private readonly ReadOnlyMemory2D<NexusChar> _sprite;
 
     ReadOnlyMemory2D<NexusChar> ISprite.Sprite => _sprite;
+
+    /// <summary>
+    /// <inheritdoc/> text
+    /// </summary>
+    public NexusSize Size => new NexusSize(_sprite.Width, _sprite.Height);
 
     /// <summary>
     /// The text itself

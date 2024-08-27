@@ -19,14 +19,9 @@ public readonly struct NexusImage : ISprite
     ReadOnlyMemory2D<NexusChar> ISprite.Sprite => _sprite;
 
     /// <summary>
-    /// The width of the image
+    /// <inheritdoc/> image
     /// </summary>
-    public readonly int Width => _sprite.Width;
-
-    /// <summary>
-    /// The height of the image
-    /// </summary>
-    public readonly int Height => _sprite.Height;
+    public readonly NexusSize Size => new NexusSize(_sprite.Width, _sprite.Height);
 
     internal NexusImage(Bitmap bitmap, NexusImageProcessor imageProcessor, in NexusSize? size)
         => _sprite = CreateSprite(bitmap, imageProcessor, size);
@@ -103,7 +98,7 @@ public readonly struct NexusImage : ISprite
 
     internal readonly NexusChar this[in int x, in int y] => _sprite[x, y];
 
-    internal readonly ReadOnlyMemory2D<NexusChar> CopyPixels() => new ReadOnlyMemory2D<NexusChar>(_sprite.Span.ToArray(), Width, Height);
+    internal readonly ReadOnlyMemory2D<NexusChar> CopyPixels() => new ReadOnlyMemory2D<NexusChar>(_sprite.Span.ToArray(), Size.Width, Size.Height);
 
     private static ReadOnlyMemory2D<NexusChar> CreateSprite(Bitmap bitmap, NexusImageProcessor processor, in NexusSize? size)
     {

@@ -15,6 +15,11 @@ public readonly record struct NexusChar : ISprite
     readonly ReadOnlyMemory2D<NexusChar> ISprite.Sprite => _sprite;
 
     /// <summary>
+    /// <inheritdoc/> character
+    /// </summary>
+    public readonly NexusSize Size => new NexusSize(_sprite.Width, _sprite.Height);
+
+    /// <summary>
     /// The character itself
     /// </summary>
     public readonly char Value { get; }
