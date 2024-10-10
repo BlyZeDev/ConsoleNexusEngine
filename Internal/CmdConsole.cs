@@ -1,7 +1,6 @@
 ﻿namespace ConsoleNexusEngine.Internal;
 
 using System.Collections.Immutable;
-using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -68,17 +67,17 @@ internal sealed class CmdConsole
 
         if (inputType.FastHasFlag(NexusInputType.Gamepad))
         {
-            _gamepads[0] = GetGamepadState(0);
-            _gamepads[1] = GetGamepadState(1);
-            _gamepads[2] = GetGamepadState(2);
-            _gamepads[3] = GetGamepadState(3);
+            for (uint i = 0; i < NexusGamepad.MaxGamepads; i++)
+            {
+                _gamepads[i] = GetGamepadState(i);
+            }
         }
         else
         {
-            _gamepads[0] = NexusGamepad.Empty;
-            _gamepads[1] = NexusGamepad.Empty;
-            _gamepads[2] = NexusGamepad.Empty;
-            _gamepads[3] = NexusGamepad.Empty;
+            for (int i = 0; i < NexusGamepad.MaxGamepads; i++)
+            {
+                _gamepads[i] = NexusGamepad.Empty;
+            }
         }
 
         _currentPressedKeys.RemoveWhere(key => !IsKeyPressed(key));

@@ -1,7 +1,7 @@
 ﻿namespace ConsoleNexusEngine;
 
 /// <summary>
-/// An exception thrown if something went wrong with the Engine
+/// An exception thrown if something went wrong inside the Engine
 /// </summary>
 [Serializable]
 public sealed class NexusEngineException : Exception

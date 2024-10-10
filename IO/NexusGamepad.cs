@@ -7,6 +7,11 @@ using System.Timers;
 /// </summary>
 public readonly record struct NexusGamepad
 {
+    /// <summary>
+    /// The maximum amount of gamepads
+    /// </summary>
+    public const int MaxGamepads = 4;
+
     private static readonly Timer[] _vibrationTimers;
 
     static NexusGamepad()

@@ -23,7 +23,7 @@ public readonly record struct NexusInputCollection
     /// The state of all gamepads
     /// </summary>
     /// <remarks>
-    /// This array ALWAYS contains 4 gamepads ordered by player number.<br/>Index 0 = player 1.
+    /// This array ALWAYS contains 4 gamepads ordered by player number.<br/>Index 0 = Player 1.
     /// </remarks>
     public readonly ImmutableArray<NexusGamepad> Gamepads { get; }
 
