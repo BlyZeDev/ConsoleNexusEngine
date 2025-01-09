@@ -13,7 +13,6 @@ public sealed record ConsoleGameSettings
     private NexusFont font;
     private NexusColorPalette colorPalette;
     private NexusKey stopGameKey;
-    private ThreadPriority priority;
     private NexusInputType inputTypes;
     private bool enableMonitoring;
 
@@ -70,19 +69,6 @@ public sealed record ConsoleGameSettings
     }
 
     /// <summary>
-    /// The thread priority of the game
-    /// </summary>
-    public ThreadPriority Priority
-    {
-        get => priority;
-        set
-        {
-            priority = value;
-            Update(nameof(Priority));
-        }
-    }
-
-    /// <summary>
     /// The allowed inputs types
     /// </summary>
     public NexusInputType InputTypes
@@ -116,7 +102,6 @@ public sealed record ConsoleGameSettings
         font = new TerminalFont(new NexusSize(10));
         colorPalette = new DefaultColorPalette();
         stopGameKey = NexusKey.Escape;
-        priority = ThreadPriority.Normal;
         inputTypes = NexusInputType.All;
         enableMonitoring = false;
     }

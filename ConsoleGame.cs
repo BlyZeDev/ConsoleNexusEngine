@@ -2,6 +2,7 @@
 
 using BackgroundTimer;
 using System.Threading;
+using System.Threading.Tasks;
 
 /// <summary>
 /// Provides methods for your Console game
@@ -22,7 +23,7 @@ public abstract class ConsoleGame : IDisposable
         hasInstance = false;
     }
 
-    private readonly Thread _game;
+    private readonly CancellationTokenSource _cts;
     private readonly CmdConsole _console;
     private readonly BackgroundTimer _fpsTimer;
 
@@ -94,9 +95,8 @@ public abstract class ConsoleGame : IDisposable
 
         IsRunning = false;
 
-        _console = new CmdConsole(ConsoleGameSettings.Default);
-
-        _game = new Thread(GameLoop);
+        _cts = new();
+        _console = new CmdConsole(ConsoleGameSettings.Default, _cts);
 
         _fpsTimer = new BackgroundTimer();
 
@@ -104,8 +104,6 @@ public abstract class ConsoleGame : IDisposable
         Graphic = new(_console, Settings);
         Utility = new(_console, Settings);
         Monitor = new();
-
-        _game.Priority = Settings.Priority;
 
         Settings.Updated += OnSettingsUpdated;
     }
@@ -115,7 +113,7 @@ public abstract class ConsoleGame : IDisposable
     /// </summary>
     public void Start()
     {
-        if (_console.stopGameKeyPressed) throw new NexusEngineException("Can't restart a console game");
+        if (_cts.IsCancellationRequested) throw new NexusEngineException("Can't restart a console game");
 
         Load();
 
@@ -123,7 +121,7 @@ public abstract class ConsoleGame : IDisposable
 
         StartTime = DateTimeOffset.Now.DateTime;
 
-        _game.Start();
+        _ = Task.Factory.StartNew(GameLoop, _cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
 
         _fpsTimer.Start(TimeSpan.FromSeconds(1), (ticks) =>
         {
@@ -131,7 +129,7 @@ public abstract class ConsoleGame : IDisposable
             lastTotalFrameCount = TotalFrameCount;
         });
 
-        SpinWait.SpinUntil(() => _console.stopGameKeyPressed);
+        _cts.Token.WaitHandle.WaitOne();
     }
 
     /// <summary>
@@ -141,13 +139,9 @@ public abstract class ConsoleGame : IDisposable
     {
         IsRunning = false;
 
-        _console.stopGameKeyPressed = true;
-
         _fpsTimer.Stop();
 
         CleanUp();
-
-        _game.Join();
 
         _console.ResetToDefault();
     }
@@ -157,6 +151,7 @@ public abstract class ConsoleGame : IDisposable
     {
         if (IsRunning) Stop();
 
+        _cts.Dispose();
         _fpsTimer.Dispose();
         Monitor.Dispose();
 

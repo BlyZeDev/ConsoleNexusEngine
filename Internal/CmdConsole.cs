@@ -3,6 +3,7 @@
 using System.Collections.Immutable;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 
 internal sealed class CmdConsole
 {
@@ -21,16 +22,17 @@ internal sealed class CmdConsole
     private readonly HashSet<NexusKey> _currentPressedKeys;
     private readonly NexusGamepad[] _gamepads;
 
+    private readonly CancellationTokenSource _cts;
+
     private readonly DefaultConsole _defaultConsole;
 
     private NexusCoord currentMousePos;
 
-    internal bool stopGameKeyPressed;
-
     public ConsoleBuffer Buffer { get; }
 
-    public CmdConsole(ConsoleGameSettings settings)
+    public CmdConsole(ConsoleGameSettings settings, CancellationTokenSource cts)
     {
+        _cts = cts;
         _handle = Native.GetConsoleWindow();
 
         var needsAllocation = _handle == nint.Zero;
@@ -50,7 +52,6 @@ internal sealed class CmdConsole
         _defaultConsole = SaveDefaultConsole(needsAllocation);
 
         currentMousePos = NexusCoord.MaxValue;
-        stopGameKeyPressed = false;
 
         var size = Initialize(settings);
 
@@ -101,9 +102,9 @@ internal sealed class CmdConsole
                     {
                         var key = (NexusKey)input.KeyEvent.VirtualKeyCode;
 
-                         _currentPressedKeys.Add(key);
-                        
-                        stopGameKeyPressed = key == stopGameKey;
+                        _currentPressedKeys.Add(key);
+
+                        if (key == stopGameKey) _cts.Cancel();
                     }
                     break;
 
@@ -122,7 +123,7 @@ internal sealed class CmdConsole
 
                         foreach (var mouseKey in mouseKeys)
                         {
-                            stopGameKeyPressed = mouseKey == stopGameKey;
+                            if (mouseKey == stopGameKey) _cts.Cancel();
 
                             _currentPressedKeys.Add(mouseKey);
                         }
