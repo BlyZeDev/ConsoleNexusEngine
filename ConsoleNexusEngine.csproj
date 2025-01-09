@@ -8,7 +8,7 @@
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
     <Authors>BlyZe</Authors>
-    <Version>7.1.0</Version>
+    <Version>7.2.0</Version>
     <Title>$(AssemblyName)</Title>
     <Description>A powerful and easy to use engine to create console games</Description>
     <PackageProjectUrl>https://github.com/BlyZeYT/ConsoleNexus-Engine</PackageProjectUrl>
@@ -16,7 +16,9 @@
     <RepositoryUrl>https://github.com/BlyZeYT/ConsoleNexus-Engine</RepositoryUrl>
     <PackageTags>engine, console engine, blyze, console nexus, console nexus engine, nexus engine, console, console game</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageReleaseNotes>Added global size property to see how large a sprite is</PackageReleaseNotes>
+    <PackageReleaseNotes>- Removed ConsoleGameSettings.ThreadPriority
+- Changed from Thread -&gt; Task
+- Bumped to .net9</PackageReleaseNotes>
     <PackAsTool>False</PackAsTool>
   </PropertyGroup>
 	
