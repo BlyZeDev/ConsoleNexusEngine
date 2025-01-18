@@ -6,14 +6,12 @@
 public sealed partial class ConsoleGraphic
 {
     private readonly CmdConsole _console;
-    private readonly ConsoleGameSettings _settings;
 
     private Memory2D<NexusChar> glyphBuffer;
 
-    internal ConsoleGraphic(CmdConsole console, ConsoleGameSettings settings)
+    internal ConsoleGraphic(CmdConsole console)
     {
         _console = console;
-        _settings = settings;
 
         glyphBuffer = new Memory2D<NexusChar>(_console.Buffer.Width, _console.Buffer.Height);
 

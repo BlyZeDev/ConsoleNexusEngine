@@ -101,9 +101,9 @@ public abstract class ConsoleGame : IDisposable
         _fpsTimer = new BackgroundTimer();
 
         Settings = ConsoleGameSettings.Default;
-        Graphic = new(_console, Settings);
-        Utility = new(_console, Settings);
-        Monitor = new();
+        Graphic = new ConsoleGraphic(_console);
+        Utility = new ConsoleGameUtil(_console, Settings);
+        Monitor = new NexusSystemMonitor();
 
         Settings.Updated += OnSettingsUpdated;
     }

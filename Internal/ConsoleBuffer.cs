@@ -6,6 +6,8 @@ internal sealed unsafe class ConsoleBuffer
 
     private CHAR_INFO[] charInfoBuffer;
 
+    private bool needsRender;
+
     public short Width { get; private set; }
     public short Height { get; private set; }
 
@@ -19,10 +21,13 @@ internal sealed unsafe class ConsoleBuffer
         Height = (short)height;
 
         charInfoBuffer = new CHAR_INFO[Width * Height];
+        needsRender = false;
     }
 
     public void ChangeDimensions(in int width, in int height)
     {
+        needsRender = true;
+
         Width = (short)width;
         Height = (short)height;
 
@@ -33,6 +38,8 @@ internal sealed unsafe class ConsoleBuffer
 
     public void ClearBuffer(in int background)
     {
+        needsRender = true;
+
         var attributes = (short)(background | background << 4);
 
         for (int i = 0; i < charInfoBuffer.Length; i++)
@@ -44,6 +51,8 @@ internal sealed unsafe class ConsoleBuffer
 
     public void SetBackgroundBuffer(in Memory2D<NexusChar> charBuffer, in int background)
     {
+        needsRender = true;
+
         var glyphs = charBuffer.Span;
         var shiftedBg = background << 4;
 
@@ -61,12 +70,22 @@ internal sealed unsafe class ConsoleBuffer
     {
         var index = MathHelper.GetIndex(x, y, Width);
 
-        charInfoBuffer[index].Attributes = (short)(character.Foreground | character.Background << 4);
+        var before = charInfoBuffer[index];
+        var attributes = (short)(character.Foreground | character.Background << 4);
+
+        if (before.UnicodeChar == character.Value && before.Attributes == attributes) return;
+
+        needsRender = true;
+        charInfoBuffer[index].Attributes = attributes;
         charInfoBuffer[index].UnicodeChar = character.Value;
     }
 
     public void RenderBuffer()
     {
+        if (!needsRender) return;
+
+        needsRender = false;
+
         var rect = new SMALL_RECT
         {
             Left = 0,
