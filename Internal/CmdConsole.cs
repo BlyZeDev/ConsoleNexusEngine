@@ -20,7 +20,7 @@ internal sealed class CmdConsole
     private readonly nint _standardInput;
     private readonly nint _standardOutput;
     private readonly HashSet<NexusKey> _currentPressedKeys;
-    private readonly NexusGamepad[] _gamepads;
+    private readonly ImmutableArray<NexusGamepad>.Builder _gamepads;
 
     private readonly CancellationTokenSource _cts;
 
@@ -47,7 +47,7 @@ internal sealed class CmdConsole
         _standardOutput = Native.GetStdHandle(STD_OUTPUT);
 
         _currentPressedKeys = [];
-        _gamepads = [ NexusGamepad.Empty, NexusGamepad.Empty, NexusGamepad.Empty, NexusGamepad.Empty ];
+        _gamepads = ImmutableArray.CreateBuilder<NexusGamepad>(4);
 
         _defaultConsole = SaveDefaultConsole(needsAllocation);
 
@@ -70,14 +70,14 @@ internal sealed class CmdConsole
         {
             for (uint i = 0; i < NexusGamepad.MaxGamepads; i++)
             {
-                _gamepads[i] = GetGamepadState(i);
+                _gamepads.Add(GetGamepadState(i));
             }
         }
         else
         {
             for (int i = 0; i < NexusGamepad.MaxGamepads; i++)
             {
-                _gamepads[i] = NexusGamepad.Empty;
+                _gamepads.Add(NexusGamepad.Empty);
             }
         }
 
@@ -85,8 +85,8 @@ internal sealed class CmdConsole
 
         Native.GetNumberOfConsoleInputEvents(_standardInput, out var numEventsRead);
 
-        if (numEventsRead is 0 && _currentPressedKeys.Count is 0)
-            return new NexusInputCollection(currentMousePos, [], _gamepads.ToImmutableArray());
+        if (numEventsRead == 0 && _currentPressedKeys.Count == 0)
+            return new NexusInputCollection(currentMousePos, [], _gamepads.MoveToImmutable());
 
         var buffer = new INPUT_RECORD[numEventsRead];
 
@@ -135,7 +135,7 @@ internal sealed class CmdConsole
         return new NexusInputCollection(
             currentMousePos,
             _currentPressedKeys.Count is 0 ? [] : _currentPressedKeys.ToImmutableArray(),
-            _gamepads.ToImmutableArray());
+            _gamepads.MoveToImmutable());
     }
 
     public void UpdateTitle(string title) => Native.SetWindowText(_handle, title);

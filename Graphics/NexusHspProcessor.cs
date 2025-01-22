@@ -5,7 +5,7 @@ using System.Collections.Immutable;
 /// <summary>
 /// Uses the HSP color space for image processing
 /// </summary>
-public sealed class NexusHspProcessor : NexusImageProcessor
+public sealed class NexusHspProcessor : NexusColorProcessor
 {
     private const double RConst = 0.299;
     private const double GConst = 0.587;

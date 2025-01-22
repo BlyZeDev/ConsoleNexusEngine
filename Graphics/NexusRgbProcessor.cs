@@ -5,7 +5,7 @@ using System.Collections.Immutable;
 /// <summary>
 /// Uses the RGB color space for image processing
 /// </summary>
-public sealed class NexusRgbProcessor : NexusImageProcessor
+public sealed class NexusRgbProcessor : NexusColorProcessor
 {
     private readonly ImmutableArray<NexusColor> _colors;
 

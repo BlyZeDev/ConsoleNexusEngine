@@ -23,7 +23,7 @@ public readonly struct NexusImage : ISprite
     /// </summary>
     public readonly NexusSize Size => new NexusSize(_sprite.Width, _sprite.Height);
 
-    internal NexusImage(Bitmap bitmap, NexusImageProcessor imageProcessor, in NexusSize? size)
+    internal NexusImage(Bitmap bitmap, NexusColorProcessor imageProcessor, in NexusSize? size)
         => _sprite = CreateSprite(bitmap, imageProcessor, size);
 
     /// <summary>
@@ -31,7 +31,7 @@ public readonly struct NexusImage : ISprite
     /// </summary>
     /// <param name="filepath">The path to the image file</param>
     /// <param name="imageProcessor">The image processor that should be used</param>
-    public NexusImage(string filepath, NexusImageProcessor imageProcessor)
+    public NexusImage(string filepath, NexusColorProcessor imageProcessor)
         : this((Bitmap)Image.FromFile(filepath), imageProcessor) { }
 
     /// <summary>
@@ -39,7 +39,7 @@ public readonly struct NexusImage : ISprite
     /// </summary>
     /// <param name="bitmap">The bitmap</param>
     /// <param name="imageProcessor">The image processor that should be used</param>
-    public NexusImage(Bitmap bitmap, NexusImageProcessor imageProcessor)
+    public NexusImage(Bitmap bitmap, NexusColorProcessor imageProcessor)
         : this(bitmap, imageProcessor, null) { }
 
     /// <summary>
@@ -48,7 +48,7 @@ public readonly struct NexusImage : ISprite
     /// <param name="filepath">The path to the image file</param>
     /// <param name="imageProcessor">The image processor that should be used</param>
     /// <param name="percentage">The desired percentage size of the bitmap</param>
-    public NexusImage(string filepath, NexusImageProcessor imageProcessor, in float percentage)
+    public NexusImage(string filepath, NexusColorProcessor imageProcessor, in float percentage)
         : this((Bitmap)Image.FromFile(filepath), imageProcessor, percentage) { }
 
     /// <summary>
@@ -57,7 +57,7 @@ public readonly struct NexusImage : ISprite
     /// <param name="bitmap">The bitmap</param>
     /// <param name="imageProcessor">The image processor that should be used</param>
     /// <param name="percentage">The desired percentage size of the bitmap</param>
-    public NexusImage(Bitmap bitmap, NexusImageProcessor imageProcessor, in float percentage)
+    public NexusImage(Bitmap bitmap, NexusColorProcessor imageProcessor, in float percentage)
         : this(bitmap, imageProcessor, ImageHelper.GetSize(bitmap.Width, bitmap.Height, percentage)) { }
 
     /// <summary>
@@ -66,7 +66,7 @@ public readonly struct NexusImage : ISprite
     /// <param name="filepath">The path to the image file</param>
     /// <param name="imageProcessor">The image processor that should be used</param>
     /// <param name="size">The desired size of the bitmap</param>
-    public NexusImage(string filepath, NexusImageProcessor imageProcessor, in NexusSize size)
+    public NexusImage(string filepath, NexusColorProcessor imageProcessor, in NexusSize size)
         : this((Bitmap)Image.FromFile(filepath), imageProcessor, size) { }
 
     /// <summary>
@@ -75,7 +75,7 @@ public readonly struct NexusImage : ISprite
     /// <param name="bitmap">The bitmap</param>
     /// <param name="imageProcessor">The image processor that should be used</param>
     /// <param name="size">The desired size of the bitmap</param>
-    public NexusImage(Bitmap bitmap, NexusImageProcessor imageProcessor, in NexusSize size)
+    public NexusImage(Bitmap bitmap, NexusColorProcessor imageProcessor, in NexusSize size)
         : this(bitmap, imageProcessor, new NexusSize?(size)) { }
 
     /// <summary>
@@ -84,7 +84,7 @@ public readonly struct NexusImage : ISprite
     /// <param name="url">The url to the image</param>
     /// <param name="imageProcessor">The image processor that should be used</param>
     /// <returns><see cref="NexusImage"/></returns>
-    public static NexusImage FromUrl(Uri url, NexusImageProcessor imageProcessor)
+    public static NexusImage FromUrl(Uri url, NexusColorProcessor imageProcessor)
     {
         using (var client = new HttpClient())
         {
@@ -100,7 +100,7 @@ public readonly struct NexusImage : ISprite
 
     internal readonly ReadOnlyMemory2D<NexusChar> CopyPixels() => new ReadOnlyMemory2D<NexusChar>(_sprite.Span.ToArray(), Size.Width, Size.Height);
 
-    private static ReadOnlyMemory2D<NexusChar> CreateSprite(Bitmap bitmap, NexusImageProcessor processor, in NexusSize? size)
+    private static ReadOnlyMemory2D<NexusChar> CreateSprite(Bitmap bitmap, NexusColorProcessor processor, in NexusSize? size)
     {
         var resized = ImageHelper.Resize(bitmap, size);
 
