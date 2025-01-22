@@ -1,4 +1,4 @@
-.vs/
-bin/
-obj/
-.editorconfig
+**/.editorconfig
+**/bin
+**/obj
+**/.vs
