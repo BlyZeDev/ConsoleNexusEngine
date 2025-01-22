@@ -22,10 +22,6 @@
     <PackAsTool>False</PackAsTool>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Content Include="Icon.ico" />
-  </ItemGroup>
 	
   <ItemGroup>
     <EmbeddedResource Include="WinRing0.dll">
