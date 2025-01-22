@@ -11,7 +11,7 @@ sealed class Program
     {
         if (!NexusEngineHelper.IsSupportedConsole())
         {
-            NexusEngineHelper.StartInSupportedConsole(true);
+            NexusEngineHelper.StartInSupportedConsole(true); //virtual ConsoleGame.OnCrash(Exception) method
             return;
         }
 

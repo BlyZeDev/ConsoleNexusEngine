@@ -20,7 +20,12 @@
 - Changed from Thread -&gt; Task
 - Bumped to .net9</PackageReleaseNotes>
     <PackAsTool>False</PackAsTool>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="Icon.ico" />
+  </ItemGroup>
 	
   <ItemGroup>
     <EmbeddedResource Include="WinRing0.dll">
@@ -35,6 +40,17 @@
     <EmbeddedResource Include="WinRing0x64.sys">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
+  </ItemGroup>
+	
+  <ItemGroup>
+    <None Include="..\Icon.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 
 	<ItemGroup>
