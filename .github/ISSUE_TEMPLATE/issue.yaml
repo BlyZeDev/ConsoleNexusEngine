@@ -2,7 +2,7 @@ name: Bug Report
 description: Create a report to help me improve this Engine
 labels: ["🐞 Bug"]
 assignees:
-  - BlyZeYT
+  - BlyZeDev
 body:
   - type: textarea
     id: error

@@ -2,7 +2,7 @@ name: Enhancement suggestion
 description: Suggest an idea to enhance this Engine
 labels: ["💡 Enhancement"]
 assignees:
-  - BlyZeYT
+  - BlyZeDev
 body:
   - type: textarea
     id: suggestion
