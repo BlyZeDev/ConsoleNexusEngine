@@ -11,4 +11,16 @@
     <PackageReference Include="ConsoleNexusEngine" Version="7.1.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Eat.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="GameOver.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="MainTheme.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
