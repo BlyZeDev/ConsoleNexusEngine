@@ -1,6 +1,5 @@
 ﻿namespace ConsoleNexusEngine;
 
-using BackgroundTimer;
 using System.Runtime.InteropServices;
 
 /// <summary>
@@ -13,7 +12,6 @@ public sealed class NexusSystemMonitor
     private const uint QueryInformation = 0x400;
     private const uint VmRead = 0x10;
 
-    private readonly BackgroundTimer _updateTimer;
     private readonly IMonitor _cpuMonitor;
     private readonly IMonitor _gpuMonitor;
 
@@ -73,7 +71,6 @@ public sealed class NexusSystemMonitor
 
     internal NexusSystemMonitor()
     {
-        _updateTimer = BackgroundTimer.StartNew(TimeSpan.FromSeconds(1), Update);
         _cpuMonitor = ICpuMonitor.GetMonitor();
         _gpuMonitor = IGpuMonitor.GetMonitor();
         
@@ -81,7 +78,7 @@ public sealed class NexusSystemMonitor
         GpuModel = _gpuMonitor.GetModel();
     }
 
-    private void Update(int ticks)
+    internal void Update()
     {
         if (!IsEnabled) return;
 
@@ -103,6 +100,4 @@ public sealed class NexusSystemMonitor
         CpuTemperature = _cpuMonitor.GetTemperature();
         GpuTemperature = _gpuMonitor.GetTemperature();
     }
-
-    internal void Dispose() => _updateTimer.Dispose();
 }

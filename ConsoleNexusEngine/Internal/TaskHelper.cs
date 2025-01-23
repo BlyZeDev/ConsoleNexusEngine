@@ -2,9 +2,24 @@
 
 using System.Threading.Tasks;
 using System.Threading;
+using System.Runtime.ExceptionServices;
 
 internal static class TaskHelper
 {
+    public static async void FireAndForget<TException>(this Task task, Action<TException> onException, bool reThrow) where TException : Exception
+    {
+        try
+        {
+            await task.ConfigureAwait(false);
+        }
+        catch (TException ex)
+        {
+            onException(ex);
+
+            if (reThrow) ExceptionDispatchInfo.Throw(ex);
+        }
+    }
+
     public static T? RunSync<T>(Func<Task<T>> task)
     {
         var oldContext = SynchronizationContext.Current;

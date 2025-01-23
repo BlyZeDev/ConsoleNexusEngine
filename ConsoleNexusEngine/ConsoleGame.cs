@@ -1,6 +1,5 @@
 ﻿namespace ConsoleNexusEngine;
 
-using BackgroundTimer;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -25,9 +24,6 @@ public abstract class ConsoleGame : IDisposable
 
     private readonly CancellationTokenSource _cts;
     private readonly CmdConsole _console;
-    private readonly BackgroundTimer _fpsTimer;
-
-    private int lastTotalFrameCount;
 
     /// <summary>
     /// The settings of the game
@@ -98,8 +94,6 @@ public abstract class ConsoleGame : IDisposable
         _cts = new();
         _console = new CmdConsole(ConsoleGameSettings.Default, _cts);
 
-        _fpsTimer = new BackgroundTimer();
-
         Settings = ConsoleGameSettings.Default;
         Graphic = new ConsoleGraphic(_console);
         Utility = new ConsoleGameUtil(_console, Settings);
@@ -121,13 +115,7 @@ public abstract class ConsoleGame : IDisposable
 
         StartTime = DateTimeOffset.Now.DateTime;
 
-        _ = Task.Factory.StartNew(GameLoop, _cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
-
-        _fpsTimer.Start(TimeSpan.FromSeconds(1), (ticks) =>
-        {
-            FramesPerSecond = TotalFrameCount - lastTotalFrameCount;
-            lastTotalFrameCount = TotalFrameCount;
-        });
+        Task.Factory.StartNew(GameLoop, _cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default).FireAndForget<Exception>(OnCrash, true);
 
         _cts.Token.WaitHandle.WaitOne();
     }
@@ -138,8 +126,6 @@ public abstract class ConsoleGame : IDisposable
     public void Stop()
     {
         IsRunning = false;
-
-        _fpsTimer.Stop();
 
         CleanUp();
 
@@ -152,8 +138,6 @@ public abstract class ConsoleGame : IDisposable
         if (IsRunning) Stop();
 
         _cts.Dispose();
-        _fpsTimer.Dispose();
-        Monitor.Dispose();
 
         GC.SuppressFinalize(this);
 
@@ -173,6 +157,12 @@ public abstract class ConsoleGame : IDisposable
     protected abstract void Update(in NexusInputCollection inputs);
 
     /// <summary>
+    /// Called if a fatal exception happens and the game is about to crash
+    /// </summary>
+    /// <param name="exception">The exception that caused the crash</param>
+    protected abstract void OnCrash(Exception exception);
+
+    /// <summary>
     /// Called once after stopping the game.<br/>
     /// Clean up used files or stop music here.
     /// </summary>
@@ -181,6 +171,8 @@ public abstract class ConsoleGame : IDisposable
     private void GameLoop()
     {
         double newTime;
+        var accumulator = 0d;
+        var frameCount = 0;
 
         var currentTime = GetHighResolutionTimestamp();
 
@@ -191,6 +183,19 @@ public abstract class ConsoleGame : IDisposable
             currentTime = newTime;
 
             unchecked { TotalFrameCount++; }
+
+            accumulator += DeltaTime;
+            frameCount++;
+
+            if (accumulator >= 1)
+            {
+                FramesPerSecond = frameCount;
+
+                Monitor.Update();
+
+                accumulator = 0d;
+                frameCount = 0;
+            }
 
             Update(_console.ReadInput(Settings.StopGameKey, Settings.InputTypes));
         }

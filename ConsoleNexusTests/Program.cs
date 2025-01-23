@@ -59,6 +59,11 @@ public sealed class TestGame : ConsoleGame
 
     }
 
+    protected override void OnCrash(Exception exception)
+    {
+
+    }
+
     protected override void CleanUp()
     {
 
@@ -73,11 +78,11 @@ public sealed class Game : ConsoleGame
 
     public Game()
     {
-        Settings.Font = new TerminalFont(new NexusSize(10));
+        Settings.Font = new TerminalFont(new NexusSize(1));
         Settings.ColorPalette = new WindowsColorPalette();
         Settings.EnableMonitoring = true;
 
-        _animation = new NexusAnimation(@"C:\Users\leons\Downloads\tenor.gif", new NexusRgbProcessor(Settings.ColorPalette), 0.5f);
+        _animation = new NexusAnimation(@"C:\Users\leons\Downloads\tenor.gif", new NexusRgbProcessor(Settings.ColorPalette));
     }
 
     protected override void Load()
@@ -87,8 +92,6 @@ public sealed class Game : ConsoleGame
 
     protected override void Update(in NexusInputCollection inputs)
     {
-        //DebugView(inputs);
-
         NexusUpdate.DoEvery(ref timeSince, DeltaTime, TimeSpan.FromSeconds(0.1), () =>
         {
             Graphic.Clear();
@@ -98,6 +101,11 @@ public sealed class Game : ConsoleGame
 
             Graphic.Render();
         });
+    }
+
+    protected override void OnCrash(Exception exception)
+    {
+
     }
 
     protected override void CleanUp()
@@ -150,5 +158,12 @@ public sealed class Game : ConsoleGame
         Graphic.DrawText(new NexusCoord(0, 15), new NexusText("Gpu Name: " + Monitor.GpuModel, NexusColorIndex.Color1));
         Graphic.DrawText(new NexusCoord(0, 16), new NexusText("Gpu Temperature: " + Monitor.GpuTemperature + " °C", NexusColorIndex.Color2));
         Graphic.DrawText(new NexusCoord(0, 17), new NexusText("FPS: " + FramesPerSecond + " FPS", NexusColorIndex.Color3));
+        Graphic.DrawText(new NexusCoord(0, 18), new NexusText("Width: " + BufferSize.Width, NexusColorIndex.Color3));
+        Graphic.DrawText(new NexusCoord(0, 19), new NexusText("Height: " + BufferSize.Height, NexusColorIndex.Color3));
+    }
+
+    private void DebugViewFull()
+    {
+        Graphic.DrawShape(NexusCoord.MinValue, new NexusRectangle(BufferSize, new NexusChar(NexusSpecialChar.Cross, NexusColorIndex.Color5), true));
     }
 }
