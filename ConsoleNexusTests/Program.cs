@@ -9,7 +9,7 @@ sealed class Program
 {
     static void Main()
     {
-        if (!NexusEngineHelper.IsSupportedConsole() || !NexusEngineHelper.IsRunAsAdmin())
+        if (!NexusEngineHelper.IsSupportedConsole())
         {
             NexusEngineHelper.StartInSupportedConsole(true);
             return;

@@ -19,8 +19,8 @@ internal static unsafe partial class Native
     [LibraryImport(Kernel32)]
     public static partial nint GetConsoleWindow();
 
-    [DllImport(User32)]
-    public static extern int ShowWindow(nint hWnd, int nCmdShow);
+    [LibraryImport(User32)]
+    public static partial int ShowWindow(nint hWnd, int nCmdShow);
 
     [DllImport(User32)]
     public static extern int GetWindowTextLength(nint hWnd);
@@ -80,7 +80,7 @@ internal static unsafe partial class Native
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool SetCurrentConsoleFontEx(nint hConsoleOutput, [MarshalAs(UnmanagedType.Bool)] bool bMaximumWindow, ref CONSOLE_FONT_INFO_EX lpConsoleCurrentFont);
 
-    [DllImport(Kernel32, ExactSpelling = true)]
+    [DllImport(Kernel32)]
     public static extern bool WriteConsoleOutputW(
         [In] nint hConsoleOutput,
         [In] CHAR_INFO* lpBuffer,
