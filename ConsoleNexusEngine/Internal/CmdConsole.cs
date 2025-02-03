@@ -224,6 +224,8 @@ internal sealed class CmdConsole
         Console.Clear();
     }
 
+    public int MessageBox(string caption, string message, uint type) => Native.MessageBox(_handle, message, caption, type | 0x00001000 | 0x00040000);
+
     private DefaultConsole SaveDefaultConsole(in bool newlyAllocated)
     {
         Native.GetConsoleCursorInfo(_standardOutput, out var cursorInfo);
@@ -275,7 +277,7 @@ internal sealed class CmdConsole
 
         Native.SetConsoleMode(_standardInput, (0x0080 | 0x0010) & ~0x0004 & ~0x0040 & ~0x0008);
 
-        _ = Native.SetWindowLong(_handle, -16, 0x00080000);
+        _ = Native.SetWindowLong(_handle, -16, 0x00080000 & ~0x00100000 & ~0x00200000);
 
         var csbe = new CONSOLE_SCREEN_BUFFER_INFO_EX();
         csbe.cbSize = Marshal.SizeOf(csbe);
@@ -314,11 +316,11 @@ internal sealed class CmdConsole
 
         Native.SetWindowPos(
             _handle,
-            nint.Zero,
+            -1,
             0, 0,
             Native.GetSystemMetrics(0),
             Native.GetSystemMetrics(1),
-            0x0040);
+            0x0040 | 0x0020);
 
         Native.GetConsoleScreenBufferInfoEx(_standardOutput, ref csbe);
 

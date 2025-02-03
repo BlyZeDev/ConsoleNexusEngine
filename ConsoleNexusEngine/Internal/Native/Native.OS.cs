@@ -10,4 +10,7 @@ internal static partial class Native
 
     [LibraryImport(Kernel32)]
     public static partial uint GetLastError();
+
+    [DllImport(User32, CharSet = CharSet.Auto)]
+    public static extern int MessageBox(nint hWnd, string text, string caption, uint type);
 }

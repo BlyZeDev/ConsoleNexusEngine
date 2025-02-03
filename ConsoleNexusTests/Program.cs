@@ -78,11 +78,11 @@ public sealed class Game : ConsoleGame
 
     public Game()
     {
-        Settings.Font = new TerminalFont(new NexusSize(25));
-        Settings.ColorPalette = new WindowsColorPalette();
+        Settings.Font = new TerminalFont(new NexusSize(1));
+        Settings.ColorPalette = new ImageColorPalette(@"C:\Users\leons\Downloads\tenor.gif");
         Settings.EnableMonitoring = true;
 
-        //_animation = new NexusAnimation(@"C:\Users\leons\Downloads\tenor.gif", new NexusRgbProcessor(Settings.ColorPalette));
+        _animation = new NexusAnimation(@"C:\Users\leons\Downloads\tenor.gif", new NexusHspProcessor(Settings.ColorPalette), 0.75f);
     }
 
     protected override void Load()
@@ -92,26 +92,26 @@ public sealed class Game : ConsoleGame
 
     protected override void Update(in NexusInputCollection inputs)
     {
+        /*
         Graphic.Clear();
         DebugView(inputs);
         Graphic.Render();
+        */
 
-        /*
         NexusUpdate.DoEvery(ref timeSince, DeltaTime, TimeSpan.FromSeconds(0.1), () =>
         {
             Graphic.Clear();
 
-            Graphic.DrawText(NexusCoord.MinValue, new NexusText($"FPS: {FramesPerSecond}", NexusColorIndex.Color15, NexusColorIndex.Color1));
-            Graphic.DrawAnimation(new NexusCoord(1, 1), _animation);
+            //Graphic.DrawText(NexusCoord.MinValue, new NexusText($"FPS: {FramesPerSecond}", NexusColorIndex.Color15, NexusColorIndex.Color1));
+            Graphic.DrawAnimation(new NexusCoord(0, 0), _animation);
 
             Graphic.Render();
         });
-        */
     }
 
     protected override void OnCrash(Exception exception)
     {
-
+        Utility.ShowAlert(exception.Message, exception.StackTrace ?? "", NexusAlertIcon.None);
     }
 
     protected override void CleanUp()

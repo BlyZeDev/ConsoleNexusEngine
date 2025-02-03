@@ -206,4 +206,13 @@ public sealed class ConsoleGameUtil
     /// <returns><see cref="NexusColorPalette"/></returns>
     public NexusColorPalette GetRandomColorPalette(in bool pseudoRandom = true)
         => _colorPalettes.Span[GetRandomNumber(_colorPalettes.Length, pseudoRandom)];
+
+    /// <summary>
+    /// Displays a message box
+    /// </summary>
+    /// <param name="caption">The title of the message box</param>
+    /// <param name="message">The title of the message box</param>
+    /// <param name="alertIcon">The icon that should be displayed</param>
+    public void ShowAlert(string caption, string message, in NexusAlertIcon alertIcon)
+        => _console.MessageBox(caption, message, (uint)alertIcon);
 }
