@@ -78,11 +78,11 @@ public sealed class Game : ConsoleGame
 
     public Game()
     {
-        Settings.Font = new TerminalFont(new NexusSize(1));
-        Settings.ColorPalette = new ImageColorPalette(@"C:\Users\leons\Downloads\tenor.gif");
+        Settings.Font = new TerminalFont(new NexusSize(10, 10));
+        Settings.ColorPalette = new Pico8ColorPalette();
         Settings.EnableMonitoring = true;
 
-        _animation = new NexusAnimation(@"C:\Users\leons\Downloads\tenor.gif", new NexusHspProcessor(Settings.ColorPalette), 0.75f);
+        //_animation = new NexusAnimation(@"C:\Users\leons\Downloads\tenor.gif", new NexusHspProcessor(Settings.ColorPalette), 0.75f);
     }
 
     protected override void Load()
@@ -92,12 +92,11 @@ public sealed class Game : ConsoleGame
 
     protected override void Update(in NexusInputCollection inputs)
     {
-        /*
         Graphic.Clear();
         DebugView(inputs);
         Graphic.Render();
-        */
 
+        /*
         NexusUpdate.DoEvery(ref timeSince, DeltaTime, TimeSpan.FromSeconds(0.1), () =>
         {
             Graphic.Clear();
@@ -107,6 +106,7 @@ public sealed class Game : ConsoleGame
 
             Graphic.Render();
         });
+        */
     }
 
     protected override void OnCrash(Exception exception)
