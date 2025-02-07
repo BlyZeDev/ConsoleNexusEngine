@@ -1,5 +1,7 @@
 ﻿namespace ConsoleNexusEngine;
 
+using System.Runtime.InteropServices;
+
 /// <summary>
 /// The graphics engine for <see cref="ConsoleGame"/>
 /// </summary>
@@ -39,8 +41,21 @@ public sealed partial class ConsoleGraphic
     /// <returns><see cref="NexusChar"/>[,]</returns>
     public NexusChar[,] GetBuffer()
     {
-        var buffer = new NexusChar[_console.Buffer.Width, _console.Buffer.Height];
+        var width = _console.Buffer.Width;
+        var height = _console.Buffer.Height;
+        var buffer = new NexusChar[width, height];
 
+        var sourceBuffer = glyphBuffer.Span;
+        for (int y = 0; y < height; y++)
+        {
+            var sourceRow = sourceBuffer.Slice(y * width, width);
+
+            var destinationRow = MemoryMarshal.CreateSpan(ref buffer[0, y], width);
+
+            sourceRow.CopyTo(destinationRow);
+        }
+
+        /*
         for (int x = 0; x < _console.Buffer.Width; x++)
         {
             for (int y = 0; y < _console.Buffer.Height; y++)
@@ -48,6 +63,7 @@ public sealed partial class ConsoleGraphic
                 buffer[x, y] = glyphBuffer[x, y];
             }
         }
+        */
 
         return buffer;
     }

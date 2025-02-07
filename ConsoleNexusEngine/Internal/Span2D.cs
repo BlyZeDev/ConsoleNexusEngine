@@ -31,6 +31,8 @@ internal readonly ref struct Span2D<T> where T : struct
         return new Span2D<T>(newSpan, width, height);
     }
 
+    public readonly Span<T> As1D() => _span;
+
     public readonly ReadOnlySpan2D<T> ToReadOnly()
     {
         var readOnly = new ReadOnlySpan2D<T>(_span, Width, Height);

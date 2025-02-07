@@ -26,20 +26,18 @@ internal sealed unsafe class ConsoleBuffer
 
     public void ChangeDimensions(in int width, in int height)
     {
-        needsRender = true;
-
         Width = (short)width;
         Height = (short)height;
 
         Array.Resize(ref charInfoBuffer, Width * Height);
 
         Updated?.Invoke(this, EventArgs.Empty);
+
+        needsRender = true;
     }
 
     public void ClearBuffer(in int background)
     {
-        needsRender = true;
-
         var attributes = (short)(background | background << 4);
 
         for (int i = 0; i < charInfoBuffer.Length; i++)
@@ -47,12 +45,12 @@ internal sealed unsafe class ConsoleBuffer
             charInfoBuffer[i].Attributes = attributes;
             charInfoBuffer[i].UnicodeChar = char.MinValue;
         }
+
+        needsRender = true;
     }
 
     public void SetBackgroundBuffer(in Memory2D<NexusChar> charBuffer, in int background)
     {
-        needsRender = true;
-
         var glyphs = charBuffer.Span;
         var shiftedBg = background << 4;
 
@@ -64,6 +62,8 @@ internal sealed unsafe class ConsoleBuffer
                     (short)(current.Foreground | (current.Value is char.MinValue ? shiftedBg : current.Background << 4));
             charInfoBuffer[i].UnicodeChar = current.Value;
         }
+
+        needsRender = true;
     }
 
     public void SetChar(in int x, in int y, in NexusChar character)

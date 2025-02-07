@@ -30,4 +30,6 @@ internal readonly ref struct ReadOnlySpan2D<T> where T : struct
 
         return new ReadOnlySpan2D<T>(newSpan, width, height);
     }
+
+    public readonly ReadOnlySpan<T> As1D() => _span;
 }

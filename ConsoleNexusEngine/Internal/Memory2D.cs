@@ -1,5 +1,7 @@
 ﻿namespace ConsoleNexusEngine.Internal;
 
+using System;
+
 internal readonly struct Memory2D<T> where T : struct
 {
     private readonly Memory<T> _memory;
