@@ -316,7 +316,7 @@ internal sealed class CmdConsole
 
         Native.SetWindowPos(
             _handle,
-            -1,
+            nint.Zero,
             0, 0,
             Native.GetSystemMetrics(0),
             Native.GetSystemMetrics(1),

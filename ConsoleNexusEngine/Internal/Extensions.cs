@@ -20,7 +20,4 @@ internal static class Extensions
 
         return -1;
     }
-
-    public static (bool X, bool Y) IsInRange<T>(this Memory2D<T> memory, in int x, in int y) where T : struct
-        => (x >= 0 && x < memory.Width, y >= 0 && y < memory.Height);
 }

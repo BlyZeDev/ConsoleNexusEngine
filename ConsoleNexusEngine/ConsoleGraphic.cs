@@ -9,13 +9,9 @@ public sealed partial class ConsoleGraphic
 {
     private readonly CmdConsole _console;
 
-    private Memory2D<NexusChar> glyphBuffer;
-
     internal ConsoleGraphic(CmdConsole console)
     {
         _console = console;
-
-        glyphBuffer = new Memory2D<NexusChar>(_console.Buffer.Width, _console.Buffer.Height);
 
         _console.Buffer.Updated += OnBufferUpdated;
     }
@@ -29,43 +25,9 @@ public sealed partial class ConsoleGraphic
     {
         ThrowIfOutOfBounds(coordinate);
 
-        return glyphBuffer[coordinate.X, coordinate.Y];
-    }
+        var pixel = _console.Buffer.GetChar(coordinate.X, coordinate.Y);
 
-    /// <summary>
-    /// Gets the whole buffer of the console as two-dimensional array
-    /// </summary>
-    /// <remarks>
-    /// This includes characters that are not rendered yet
-    /// </remarks>
-    /// <returns><see cref="NexusChar"/>[,]</returns>
-    public NexusChar[,] GetBuffer()
-    {
-        var width = _console.Buffer.Width;
-        var height = _console.Buffer.Height;
-        var buffer = new NexusChar[width, height];
-
-        var sourceBuffer = glyphBuffer.Span;
-        for (int y = 0; y < height; y++)
-        {
-            var sourceRow = sourceBuffer.Slice(y * width, width);
-
-            var destinationRow = MemoryMarshal.CreateSpan(ref buffer[0, y], width);
-
-            sourceRow.CopyTo(destinationRow);
-        }
-
-        /*
-        for (int x = 0; x < _console.Buffer.Width; x++)
-        {
-            for (int y = 0; y < _console.Buffer.Height; y++)
-            {
-                buffer[x, y] = glyphBuffer[x, y];
-            }
-        }
-        */
-
-        return buffer;
+        return new NexusChar().
     }
 
     /// <summary>

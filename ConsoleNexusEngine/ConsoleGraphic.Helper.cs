@@ -29,26 +29,20 @@ public sealed partial class ConsoleGraphic
         }
     }
 
-    private void SetChar(in int x, in int y, in NexusChar character)
-    {
-        glyphBuffer[x, y] = character;
-        _console.Buffer.SetChar(x, y, character);
-    }
-
     private void SetChar(in NexusCoord coordinate, in NexusChar character)
         => SetChar(coordinate.X, coordinate.Y, character);
+
+    private void SetChar(in int x, in int y, in NexusChar character) => _console.Buffer.SetChar(x, y, character);
 
     private void ThrowIfOutOfBounds(in NexusCoord coord)
         => ThrowIfOutOfBounds(coord.X, coord.Y);
 
     private void ThrowIfOutOfBounds(in int x, in int y)
     {
-        var isInRange = glyphBuffer.IsInRange(x, y);
-
-        if (!isInRange.X)
+        if (_console.Buffer.Width < 0 || _console.Buffer.Width >= x)
             throw new ArgumentOutOfRangeException(nameof(x), "The coordinate is not in bounds of the console buffer");
 
-        if (!isInRange.Y)
+        if (_console.Buffer.Height < 0 || _console.Buffer.Height >= y)
             throw new ArgumentOutOfRangeException(nameof(y), "The coordinate is not in bounds of the console buffer");
     }
 }

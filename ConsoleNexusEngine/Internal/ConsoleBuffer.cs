@@ -66,18 +66,19 @@ internal sealed unsafe class ConsoleBuffer
         needsRender = true;
     }
 
+    public CHAR_INFO GetChar(in int x, in int y) => charInfoBuffer[MathHelper.GetIndex(x, y, Width)];
+
     public void SetChar(in int x, in int y, in NexusChar character)
     {
         var index = MathHelper.GetIndex(x, y, Width);
 
-        var before = charInfoBuffer[index];
-        var attributes = (short)(character.Foreground | character.Background << 4);
+        ref var before = ref charInfoBuffer[index];
+        var current = Converter.ToCharInfo(character);
 
-        if (before.UnicodeChar == character.Value && before.Attributes == attributes) return;
+        if (before.UnicodeChar == current.UnicodeChar && before.Attributes == current.Attributes) return;
 
+        before = current;
         needsRender = true;
-        charInfoBuffer[index].Attributes = attributes;
-        charInfoBuffer[index].UnicodeChar = character.Value;
     }
 
     public void RenderBuffer()

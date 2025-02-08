@@ -94,17 +94,6 @@ public sealed class Game : ConsoleGame
     {
         Graphic.Clear();
         DebugView(inputs);
-        var current = Graphic.GetBuffer();
-        Graphic.Clear();
-
-        for (int x = 0; x < current.GetLength(0); x++)
-        {
-            for (int y = 0; y < current.GetLength(1); y++)
-            {
-                Graphic.DrawPixel(new NexusCoord(x, y), current[x, y]);
-            }
-        }
-
         Graphic.Render();
 
         /*
