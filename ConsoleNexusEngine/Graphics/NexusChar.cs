@@ -10,9 +10,9 @@ public readonly record struct NexusChar : ISprite
     /// </summary>
     public static NexusChar Empty => new NexusChar();
 
-    private readonly ReadOnlyMemory2D<NexusChar> _sprite;
+    private readonly ReadOnlyMemory2D<CHAR_INFO> _sprite;
 
-    readonly ReadOnlyMemory2D<NexusChar> ISprite.Sprite => _sprite;
+    readonly ReadOnlyMemory2D<CHAR_INFO> ISprite.Sprite => _sprite;
 
     /// <summary>
     /// <inheritdoc/> character
@@ -51,7 +51,7 @@ public readonly record struct NexusChar : ISprite
         Foreground = foreground;
         Background = background;
 
-        _sprite = new ReadOnlyMemory2D<NexusChar>(this);
+        _sprite = new ReadOnlyMemory2D<CHAR_INFO>(Converter.ToCharInfo(this));
     }
 
     /// <summary>

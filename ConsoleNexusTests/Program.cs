@@ -44,9 +44,6 @@ public sealed class TestGame : ConsoleGame
 
         // Set the title of the console
         Settings.Title = "My first game";
-
-        // If true, enables hardware monitoring
-        Settings.EnableMonitoring = true;
     }
 
     protected override void Load()
@@ -54,7 +51,7 @@ public sealed class TestGame : ConsoleGame
 
     }
 
-    protected override void Update(in NexusInputCollection inputs)
+    protected override void Update(NexusInputCollection inputs)
     {
 
     }
@@ -73,16 +70,19 @@ public sealed class TestGame : ConsoleGame
 public sealed class Game : ConsoleGame
 {
     private readonly NexusAnimation _animation;
+    private readonly NexusImage _image;
+    private readonly NexusFiggleText _text;
 
     private double timeSince;
 
     public Game()
     {
-        Settings.Font = new TerminalFont(new NexusSize(10, 10));
+        Settings.Font = new TerminalFont(new NexusSize(1));
         Settings.ColorPalette = new Pico8ColorPalette();
-        Settings.EnableMonitoring = true;
 
-        //_animation = new NexusAnimation(@"C:\Users\leons\Downloads\tenor.gif", new NexusHspProcessor(Settings.ColorPalette), 0.75f);
+        _animation = new NexusAnimation(@"C:\Users\leons\Downloads\tenor.gif", new NexusHspProcessor(Settings.ColorPalette), 0.5f);
+        _image = new NexusImage(@"C:\Users\leons\Downloads\tenor.gif", new NexusHspProcessor(Settings.ColorPalette), 0.5f);
+        _text = new NexusFiggleText("Flux", Figgle.FiggleFonts.Acrobatic, new NexusColorIndex(3));
     }
 
     protected override void Load()
@@ -90,28 +90,24 @@ public sealed class Game : ConsoleGame
 
     }
 
-    protected override void Update(in NexusInputCollection inputs)
+    protected override void Update(NexusInputCollection inputs)
     {
-        Graphic.Clear();
-        DebugView(inputs);
-        Graphic.Render();
-
-        /*
         NexusUpdate.DoEvery(ref timeSince, DeltaTime, TimeSpan.FromSeconds(0.1), () =>
         {
             Graphic.Clear();
 
-            //Graphic.DrawText(NexusCoord.MinValue, new NexusText($"FPS: {FramesPerSecond}", NexusColorIndex.Color15, NexusColorIndex.Color1));
-            Graphic.DrawAnimation(new NexusCoord(0, 0), _animation);
+            DebugView(inputs);
+            Graphic.DrawAnimation(new NexusCoord(0, 13), _animation);
+            Graphic.DrawImage(new NexusCoord(0, 100), _image);
+            Graphic.DrawText(new NexusCoord(0, 200), _text);
 
             Graphic.Render();
         });
-        */
     }
 
     protected override void OnCrash(Exception exception)
     {
-        Utility.ShowAlert(exception.Message, exception.StackTrace ?? "", NexusAlertIcon.None);
+        Utility.ShowAlert(exception.Message, exception.StackTrace ?? "", NexusAlertIcon.Error);
     }
 
     protected override void CleanUp()
@@ -136,11 +132,6 @@ public sealed class Game : ConsoleGame
         Graphic.ClearRow(10);
         Graphic.ClearRow(11);
         Graphic.ClearRow(12);
-        Graphic.ClearRow(13);
-        Graphic.ClearRow(14);
-        Graphic.ClearRow(15);
-        Graphic.ClearRow(16);
-        Graphic.ClearRow(17);
 
         Graphic.DrawText(new NexusCoord(0, 0), new NexusText("Type: " + gamepad.Type, NexusColorIndex.Color1));
         Graphic.DrawText(new NexusCoord(0, 1), new NexusText("Battery Type: " + gamepad.BatteryType, NexusColorIndex.Color2));
@@ -152,20 +143,9 @@ public sealed class Game : ConsoleGame
         Graphic.DrawText(new NexusCoord(0, 7), new NexusText("Left Thumb Y: " + gamepad.LeftThumbY, NexusColorIndex.Color8));
         Graphic.DrawText(new NexusCoord(0, 8), new NexusText("Right Thumb X: " + gamepad.RightThumbX, NexusColorIndex.Color9));
         Graphic.DrawText(new NexusCoord(0, 9), new NexusText("Right Thumb Y: " + gamepad.RightThumbY, NexusColorIndex.Color10));
-
-        Graphic.DrawText(new NexusCoord(0, 10), new NexusText("Memory Allocated: " + Monitor.AllocatedMemory + " MB", NexusColorIndex.Color11));
-        Graphic.DrawText(new NexusCoord(0, 11), new NexusText("Peak Memory Allocated: " + Monitor.PeakAllocatedMemory + " MB", NexusColorIndex.Color12));
-
-        Graphic.DrawText(new NexusCoord(0, 12), new NexusText("IsAdmin: " + NexusEngineHelper.IsRunAsAdmin(), NexusColorIndex.Color13));
-
-        Graphic.DrawText(new NexusCoord(0, 13), new NexusText("Cpu Name: " + Monitor.CpuModel, NexusColorIndex.Color14));
-        Graphic.DrawText(new NexusCoord(0, 14), new NexusText("Cpu Temperature: " + Monitor.CpuTemperature + " °C", NexusColorIndex.Color15));
-
-        Graphic.DrawText(new NexusCoord(0, 15), new NexusText("Gpu Name: " + Monitor.GpuModel, NexusColorIndex.Color1));
-        Graphic.DrawText(new NexusCoord(0, 16), new NexusText("Gpu Temperature: " + Monitor.GpuTemperature + " °C", NexusColorIndex.Color2));
-        Graphic.DrawText(new NexusCoord(0, 17), new NexusText("FPS: " + FramesPerSecond + " FPS", NexusColorIndex.Color3));
-        Graphic.DrawText(new NexusCoord(0, 18), new NexusText("Width: " + BufferSize.Width, NexusColorIndex.Color3));
-        Graphic.DrawText(new NexusCoord(0, 19), new NexusText("Height: " + BufferSize.Height, NexusColorIndex.Color3));
+        Graphic.DrawText(new NexusCoord(0, 10), new NexusText("FPS: " + FramesPerSecond + " FPS", NexusColorIndex.Color3));
+        Graphic.DrawText(new NexusCoord(0, 11), new NexusText("Width: " + BufferSize.Width, NexusColorIndex.Color3));
+        Graphic.DrawText(new NexusCoord(0, 12), new NexusText("Height: " + BufferSize.Height, NexusColorIndex.Color3));
     }
 
     private void DebugViewFull()

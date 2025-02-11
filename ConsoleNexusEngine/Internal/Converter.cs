@@ -2,12 +2,14 @@
 
 internal static class Converter
 {
-    public static CHAR_INFO ToCharInfo(in NexusChar character)
+    public static CHAR_INFO ToCharInfo(in NexusChar character) => ToCharInfo(character.Value, character.Foreground, character.Background);
+
+    public static CHAR_INFO ToCharInfo(in char character, in int foreground, in int background)
     {
         return new CHAR_INFO
         {
-            Attributes = (short)(character.Foreground | character.Background << 4),
-            UnicodeChar = character.Value
+            Attributes = (short)(foreground | background << 4),
+            UnicodeChar = character
         };
     }
 

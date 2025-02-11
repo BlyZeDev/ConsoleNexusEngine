@@ -14,9 +14,9 @@ public readonly struct NexusImage : ISprite
     private const char DarkBlock = (char)NexusSpecialChar.DarkBlock;
     private const char FullBlock = (char)NexusSpecialChar.FullBlock;
 
-    private readonly ReadOnlyMemory2D<NexusChar> _sprite;
+    private readonly ReadOnlyMemory2D<CHAR_INFO> _sprite;
 
-    ReadOnlyMemory2D<NexusChar> ISprite.Sprite => _sprite;
+    ReadOnlyMemory2D<CHAR_INFO> ISprite.Sprite => _sprite;
 
     /// <summary>
     /// <inheritdoc/> image
@@ -96,15 +96,11 @@ public readonly struct NexusImage : ISprite
         }
     }
 
-    internal readonly NexusChar this[in int x, in int y] => _sprite[x, y];
-
-    internal readonly ReadOnlyMemory2D<NexusChar> CopyPixels() => new ReadOnlyMemory2D<NexusChar>(_sprite.Span.ToArray(), Size.Width, Size.Height);
-
-    private static ReadOnlyMemory2D<NexusChar> CreateSprite(Bitmap bitmap, NexusColorProcessor processor, in NexusSize? size)
+    private static ReadOnlyMemory2D<CHAR_INFO> CreateSprite(Bitmap bitmap, NexusColorProcessor processor, in NexusSize? size)
     {
         var resized = ImageHelper.Resize(bitmap, size);
 
-        var pixels = new Memory2D<NexusChar>(resized.Width, resized.Height);
+        var pixels = new Memory2D<CHAR_INFO>(resized.Width, resized.Height);
 
         var data = resized.LockBits(
             new Rectangle(0, 0, resized.Width, resized.Height),
@@ -127,8 +123,10 @@ public readonly struct NexusImage : ISprite
                 {
                     pixel = row + x * pixelSize;
 
-                    pixels[x, y] = new NexusChar(GetAlphaLevel(pixel[3]),
-                        processor.Process(new NexusColor(pixel[2], pixel[1], pixel[0])));
+                    pixels[x, y] = Converter.ToCharInfo(
+                        GetAlphaLevel(pixel[3]),
+                        processor.Process(new NexusColor(pixel[2], pixel[1], pixel[0])),
+                        0);
                 }
             }
         }

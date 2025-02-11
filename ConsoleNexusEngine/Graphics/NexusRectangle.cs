@@ -8,9 +8,9 @@ using System.Drawing.Imaging;
 /// </summary>
 public readonly struct NexusRectangle : INexusShape, ISprite
 {
-    private readonly ReadOnlyMemory2D<NexusChar> _sprite;
+    private readonly ReadOnlyMemory2D<CHAR_INFO> _sprite;
 
-    readonly ReadOnlyMemory2D<NexusChar> ISprite.Sprite => _sprite;
+    readonly ReadOnlyMemory2D<CHAR_INFO> ISprite.Sprite => _sprite;
 
     /// <inheritdoc/>
     public readonly NexusSize Size { get; }
@@ -63,16 +63,17 @@ public readonly struct NexusRectangle : INexusShape, ISprite
         {
             for (int x = 0; x < Size.Width; x++)
             {
-                result[x, y] = _sprite.Span[MathHelper.GetIndex(x, y, Size.Width)] != NexusChar.Empty;
+                result[x, y] = _sprite[x, y].UnicodeChar != char.MinValue;
             }
         }
 
         return result;
     }
 
-    private static ReadOnlyMemory2D<NexusChar> CreateSprite(Bitmap bitmap, in NexusChar character)
+    private static ReadOnlyMemory2D<CHAR_INFO> CreateSprite(Bitmap bitmap, in NexusChar character)
     {
-        var sprite = new Memory2D<NexusChar>(bitmap.Width, bitmap.Height);
+        var sprite = new Memory2D<CHAR_INFO>(bitmap.Width, bitmap.Height);
+        var charInfo = Converter.ToCharInfo(character);
 
         unsafe
         {
@@ -91,7 +92,7 @@ public readonly struct NexusRectangle : INexusShape, ISprite
                 {
                     pixel = row + x * pixelSize;
 
-                    sprite[x, y] = ((pixel[1] & 0b01111100) >> 2 is 31) ? character : NexusChar.Empty;
+                    sprite[x, y] = ((pixel[1] & 0b01111100) >> 2 is 31) ? charInfo : default;
                 }
             }
 

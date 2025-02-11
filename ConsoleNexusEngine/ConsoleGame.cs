@@ -41,11 +41,6 @@ public abstract class ConsoleGame : IDisposable
     protected ConsoleGameUtil Utility { get; }
 
     /// <summary>
-    /// Provides useful system monitoring functions
-    /// </summary>
-    protected NexusSystemMonitor Monitor { get; }
-
-    /// <summary>
     /// <see langword="true"/> if the game is running, otherwise <see langword="false"/>
     /// </summary>
     public bool IsRunning { get; private set; }
@@ -97,7 +92,6 @@ public abstract class ConsoleGame : IDisposable
         Settings = ConsoleGameSettings.Default;
         Graphic = new ConsoleGraphic(_console);
         Utility = new ConsoleGameUtil(_console, Settings);
-        Monitor = new NexusSystemMonitor();
 
         Settings.Updated += OnSettingsUpdated;
     }
@@ -154,7 +148,7 @@ public abstract class ConsoleGame : IDisposable
     /// Called every frame
     /// </summary>
     /// <param name="inputs">The inputs made during the last frame</param>
-    protected abstract void Update(in NexusInputCollection inputs);
+    protected abstract void Update(NexusInputCollection inputs);
 
     /// <summary>
     /// Called if a fatal exception happens and the game is about to crash
@@ -191,8 +185,6 @@ public abstract class ConsoleGame : IDisposable
             {
                 FramesPerSecond = frameCount;
 
-                Monitor.Update();
-
                 accumulator = 0d;
                 frameCount = 0;
             }
@@ -208,7 +200,6 @@ public abstract class ConsoleGame : IDisposable
             case nameof(ConsoleGameSettings.Title): _console.UpdateTitle(Settings.Title); break;
             case nameof(ConsoleGameSettings.ColorPalette): _console.UpdateColorPalette(Settings.ColorPalette); break;
             case nameof(ConsoleGameSettings.Font): _console.UpdateFont(Settings.Font); break;
-            case nameof(ConsoleGameSettings.EnableMonitoring): Monitor.IsEnabled = Settings.EnableMonitoring; break;
         }
     }
 

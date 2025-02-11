@@ -14,7 +14,6 @@ public sealed record ConsoleGameSettings
     private NexusColorPalette colorPalette;
     private NexusKey stopGameKey;
     private NexusInputType inputTypes;
-    private bool enableMonitoring;
 
     /// <summary>
     /// The title the console should have
@@ -81,19 +80,6 @@ public sealed record ConsoleGameSettings
         }
     }
 
-    /// <summary>
-    /// <see langword="true"/> if monitoring should be enabled, otherwise <see langword="false"/>
-    /// </summary>
-    public bool EnableMonitoring
-    {
-        get => enableMonitoring;
-        set
-        {
-            enableMonitoring = value;
-            Update(nameof(EnableMonitoring));
-        }
-    }
-
     internal event EventHandler<string>? Updated;
 
     private ConsoleGameSettings()
@@ -103,7 +89,6 @@ public sealed record ConsoleGameSettings
         colorPalette = new DefaultColorPalette();
         stopGameKey = NexusKey.Escape;
         inputTypes = NexusInputType.All;
-        enableMonitoring = false;
     }
 
     private void Update(string propertyName) => Updated?.Invoke(this, propertyName);

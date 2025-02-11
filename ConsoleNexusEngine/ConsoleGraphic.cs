@@ -1,7 +1,5 @@
 ﻿namespace ConsoleNexusEngine;
 
-using System.Runtime.InteropServices;
-
 /// <summary>
 /// The graphics engine for <see cref="ConsoleGame"/>
 /// </summary>
@@ -9,12 +7,7 @@ public sealed partial class ConsoleGraphic
 {
     private readonly CmdConsole _console;
 
-    internal ConsoleGraphic(CmdConsole console)
-    {
-        _console = console;
-
-        _console.Buffer.Updated += OnBufferUpdated;
-    }
+    internal ConsoleGraphic(CmdConsole console) => _console = console;
 
     /// <summary>
     /// Gets a pixel in the console at a specific position
@@ -25,9 +18,7 @@ public sealed partial class ConsoleGraphic
     {
         ThrowIfOutOfBounds(coordinate);
 
-        var pixel = _console.Buffer.GetChar(coordinate.X, coordinate.Y);
-
-        return new NexusChar().
+        return Converter.ToNexusChar(_console.Buffer.GetChar(coordinate.X, coordinate.Y));
     }
 
     /// <summary>
@@ -243,21 +234,10 @@ public sealed partial class ConsoleGraphic
     /// <summary>
     /// Clears the current buffer of the console
     /// </summary>
-    public void Clear()
-    {
-        glyphBuffer.Span.Clear();
-        _console.Buffer.ClearBuffer(NexusColorIndex.Background);
-    }
+    public void Clear() => _console.Buffer.ClearBuffer();
 
     /// <summary>
     /// Renders the buffer to the console
     /// </summary>
     public void Render() => _console.Buffer.RenderBuffer();
-
-    private void OnBufferUpdated(object? sender, EventArgs e)
-    {
-        glyphBuffer = glyphBuffer.Resize(_console.Buffer.Width, _console.Buffer.Height);
-
-        _console.Buffer.SetBackgroundBuffer(glyphBuffer, NexusColorIndex.Background);
-    }
 }

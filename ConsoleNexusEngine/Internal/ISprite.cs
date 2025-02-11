@@ -2,7 +2,7 @@
 
 internal interface ISprite
 {
-    internal ReadOnlyMemory2D<NexusChar> Sprite { get; }
+    internal ReadOnlyMemory2D<CHAR_INFO> Sprite { get; }
 
     /// <summary>
     /// The size of the

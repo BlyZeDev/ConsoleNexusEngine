@@ -93,14 +93,14 @@ public readonly record struct NexusColorIndex
     /// <summary>
     /// The color index
     /// </summary>
-    public readonly int Index { get; }
+    public readonly int Value { get; }
     
     /// <summary>
-    /// <see langword="true"/> if <see cref="Index"/> is equal to -1, otherwise <see langword="false"/>
+    /// <see langword="true"/> if <see cref="Value"/> is equal to -1, otherwise <see langword="false"/>
     /// </summary>
-    public readonly bool IsInvalid => Index is -1;
+    public readonly bool IsInvalid => Value is -1;
 
-    private NexusColorIndex(int index) => Index = index;
+    private NexusColorIndex(int index) => Value = index;
 
     /// <summary>
     /// Initializes a color index from a number
@@ -109,7 +109,7 @@ public readonly record struct NexusColorIndex
     /// The color index is clamped between 0-15
     /// </remarks>
     /// <param name="index">The index of the color</param>
-    public NexusColorIndex(in int index) => Index = Math.Clamp(index, 0, 15);
+    public NexusColorIndex(in int index) => Value = Math.Clamp(index, 0, 15);
 
     /// <summary>
     /// Initializes a <see cref="Invalid"/> index
@@ -120,7 +120,7 @@ public readonly record struct NexusColorIndex
     /// Implicitly converts <see cref="NexusColorIndex"/> to <see cref="int"/>
     /// </summary>
     /// <param name="index">The index to convert</param>
-    public static implicit operator int(in NexusColorIndex index) => index.Index;
+    public static implicit operator int(in NexusColorIndex index) => index.Value;
 
     internal static NexusColorIndex UnClamped(in int index) => new NexusColorIndex(index);
 }

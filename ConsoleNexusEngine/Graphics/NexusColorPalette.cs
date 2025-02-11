@@ -132,7 +132,7 @@ public abstract class NexusColorPalette : IEnumerable<NexusColor>
     /// </summary>
     /// <param name="index">The index of the color [0-15]</param>
     /// <returns><see cref="NexusColor"/></returns>
-    public NexusColor this[in NexusColorIndex index] => this[index.Index];
+    public NexusColor this[in NexusColorIndex index] => this[index.Value];
 
     /// <inheritdoc/>
     public IEnumerator<NexusColor> GetEnumerator() => Colors.GetEnumerator();

@@ -7,9 +7,9 @@ using System.Linq;
 /// </summary>
 public sealed record NexusText : ISprite
 {
-    private readonly ReadOnlyMemory2D<NexusChar> _sprite;
+    private readonly ReadOnlyMemory2D<CHAR_INFO> _sprite;
 
-    ReadOnlyMemory2D<NexusChar> ISprite.Sprite => _sprite;
+    ReadOnlyMemory2D<CHAR_INFO> ISprite.Sprite => _sprite;
 
     /// <summary>
     /// <inheritdoc/> text
@@ -81,11 +81,11 @@ public sealed record NexusText : ISprite
     public NexusText(object? value, in NexusColorIndex foreground, in NexusTextDirection textDirection = NexusTextDirection.Horizontal)
         : this(value?.ToString() ?? "", foreground, NexusColorIndex.Background, textDirection) { }
 
-    private static ReadOnlyMemory2D<NexusChar> CreateSprite(string value, in NexusColorIndex foreground, in NexusColorIndex background, in NexusTextDirection direction)
+    private static ReadOnlyMemory2D<CHAR_INFO> CreateSprite(string value, in NexusColorIndex foreground, in NexusColorIndex background, in NexusTextDirection direction)
     {
         var isHorizontal = direction is NexusTextDirection.Horizontal or NexusTextDirection.HorizontalRightToLeft;
 
-        var sprite = new Memory2D<NexusChar>(isHorizontal ? value.Length : 1, isHorizontal ? 1 : value.Length);
+        var sprite = new Memory2D<CHAR_INFO>(isHorizontal ? value.Length : 1, isHorizontal ? 1 : value.Length);
 
         var text = direction is NexusTextDirection.HorizontalRightToLeft or NexusTextDirection.VerticalRightToLeft
             ? value.Reverse() : value;
@@ -94,7 +94,7 @@ public sealed record NexusText : ISprite
         foreach (var letter in text)
         {
             index++;
-            sprite[index] = new NexusChar(letter, foreground, background);
+            sprite[index] = Converter.ToCharInfo(letter, foreground, background);
         }
 
         return sprite.ToReadOnly();

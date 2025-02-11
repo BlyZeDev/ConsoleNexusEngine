@@ -24,21 +24,6 @@
   </PropertyGroup>
 	
   <ItemGroup>
-    <EmbeddedResource Include="WinRing0.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="WinRing0.sys">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="WinRing0x64.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="WinRing0x64.sys">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-  </ItemGroup>
-	
-  <ItemGroup>
     <None Include="..\Icon.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>

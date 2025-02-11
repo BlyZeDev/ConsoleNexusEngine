@@ -9,9 +9,9 @@ using System.Linq;
 /// </summary>
 public sealed record NexusFiggleText : ISprite
 {
-    private readonly ReadOnlyMemory2D<NexusChar> _sprite;
+    private readonly ReadOnlyMemory2D<CHAR_INFO> _sprite;
 
-    ReadOnlyMemory2D<NexusChar> ISprite.Sprite => _sprite;
+    ReadOnlyMemory2D<CHAR_INFO> ISprite.Sprite => _sprite;
 
     /// <summary>
     /// <inheritdoc/> figgle text
@@ -113,15 +113,15 @@ public sealed record NexusFiggleText : ISprite
         return values;
     }
 
-    private static ReadOnlyMemory2D<NexusChar> CreateSprite(in ReadOnlySpan<string> text, in NexusColorIndex foreground, in NexusColorIndex background, in NexusSize size)
+    private static ReadOnlyMemory2D<CHAR_INFO> CreateSprite(in ReadOnlySpan<string> text, in NexusColorIndex foreground, in NexusColorIndex background, in NexusSize size)
     {
-        var sprite = new Memory2D<NexusChar>(size.Width, size.Height);
+        var sprite = new Memory2D<CHAR_INFO>(size.Width, size.Height);
 
         for (int x = 0; x < sprite.Width; x++)
         {
             for (int y = 0; y < sprite.Height; y++)
             {
-                sprite[x, y] = new NexusChar(text[y][x], foreground, background);
+                sprite[x, y] = Converter.ToCharInfo(text[y][x], foreground, background);
             }
         }
 
