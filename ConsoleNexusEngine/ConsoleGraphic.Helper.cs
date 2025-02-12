@@ -1,7 +1,5 @@
 ﻿namespace ConsoleNexusEngine;
 
-using System;
-
 public sealed partial class ConsoleGraphic
 {
     private void DrawSprite(in NexusCoord start, ISprite sprite)
@@ -9,17 +7,14 @@ public sealed partial class ConsoleGraphic
         ThrowIfOutOfBounds(start);
         ThrowIfOutOfBounds(start.X + sprite.Sprite.Width, start.Y + sprite.Sprite.Height);
 
-        BlockSetChar(MathHelper.GetIndex(start.X, start.Y, sprite.Size.Width), sprite.Sprite.Span, sprite.Size.Width); //Needs fix
+        var destWidth = _console.Buffer.Width;
+        var spriteWidth = sprite.Size.Width;
+        var spriteSpan = sprite.Sprite.Span;
 
-        /*
-        for (int x = 0; x < sprite.Sprite.Width; x++)
+        for (int y = 0; y < sprite.Size.Height; y++)
         {
-            for (int y = 0; y < sprite.Sprite.Height; y++)
-            {
-                SetChar(start.X + x, start.Y + y, sprite.Sprite[x, y]);
-            }
+            _console.Buffer.BlockSetChar(spriteSpan, y * spriteWidth, (start.Y + y) * destWidth + start.X, spriteWidth);
         }
-        */
     }
 
     private void DrawShape(in NexusCoord start, INexusShape shape, in NexusChar character)
@@ -40,18 +35,15 @@ public sealed partial class ConsoleGraphic
 
     private void SetChar(in int x, in int y, in NexusChar character) => _console.Buffer.SetChar(x, y, Converter.ToCharInfo(character));
 
-    private unsafe void BlockSetChar(in int index, in ReadOnlySpan<CHAR_INFO> characterBlock, in int length)
-        => _console.Buffer.BlockSetChar(index, characterBlock, length);
-
     private void ThrowIfOutOfBounds(in NexusCoord coord)
         => ThrowIfOutOfBounds(coord.X, coord.Y);
 
     private void ThrowIfOutOfBounds(in int x, in int y)
     {
-        if (_console.Buffer.Width < 0 || _console.Buffer.Width <= x)
+        if (_console.Buffer.Width < 0 || _console.Buffer.Width < x)
             throw new ArgumentOutOfRangeException(nameof(x), "The coordinate is not in bounds of the console buffer");
 
-        if (_console.Buffer.Height < 0 || _console.Buffer.Height <= y)
+        if (_console.Buffer.Height < 0 || _console.Buffer.Height < y)
             throw new ArgumentOutOfRangeException(nameof(y), "The coordinate is not in bounds of the console buffer");
     }
 }

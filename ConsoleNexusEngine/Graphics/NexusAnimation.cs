@@ -5,7 +5,7 @@ using System.Drawing.Imaging;
 using System.Net.Http;
 
 /// <summary>
-/// Represents a animation that can be played in console
+/// Represents an animation that can be played in console
 /// </summary>
 public sealed class NexusAnimation
 {

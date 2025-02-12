@@ -4,6 +4,19 @@ using System.Runtime.CompilerServices;
 
 internal sealed unsafe class ConsoleBuffer
 {
+    private static readonly COORD _defaultBufferCoord = new COORD
+    {
+        X = 0,
+        Y = 0
+    };
+    private static readonly SMALL_RECT _defaultRenderArea = new SMALL_RECT
+    {
+        Left = short.MaxValue,
+        Bottom = short.MinValue,
+        Right = short.MinValue,
+        Top = short.MaxValue
+    };
+
     private readonly nint _standardOutput;
 
     private CHAR_INFO[] charInfoBuffer;
@@ -23,7 +36,13 @@ internal sealed unsafe class ConsoleBuffer
 
         charInfoBuffer = new CHAR_INFO[Width * Height];
         needsRender = false;
-        renderArea = default;
+        renderArea = new SMALL_RECT
+        {
+            Left = 0,
+            Top = 0,
+            Right = Width,
+            Bottom = Height
+        };
     }
 
     public void ChangeDimensions(in int width, in int height)
@@ -33,7 +52,7 @@ internal sealed unsafe class ConsoleBuffer
 
         Array.Resize(ref charInfoBuffer, Width * Height);
 
-        SetRedraw(0, 0, Width, Height);
+        SetRenderArea(0, 0, Width, Height);
     }
 
     public void ClearBuffer()
@@ -50,49 +69,44 @@ internal sealed unsafe class ConsoleBuffer
 
     public void SetChar(in int x, in int y, CHAR_INFO character)
     {
-        var index = MathHelper.GetIndex(x, y, Width);
+        ref var current = ref charInfoBuffer[MathHelper.GetIndex(x, y, Width)];
 
-        ref var before = ref charInfoBuffer[index];
-
-        if (Unsafe.ReadUnaligned<long>(Unsafe.AsPointer(ref before)) == Unsafe.ReadUnaligned<long>(Unsafe.AsPointer(ref character)))
+        if (Unsafe.ReadUnaligned<long>(Unsafe.AsPointer(ref current)) == Unsafe.ReadUnaligned<long>(&character))
             return;
 
-        before = character;
-        SetRedraw(x, y, x, y);
+        current = character;
+        SetRenderArea(x, y, x, y);
     }
 
-    public void BlockSetChar(in int index, in ReadOnlySpan<CHAR_INFO> characterBlock, in int length)
-        => characterBlock.CopyTo(charInfoBuffer.AsSpan().Slice(index, length));
+    public void BlockSetChar(in ReadOnlySpan<CHAR_INFO> characterBlock, in int sourceIndex, in int destIndex, in int blockWidth)
+    {
+        characterBlock.Slice(sourceIndex, blockWidth).CopyTo(charInfoBuffer.AsSpan(destIndex, blockWidth));
+
+        SetRenderArea(destIndex % Width, destIndex / Width, (destIndex + blockWidth - 1) % Width, (destIndex + blockWidth - 1) / Width);
+    }
 
     public void RenderBuffer()
     {
         if (!needsRender) return;
 
-        needsRender = false;
-
-        fixed (CHAR_INFO* arrayP = &charInfoBuffer[0])
+        fixed (CHAR_INFO* arrayPtr = &charInfoBuffer[0])
         {
-            fixed (SMALL_RECT* redrawAreaPtr = &renderArea)
-            {
-                Native.WriteConsoleOutputW(
+            Native.WriteConsoleOutput(
                 _standardOutput,
-                arrayP,
+                arrayPtr,
                 new COORD
                 {
                     X = Width,
                     Y = Height
                 },
-                new COORD
-                {
-                    X = 0,
-                    Y = 0
-                },
-                redrawAreaPtr);
-            }
+                _defaultBufferCoord,
+                (SMALL_RECT*)Unsafe.AsPointer(ref renderArea));
         }
+
+        renderArea = _defaultRenderArea;
     }
 
-    private void SetRedraw(in int startX, in int startY, in int endX, in int endY)
+    private void SetRenderArea(in int startX, in int startY, in int endX, in int endY)
     {
         renderArea.Left = (short)Math.Min(startX, renderArea.Left);
         renderArea.Top = (short)Math.Min(startY, renderArea.Top);

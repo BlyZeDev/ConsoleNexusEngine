@@ -81,7 +81,7 @@ internal static unsafe partial class Native
     public static extern bool SetCurrentConsoleFontEx(nint hConsoleOutput, [MarshalAs(UnmanagedType.Bool)] bool bMaximumWindow, ref CONSOLE_FONT_INFO_EX lpConsoleCurrentFont);
 
     [DllImport(Kernel32)]
-    public static extern bool WriteConsoleOutputW(
+    public static extern bool WriteConsoleOutput(
         [In] nint hConsoleOutput,
         [In] CHAR_INFO* lpBuffer,
         [In] COORD dwBufferSize,
