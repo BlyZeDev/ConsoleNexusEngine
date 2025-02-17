@@ -77,12 +77,12 @@ public sealed class Game : ConsoleGame
 
     public Game()
     {
-        Settings.Font = new ConsolasFont(new NexusSize(3));
+        Settings.Font = new TerminalFont(new NexusSize(3));
         Settings.ColorPalette = new Pico8ColorPalette();
 
         _animation = new NexusAnimation(@"C:\Users\leons\Downloads\tenor.gif", new NexusHspProcessor(Settings.ColorPalette), 0.5f);
         _image = new NexusImage(@"C:\Users\leons\Downloads\tenor.gif", new NexusHspProcessor(Settings.ColorPalette), 0.5f);
-        _text = new NexusFiggleText("Flux", Figgle.FiggleFonts.Acrobatic, new NexusColorIndex(3));
+        _text = new NexusFiggleText("Flux", Figgle.FiggleFonts.Fender, new NexusColorIndex(3));
     }
 
     protected override void Load()
