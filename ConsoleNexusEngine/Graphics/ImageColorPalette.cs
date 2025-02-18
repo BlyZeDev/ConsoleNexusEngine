@@ -1,5 +1,6 @@
 ﻿namespace ConsoleNexusEngine.Graphics;
 
+using System.Collections.Immutable;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
@@ -9,7 +10,7 @@ using System.Net.Http;
 /// The color palette created from an image
 /// </summary>
 [IgnoreColorPalette]
-public sealed class ImageColorPalette : NexusColorPalette
+public sealed record ImageColorPalette : NexusColorPalette
 {
     /// <summary>
     /// Initializes a new <see cref="ImageColorPalette"/> from an image
@@ -29,9 +30,9 @@ public sealed class ImageColorPalette : NexusColorPalette
     /// <param name="bitmap">The image itself</param>
     public ImageColorPalette(Bitmap bitmap) : base(FromImage(bitmap)) { }
 
-    private static List<NexusColor> FromImage(string filepath) => FromImage((Bitmap)Image.FromFile(filepath));
+    private static ImmutableArray<NexusColor> FromImage(string filepath) => FromImage((Bitmap)Image.FromFile(filepath));
 
-    private static List<NexusColor> FromImage(Uri url)
+    private static ImmutableArray<NexusColor> FromImage(Uri url)
     {
         using (var client = new HttpClient())
         {
@@ -44,7 +45,7 @@ public sealed class ImageColorPalette : NexusColorPalette
         }
     }
 
-    private static List<NexusColor> FromImage(Bitmap bitmap)
+    private static ImmutableArray<NexusColor> FromImage(Bitmap bitmap)
     {
         var data = bitmap.LockBits(
             new Rectangle(0, 0, bitmap.Width, bitmap.Height),
@@ -80,13 +81,13 @@ public sealed class ImageColorPalette : NexusColorPalette
 
         bitmap.UnlockBits(data);
 
-        var colors = new List<NexusColor>();
+        var colors = ImmutableArray.CreateBuilder<NexusColor>();
 
         foreach (var color in mostUsedColors.Keys.Take(16))
         {
             colors.Add(color);
         }
 
-        return colors;
+        return colors.DrainToImmutable();
     }
 }

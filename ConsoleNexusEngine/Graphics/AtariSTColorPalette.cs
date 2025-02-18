@@ -1,15 +1,15 @@
 ﻿namespace ConsoleNexusEngine.Graphics;
 
-using System.Collections.Generic;
+using System.Collections.Immutable;
 
 /// <summary>
 /// The color palette of the Atari ST<br/>
 /// <see href="https://en.wikipedia.org/wiki/Atari_ST"/>
 /// </summary>
-public sealed class AtariSTColorPalette : NexusColorPalette
+public sealed record AtariSTColorPalette : NexusColorPalette
 {
     /// <inheritdoc/>
-    protected override IReadOnlyList<NexusColor> Colors => [
+    protected override ImmutableArray<NexusColor> Colors => [
         new NexusColor(0x000000),
         new NexusColor(0x606060),
         new NexusColor(0xA0A0A0),

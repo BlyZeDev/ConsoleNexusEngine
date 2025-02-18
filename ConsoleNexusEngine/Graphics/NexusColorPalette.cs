@@ -1,11 +1,13 @@
 ﻿namespace ConsoleNexusEngine.Graphics;
 
 using System.Collections;
+using System.Collections.Immutable;
+using System.Linq;
 
 /// <summary>
 /// Represents a color palette with 16 unique colors for the console
 /// </summary>
-public abstract class NexusColorPalette : IEnumerable<NexusColor>
+public abstract record NexusColorPalette : IEnumerable<NexusColor>
 {
     /// <summary>
     /// The maximum amount of different colors that can be in a color palette
@@ -15,7 +17,7 @@ public abstract class NexusColorPalette : IEnumerable<NexusColor>
     /// <summary>
     /// The colors of the color palette sorted by index
     /// </summary>
-    protected virtual IReadOnlyList<NexusColor> Colors { get; }
+    protected virtual ImmutableArray<NexusColor> Colors { get; }
     
     /// <summary>
     /// 1st Color of the Palette
@@ -105,17 +107,17 @@ public abstract class NexusColorPalette : IEnumerable<NexusColor>
     /// </summary>
     /// <param name="colors">The colors of the color palette</param>
     /// <exception cref="InvalidOperationException"></exception>
-    protected NexusColorPalette(IReadOnlyList<NexusColor>? colors = null)
+    protected NexusColorPalette(ImmutableArray<NexusColor> colors = default)
     {
-        if (colors is not null) Colors = colors;
+        if (!colors.IsDefault) Colors = colors;
 
-        if (Colors is null)
-            throw new NullReferenceException($"{nameof(Colors)} was null");
+        if (Colors.IsDefault)
+            throw new NullReferenceException($"{nameof(Colors)} was default");
         
-        if (Colors.Count is not MaxColorCount)
+        if (Colors.Length != MaxColorCount)
             throw new InvalidOperationException($"{nameof(Colors)} must contain exactly 16 unique colors");
 
-        if (new HashSet<NexusColor>(Colors).Count is not MaxColorCount)
+        if (new HashSet<NexusColor>(Colors).Count != MaxColorCount)
             throw new InvalidOperationException($"{nameof(Colors)} must contain exactly 16 unique colors");
     }
 
@@ -135,10 +137,7 @@ public abstract class NexusColorPalette : IEnumerable<NexusColor>
     public NexusColor this[in NexusColorIndex index] => this[index.Value];
 
     /// <inheritdoc/>
-    public IEnumerator<NexusColor> GetEnumerator() => Colors.GetEnumerator();
-
-    /// <inheritdoc/>
-    public override bool Equals(object? obj) => obj is NexusColorPalette colorPalette && Equals(colorPalette);
+    public IEnumerator<NexusColor> GetEnumerator() => Colors.AsEnumerable().GetEnumerator();
 
     /// <inheritdoc/>
     public override int GetHashCode() => HashCode.Combine(Colors);

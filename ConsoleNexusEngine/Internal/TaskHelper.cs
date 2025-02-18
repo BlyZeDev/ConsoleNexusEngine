@@ -6,7 +6,7 @@ using System.Runtime.ExceptionServices;
 
 internal static class TaskHelper
 {
-    public static async void FireAndForget<TException>(this Task task, Action<TException> onException, bool reThrow) where TException : Exception
+    public static async void RunInBackground<TException>(this Task task, Action<TException> onException, bool rethrow) where TException : Exception
     {
         try
         {
@@ -16,7 +16,7 @@ internal static class TaskHelper
         {
             onException(ex);
 
-            if (reThrow) ExceptionDispatchInfo.Throw(ex);
+            if (rethrow) ExceptionDispatchInfo.Throw(ex);
         }
     }
 

@@ -9,10 +9,10 @@ using System.Net.Http;
 /// </summary>
 public readonly struct NexusImage : ISprite
 {
-    private const char LightBlock = (char)NexusSpecialChar.LightBlock;
-    private const char MiddleBlock = (char)NexusSpecialChar.MiddleBlock;
-    private const char DarkBlock = (char)NexusSpecialChar.DarkBlock;
-    private const char FullBlock = (char)NexusSpecialChar.FullBlock;
+    private const char LightBlock = '░';
+    private const char MiddleBlock = '▒';
+    private const char DarkBlock = '▓';
+    private const char FullBlock = '█';
 
     private readonly ReadOnlyMemory2D<CHAR_INFO> _sprite;
 

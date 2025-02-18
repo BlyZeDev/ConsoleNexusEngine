@@ -1,15 +1,15 @@
 ﻿namespace ConsoleNexusEngine.Graphics;
 
-using System.Collections.Generic;
+using System.Collections.Immutable;
 
 /// <summary>
 /// The color palette of the Pico-8<br/>
 /// <see href="https://de.wikipedia.org/wiki/Pico-8"/>
 /// </summary>
-public sealed class Pico8ColorPalette : NexusColorPalette
+public sealed record Pico8ColorPalette : NexusColorPalette
 {
     /// <inheritdoc/>
-    protected override IReadOnlyList<NexusColor> Colors => [
+    protected override ImmutableArray<NexusColor> Colors => [
         new NexusColor(0x000000),
         new NexusColor(0x1D2B53),
         new NexusColor(0x7E2553),

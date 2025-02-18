@@ -6,7 +6,7 @@
 public abstract class NexusColorProcessor
 {
     /// <summary>
-    /// The color palette used
+    /// The used color palette
     /// </summary>
     protected readonly NexusColorPalette _colorPalette;
 
@@ -20,6 +20,6 @@ public abstract class NexusColorProcessor
     /// The process to calculate the color index
     /// </summary>
     /// <param name="targetColor">The color to process</param>
-    /// <returns><see cref="NexusColor"/></returns>
+    /// <returns><see cref="NexusColorIndex"/></returns>
     public abstract NexusColorIndex Process(in NexusColor targetColor);
 }

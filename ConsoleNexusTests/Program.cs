@@ -26,63 +26,21 @@ sealed class Program
     }
 }
 
-public sealed class TestGame : ConsoleGame
-{
-    public TestGame()
-    {
-        // Set the allowed input types
-        Settings.InputTypes = NexusInputType.All;
-
-        // Set the color palette of the console
-        Settings.ColorPalette = new WindowsColorPalette();
-
-        // Set the font family and size of the console
-        Settings.Font = new TerminalFont(new NexusSize(25));
-
-        // Set the key that should immediately stop the game
-        Settings.StopGameKey = NexusKey.Escape;
-
-        // Set the title of the console
-        Settings.Title = "My first game";
-    }
-
-    protected override void Load()
-    {
-
-    }
-
-    protected override void Update(NexusInputCollection inputs)
-    {
-
-    }
-
-    protected override void OnCrash(Exception exception)
-    {
-
-    }
-
-    protected override void CleanUp()
-    {
-
-    }
-}
-
 public sealed class Game : ConsoleGame
 {
-    private readonly NexusAnimation _animation;
-    private readonly NexusImage _image;
-    private readonly NexusFiggleText _text;
-
-    private double timeSince;
+    private readonly NexusUpdate _everySecond;
 
     public Game()
     {
-        Settings.Font = new TerminalFont(new NexusSize(3));
-        Settings.ColorPalette = new Pico8ColorPalette();
+        Settings.Font = new ConsolasFont(new NexusSize(25));
+        Settings.ColorPalette = new CGAColorPalette();
 
-        _animation = new NexusAnimation(@"C:\Users\leons\Downloads\tenor.gif", new NexusHspProcessor(Settings.ColorPalette), 0.5f);
-        _image = new NexusImage(@"C:\Users\leons\Downloads\tenor.gif", new NexusHspProcessor(Settings.ColorPalette), 0.5f);
-        _text = new NexusFiggleText("Flux", Figgle.FiggleFonts.Fender, new NexusColorIndex(3));
+        _everySecond = NexusUpdate.DoEverySecond((inputs) =>
+        {
+            Graphic.Clear();
+            DebugView(inputs);
+            Graphic.Render();
+        });
     }
 
     protected override void Load()
@@ -92,14 +50,7 @@ public sealed class Game : ConsoleGame
 
     protected override void Update(NexusInputCollection inputs)
     {
-        Graphic.Clear();
-
-        DebugView(inputs);
-        Graphic.DrawAnimation(new NexusCoord(0, 13), _animation);
-        Graphic.DrawImage(new NexusCoord(300, 13), _image);
-        Graphic.DrawText(new NexusCoord(600, 13), _text);
-
-        Graphic.Render();
+        _everySecond.Update(DeltaTime);
     }
 
     protected override void OnCrash(Exception exception)
@@ -143,10 +94,5 @@ public sealed class Game : ConsoleGame
         Graphic.DrawText(new NexusCoord(0, 10), new NexusText("FPS: " + FramesPerSecond + " FPS", NexusColorIndex.Color3));
         Graphic.DrawText(new NexusCoord(0, 11), new NexusText("Width: " + BufferSize.Width, NexusColorIndex.Color3));
         Graphic.DrawText(new NexusCoord(0, 12), new NexusText("Height: " + BufferSize.Height, NexusColorIndex.Color3));
-    }
-
-    private void DebugViewFull()
-    {
-        Graphic.DrawShape(NexusCoord.MinValue, new NexusRectangle(BufferSize, new NexusChar(NexusSpecialChar.Cross, NexusColorIndex.Color5), true));
     }
 }

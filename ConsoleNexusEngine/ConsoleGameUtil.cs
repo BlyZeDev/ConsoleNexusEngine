@@ -9,13 +9,10 @@ using System.Security.Cryptography;
 /// </summary>
 public sealed class ConsoleGameUtil
 {
-    private static readonly ReadOnlyMemory<NexusSpecialChar> _specialChars;
     private static readonly ReadOnlyMemory<NexusColorPalette> _colorPalettes;
 
     static ConsoleGameUtil()
     {
-        _specialChars = Enum.GetValues<NexusSpecialChar>();
-
         var colorPalettes = new List<NexusColorPalette>();
         var type = typeof(NexusColorPalette);
 
@@ -162,14 +159,6 @@ public sealed class ConsoleGameUtil
     /// <returns><see cref="int"/></returns>
     public int GetRandomNumber(in int minValue, in int maxValue, in bool pseudoRandom = true)
         => pseudoRandom ? Random.Shared.Next(minValue, maxValue) : RandomNumberGenerator.GetInt32(minValue, maxValue);
-
-    /// <summary>
-    /// Generate a pseudo or strong random <see cref="NexusSpecialChar"/>
-    /// </summary>
-    /// <param name="pseudoRandom"><see langword="false"/> if it should be generated as a strong random</param>
-    /// <returns><see cref="NexusSpecialChar"/></returns>
-    public NexusSpecialChar GetRandomSpecialChar(in bool pseudoRandom = true)
-        => _specialChars.Span[GetRandomNumber(_specialChars.Length, pseudoRandom)];
 
     /// <summary>
     /// Generate a pseudo or strong random character

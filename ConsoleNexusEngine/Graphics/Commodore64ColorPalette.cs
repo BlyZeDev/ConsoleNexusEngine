@@ -1,15 +1,15 @@
 ﻿namespace ConsoleNexusEngine.Graphics;
 
-using System.Collections.Generic;
+using System.Collections.Immutable;
 
 /// <summary>
 /// The color palette of the Commodore 64<br/>
 /// <see href="https://de.wikipedia.org/wiki/Commodore_64"/>
 /// </summary>
-public sealed class Commodore64ColorPalette : NexusColorPalette
+public sealed record Commodore64ColorPalette : NexusColorPalette
 {
     /// <inheritdoc/>
-    protected override IReadOnlyList<NexusColor> Colors => [
+    protected override ImmutableArray<NexusColor> Colors => [
         new NexusColor(0x000000),
         new NexusColor(0x626262),
         new NexusColor(0x898989),

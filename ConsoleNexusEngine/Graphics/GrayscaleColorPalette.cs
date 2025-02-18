@@ -1,14 +1,14 @@
 ﻿namespace ConsoleNexusEngine.Graphics;
 
-using System.Collections.Generic;
+using System.Collections.Immutable;
 
 /// <summary>
 /// A grayscale color palette
 /// </summary>
-public sealed class GrayscaleColorPalette : NexusColorPalette
+public sealed record GrayscaleColorPalette : NexusColorPalette
 {
     /// <inheritdoc/>
-    protected override IReadOnlyList<NexusColor> Colors => [
+    protected override ImmutableArray<NexusColor> Colors => [
         new NexusColor(0x000000),
         new NexusColor(0x181818),
         new NexusColor(0x282828),

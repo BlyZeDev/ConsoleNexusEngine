@@ -1,15 +1,15 @@
 ﻿namespace ConsoleNexusEngine.Graphics;
 
-using System.Collections.Generic;
+using System.Collections.Immutable;
 
 /// <summary>
 /// The color palette of the old Windows<br/>
 /// <see href="https://de.wikipedia.org/wiki/Microsoft_Windows_1.0"/>
 /// </summary>
-public sealed class WindowsColorPalette : NexusColorPalette
+public sealed record WindowsColorPalette : NexusColorPalette
 {
     /// <inheritdoc/>
-    protected override IReadOnlyList<NexusColor> Colors => [
+    protected override ImmutableArray<NexusColor> Colors => [
         new NexusColor(0x000000),
         new NexusColor(0x7E7E7E),
         new NexusColor(0xBEBEBE),

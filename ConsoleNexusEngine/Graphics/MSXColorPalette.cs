@@ -1,15 +1,15 @@
 ﻿namespace ConsoleNexusEngine.Graphics;
 
-using System.Collections.Generic;
+using System.Collections.Immutable;
 
 /// <summary>
 /// The color palette of the MSX (only 15 colors)<br/>
 /// <see href="https://en.wikipedia.org/wiki/MSX2"/>
 /// </summary>
-public sealed class MSXColorPalette : NexusColorPalette
+public sealed record MSXColorPalette : NexusColorPalette
 {
     /// <inheritdoc/>
-    protected override IReadOnlyList<NexusColor> Colors => [
+    protected override ImmutableArray<NexusColor> Colors => [
         new NexusColor(0x000000),
         new NexusColor(0xCACACA),
         new NexusColor(0xFFFFFF),

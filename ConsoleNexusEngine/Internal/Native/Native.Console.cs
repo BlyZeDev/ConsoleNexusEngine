@@ -80,7 +80,7 @@ internal static unsafe partial class Native
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool SetCurrentConsoleFontEx(nint hConsoleOutput, [MarshalAs(UnmanagedType.Bool)] bool bMaximumWindow, ref CONSOLE_FONT_INFO_EX lpConsoleCurrentFont);
 
-    [DllImport(Kernel32)]
+    [DllImport(Kernel32, CharSet = CharSet.Unicode)]
     public static extern bool WriteConsoleOutput(
         [In] nint hConsoleOutput,
         [In] CHAR_INFO* lpBuffer,

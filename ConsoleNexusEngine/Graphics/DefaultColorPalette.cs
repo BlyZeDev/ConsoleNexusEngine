@@ -1,14 +1,14 @@
 ﻿namespace ConsoleNexusEngine.Graphics;
 
-using System.Collections.Generic;
+using System.Collections.Immutable;
 
 /// <summary>
 /// The default windows console color palette
 /// </summary>
-public sealed class DefaultColorPalette : NexusColorPalette
+public sealed record DefaultColorPalette : NexusColorPalette
 {
     /// <inheritdoc/>
-    protected override IReadOnlyList<NexusColor> Colors => [
+    protected override ImmutableArray<NexusColor> Colors => [
         new NexusColor(0x000000),
         new NexusColor(0x000080),
         new NexusColor(0x008000),

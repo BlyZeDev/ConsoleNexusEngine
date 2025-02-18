@@ -7,7 +7,7 @@ using System.Collections.Immutable;
 /// </summary>
 public readonly record struct NexusInputCollection
 {
-    internal static NexusInputCollection Empty => default;
+    internal static NexusInputCollection Empty => new NexusInputCollection();
 
     /// <summary>
     /// The mouse position

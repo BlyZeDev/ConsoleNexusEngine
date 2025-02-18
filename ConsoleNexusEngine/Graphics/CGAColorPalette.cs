@@ -1,15 +1,15 @@
 ﻿namespace ConsoleNexusEngine.Graphics;
 
-using System.Collections.Generic;
+using System.Collections.Immutable;
 
 /// <summary>
 /// The color palette of IBM's original Color Graphics Adapter<br/>
 /// <see href="https://en.wikipedia.org/wiki/Color_Graphics_Adapter"/>
 /// </summary>
-public sealed class CGAColorPalette : NexusColorPalette
+public sealed record CGAColorPalette : NexusColorPalette
 {
     /// <inheritdoc/>
-    protected override IReadOnlyList<NexusColor> Colors => [
+    protected override ImmutableArray<NexusColor> Colors => [
         new NexusColor(0x000000),
         new NexusColor(0x0000AA),
         new NexusColor(0x00AA00),

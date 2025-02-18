@@ -61,21 +61,4 @@ public readonly record struct NexusChar : ISprite
     /// <param name="foreground">The foreground color of the character</param>
     public NexusChar(in char value, in NexusColorIndex foreground)
         : this(value, foreground, NexusColorIndex.Background) { }
-
-    /// <summary>
-    /// Initializes a new console character
-    /// </summary>
-    /// <param name="value">The character itself</param>
-    /// <param name="foreground">The foreground color of the character</param>
-    /// <param name="background">The background color of the character</param>
-    public NexusChar(in NexusSpecialChar value, in NexusColorIndex foreground, in NexusColorIndex background)
-        : this((char)value, foreground, background) { }
-
-    /// <summary>
-    /// Initializes a new console character
-    /// </summary>
-    /// <param name="value">The character itself</param>
-    /// <param name="foreground">The foreground color of the character</param>
-    public NexusChar(in NexusSpecialChar value, in NexusColorIndex foreground)
-        : this((char)value, foreground, NexusColorIndex.Background) { }
 }

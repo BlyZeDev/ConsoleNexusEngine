@@ -86,7 +86,7 @@ public abstract class ConsoleGame : IDisposable
 
         IsRunning = false;
 
-        _cts = new();
+        _cts = new CancellationTokenSource();
         _console = new CmdConsole(ConsoleGameSettings.Default, _cts);
 
         Settings = ConsoleGameSettings.Default;
@@ -109,7 +109,7 @@ public abstract class ConsoleGame : IDisposable
 
         StartTime = DateTimeOffset.Now.DateTime;
 
-        Task.Factory.StartNew(GameLoop, _cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default).FireAndForget<Exception>(OnCrash, true);
+        Task.Factory.StartNew(GameLoop, _cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default).RunInBackground<Exception>(OnCrash, true);
 
         _cts.Token.WaitHandle.WaitOne();
     }

@@ -1,15 +1,15 @@
 ﻿namespace ConsoleNexusEngine.Graphics;
 
-using System.Collections.Generic;
+using System.Collections.Immutable;
 
 /// <summary>
 /// The color palette of the ZX Spectrum computer series (only 15 colors)<br/>
 /// <see href="https://en.wikipedia.org/wiki/ZX_Spectrum"/>
 /// </summary>
-public sealed class ZXSpectrumColorPalette : NexusColorPalette
+public sealed record ZXSpectrumColorPalette : NexusColorPalette
 {
     /// <inheritdoc/>
-    protected override IReadOnlyList<NexusColor> Colors => [
+    protected override ImmutableArray<NexusColor> Colors => [
         new NexusColor(0x000000),
         new NexusColor(0x0000D8),
         new NexusColor(0x0000FF),

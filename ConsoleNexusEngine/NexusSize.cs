@@ -39,7 +39,7 @@ public readonly record struct NexusSize
     /// Initializes a new <see cref="NexusSize"/>
     /// </summary>
     /// <remarks>
-    /// The size is clamped between <see cref="int.MinValue"/> and <see cref="int.MaxValue"/>
+    /// The size is clamped between <see cref="MinValue"/> and <see cref="MaxValue"/>
     /// </remarks>
     /// <param name="width">The width</param>
     /// <param name="height">The height</param>
@@ -53,7 +53,7 @@ public readonly record struct NexusSize
     /// Initializes a new <see cref="NexusSize"/>
     /// </summary>
     /// <remarks>
-    /// The size is clamped between <see cref="int.MinValue"/> and <see cref="int.MaxValue"/>
+    /// The size is clamped between <see cref="MinValue"/> and <see cref="int.MaxValue"/>
     /// </remarks>
     /// <param name="dimensions">The width and height</param>
     public NexusSize(in int dimensions) : this(dimensions, dimensions) { }
