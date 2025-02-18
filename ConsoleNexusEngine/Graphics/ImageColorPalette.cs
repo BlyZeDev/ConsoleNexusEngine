@@ -53,33 +53,39 @@ public sealed record ImageColorPalette : NexusColorPalette
             PixelFormat.Format32bppArgb);
 
         var mostUsedColors = new Dictionary<NexusColor, int>();
-        unsafe
+
+        try
         {
-            var pixelSize = Image.GetPixelFormatSize(bitmap.PixelFormat) / 8;
-            var scan0 = (byte*)data.Scan0;
-
-            byte* row;
-            byte* pixel;
-            NexusColor color;
-
-            for (int y = 0; y < data.Height; y++)
+            unsafe
             {
-                row = scan0 + y * data.Stride;
+                var pixelSize = Image.GetPixelFormatSize(bitmap.PixelFormat) / 8;
+                var scan0 = (byte*)data.Scan0;
 
-                for (int x = 0; x < data.Width; x++)
+                byte* row;
+                byte* pixel;
+                NexusColor color;
+
+                for (int y = 0; y < data.Height; y++)
                 {
-                    pixel = row + x * pixelSize;
+                    row = scan0 + y * data.Stride;
 
-                    if (pixel[3] < 128) continue;
+                    for (int x = 0; x < data.Width; x++)
+                    {
+                        pixel = row + x * pixelSize;
 
-                    color = new NexusColor(pixel[2], pixel[1], pixel[0]);
+                        if (pixel[3] < 128) continue;
 
-                    if (!mostUsedColors.TryAdd(color, 0)) mostUsedColors[color]++;
+                        color = new NexusColor(pixel[2], pixel[1], pixel[0]);
+
+                        if (!mostUsedColors.TryAdd(color, 0)) mostUsedColors[color]++;
+                    }
                 }
             }
         }
-
-        bitmap.UnlockBits(data);
+        finally
+        {
+            bitmap.UnlockBits(data);
+        }
 
         var colors = ImmutableArray.CreateBuilder<NexusColor>();
 

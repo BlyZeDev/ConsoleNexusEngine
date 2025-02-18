@@ -106,32 +106,37 @@ public readonly struct NexusImage : ISprite
             new Rectangle(0, 0, resized.Width, resized.Height),
             ImageLockMode.ReadOnly,
             PixelFormat.Format32bppArgb);
-        
-        unsafe
+
+        try
         {
-            var pixelSize = Image.GetPixelFormatSize(resized.PixelFormat) / 8;
-            var scan0 = (byte*)data.Scan0;
-
-            byte* row;
-            byte* pixel;
-
-            for (int y = 0; y < data.Height; y++)
+            unsafe
             {
-                row = scan0 + y * data.Stride;
+                var pixelSize = Image.GetPixelFormatSize(resized.PixelFormat) / 8;
+                var scan0 = (byte*)data.Scan0;
 
-                for (int x = 0; x < data.Width; x++)
+                byte* row;
+                byte* pixel;
+
+                for (int y = 0; y < data.Height; y++)
                 {
-                    pixel = row + x * pixelSize;
+                    row = scan0 + y * data.Stride;
 
-                    pixels[x, y] = Converter.ToCharInfo(
-                        GetAlphaLevel(pixel[3]),
-                        processor.Process(new NexusColor(pixel[2], pixel[1], pixel[0])),
-                        0);
+                    for (int x = 0; x < data.Width; x++)
+                    {
+                        pixel = row + x * pixelSize;
+
+                        pixels[x, y] = Converter.ToCharInfo(
+                            GetAlphaLevel(pixel[3]),
+                            processor.Process(new NexusColor(pixel[2], pixel[1], pixel[0])),
+                            0);
+                    }
                 }
             }
         }
-
-        resized.UnlockBits(data);
+        finally
+        {
+            resized.UnlockBits(data);
+        }
 
         return pixels.ToReadOnly();
     }
