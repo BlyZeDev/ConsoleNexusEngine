@@ -1,6 +1,6 @@
 # ConsoleNexusEngine
 
-![Icon](https://github.com/BlyZeYT/ConsoleNexusEngine/blob/master/Icon.svg)
+![Icon](https://github.com/BlyZeYT/ConsoleNexusEngine/blob/master/Icon.png)
 
 ## A game engine for creating games in the windows console written in C#
 
