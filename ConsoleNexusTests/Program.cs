@@ -32,10 +32,10 @@ public sealed class Game : ConsoleGame
 
     public Game()
     {
-        Settings.Font = new ConsolasFont(new NexusSize(25));
+        Settings.Font = new ConsolasFont(new NexusSize(5));
         Settings.ColorPalette = new CGAColorPalette();
 
-        _everySecond = NexusUpdate.DoEverySecond((inputs) =>
+        _everySecond = NexusUpdate.DoEvery(TimeSpan.FromMicroseconds(1), (inputs) =>
         {
             Graphic.Clear();
             DebugView(inputs);
