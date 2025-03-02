@@ -1,35 +1,36 @@
 ﻿namespace ConsoleNexusEngine;
 
+using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography;
 
 /// <summary>
-/// Provides useful functions for <see cref="ConsoleGame"/>
+/// Provides useful functions for <see cref="NexusConsoleGame"/>
 /// </summary>
-public sealed class ConsoleGameUtil
+public sealed class NexusConsoleGameUtil
 {
-    private static readonly ReadOnlyMemory<NexusColorPalette> _colorPalettes;
+    private static readonly ImmutableArray<NexusColorPalette> _colorPalettes;
 
-    static ConsoleGameUtil()
+    static NexusConsoleGameUtil()
     {
-        var colorPalettes = new List<NexusColorPalette>();
+        var colorPalettes = ImmutableArray.CreateBuilder<NexusColorPalette>();
         var type = typeof(NexusColorPalette);
 
-        foreach (var cp in AppDomain.CurrentDomain.GetAssemblies()
+        foreach (var colorPalette in AppDomain.CurrentDomain.GetAssemblies()
             .SelectMany(x => x.GetTypes())
             .Where(x => x.IsClass && !x.IsAbstract && x.IsSubclassOf(type) && x.GetCustomAttribute<IgnoreColorPaletteAttribute>() is null))
         {
-            colorPalettes.Add((NexusColorPalette)Activator.CreateInstance(cp)!);
+            colorPalettes.Add((NexusColorPalette)Activator.CreateInstance(colorPalette)!);
         }
 
-        _colorPalettes = new ReadOnlyMemory<NexusColorPalette>(colorPalettes.ToArray());
+        _colorPalettes = colorPalettes.DrainToImmutable();
     }
 
     private readonly CmdConsole _console;
-    private readonly ConsoleGameSettings _settings;
+    private readonly NexusConsoleGameSettings _settings;
 
-    internal ConsoleGameUtil(CmdConsole console, ConsoleGameSettings settings)
+    internal NexusConsoleGameUtil(CmdConsole console, NexusConsoleGameSettings settings)
     {
         _console = console;
         _settings = settings;
@@ -66,13 +67,7 @@ public sealed class ConsoleGameUtil
         Span<byte> rgb = stackalloc byte[3];
 
         if (pseudoRandom) Random.Shared.NextBytes(rgb);
-        else
-        {
-            using (var rng = RandomNumberGenerator.Create())
-            {
-                rng.GetNonZeroBytes(rgb);
-            }
-        }
+        else RandomNumberGenerator.Fill(rgb);
 
         return new NexusColor(rgb[0], rgb[1], rgb[2]);
     }
@@ -194,7 +189,7 @@ public sealed class ConsoleGameUtil
     /// <param name="pseudoRandom"><see langword="false"/> if it should be generated as a strong random</param>
     /// <returns><see cref="NexusColorPalette"/></returns>
     public NexusColorPalette GetRandomColorPalette(in bool pseudoRandom = true)
-        => _colorPalettes.Span[GetRandomNumber(_colorPalettes.Length, pseudoRandom)];
+        => _colorPalettes[GetRandomNumber(_colorPalettes.Length, pseudoRandom)];
 
     /// <summary>
     /// Displays a message box

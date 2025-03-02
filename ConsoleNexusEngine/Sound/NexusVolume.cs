@@ -10,6 +10,10 @@ public readonly record struct NexusVolume
     ISubtractionOperators<NexusVolume, NexusVolume, NexusVolume>,
     IMultiplyOperators<NexusVolume, NexusVolume, NexusVolume>,
     IDivisionOperators<NexusVolume, NexusVolume, NexusVolume>,
+    IAdditionOperators<NexusVolume, int, NexusVolume>,
+    ISubtractionOperators<NexusVolume, int, NexusVolume>,
+    IMultiplyOperators<NexusVolume, int, NexusVolume>,
+    IDivisionOperators<NexusVolume, int, NexusVolume>,
     IMinMaxValue<NexusVolume>,
     IDecrementOperators<NexusVolume>,
     IIncrementOperators<NexusVolume>
@@ -74,6 +78,22 @@ public readonly record struct NexusVolume
     /// <inheritdoc/>
     public static NexusVolume operator /(NexusVolume left, NexusVolume right)
         => new(left._value / right._value);
+
+    /// <inheritdoc/>
+    public static NexusVolume operator +(NexusVolume left, int right)
+        => new(left.Value + right);
+
+    /// <inheritdoc/>
+    public static NexusVolume operator -(NexusVolume left, int right)
+        => new(left.Value - right);
+
+    /// <inheritdoc/>
+    public static NexusVolume operator *(NexusVolume left, int right)
+        => new(left.Value * right);
+
+    /// <inheritdoc/>
+    public static NexusVolume operator /(NexusVolume left, int right)
+        => new(left.Value / right);
 
     /// <inheritdoc/>
     public static NexusVolume operator ++(NexusVolume value) => new(value._value + 0.01f);

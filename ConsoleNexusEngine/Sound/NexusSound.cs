@@ -8,14 +8,14 @@ using NAudio.Wave;
 public sealed record NexusSound : IDisposable
 {
     private readonly WaveOutEvent _wave;
+    private readonly LoopStream _stream;
 
-    private LoopStream stream = null!;
     private bool isDisposed;
 
     /// <summary>
     /// The length of the sound
     /// </summary>
-    public TimeSpan Length => stream.TotalTime;
+    public TimeSpan Length => _stream.TotalTime;
 
     /// <summary>
     /// The path to the sound file
@@ -37,8 +37,8 @@ public sealed record NexusSound : IDisposable
     /// </summary>
     public TimeSpan Position
     {
-        get => stream.CurrentTime;
-        private set => stream.CurrentTime = value;
+        get => _stream.CurrentTime;
+        private set => _stream.CurrentTime = value;
     }
 
     /// <summary>
@@ -47,8 +47,8 @@ public sealed record NexusSound : IDisposable
     /// <remarks>Clamped between 0 and 100</remarks>
     public NexusVolume Volume
     {
-        get => (NexusVolume)stream.Volume;
-        set => stream.Volume = value._value;
+        get => (NexusVolume)_stream.Volume;
+        set => _stream.Volume = value._value;
     }
 
     /// <summary>
@@ -59,15 +59,20 @@ public sealed record NexusSound : IDisposable
     /// <param name="shouldLoop"><see langword="true"/> if the sound should be looped, otherwise <see langword="false"/></param>
     public NexusSound(string filePath, in NexusVolume volume, in bool shouldLoop = false)
     {
-        _wave = new WaveOutEvent();
+        _wave = new WaveOutEvent()
+        {
+            DesiredLatency = 100
+        };
         _wave.PlaybackStopped += OnFinish;
+
+        _stream = new LoopStream(new AudioFileReader(filePath), shouldLoop);
+        _wave.Init(_stream);
 
         FilePath = filePath;
         IsLooped = shouldLoop;
+        Volume = volume;
 
         State = NexusPlayerState.NotStarted;
-
-        InitWave(volume);
     }
 
     /// <summary>
@@ -77,7 +82,7 @@ public sealed record NexusSound : IDisposable
     {
         if (State is NexusPlayerState.Playing) return;
 
-        if (State is NexusPlayerState.Finished) InitWave(Volume);
+        if (State is NexusPlayerState.Finished) _stream.Position = 0;
 
         _wave.Play();
         State = NexusPlayerState.Playing;
@@ -157,7 +162,7 @@ public sealed record NexusSound : IDisposable
         if (!isDisposed)
         {
             _wave.Dispose();
-            stream.Dispose();
+            _stream.Dispose();
 
             isDisposed = true;
         }
@@ -165,17 +170,7 @@ public sealed record NexusSound : IDisposable
         GC.SuppressFinalize(this);
     }
 
-    private void InitWave(in NexusVolume volume)
-    {
-        stream = new LoopStream(new AudioFileReader(FilePath), IsLooped)
-        {
-            Volume = volume._value
-        };
-
-        _wave.Init(stream);
-    }
-
-    private void ChangePos(in int seconds) => stream.Skip(seconds);
+    private void ChangePos(in int seconds) => _stream.Skip(seconds);
 
     private void OnFinish(object? sender, StoppedEventArgs e) => Stop();
 }

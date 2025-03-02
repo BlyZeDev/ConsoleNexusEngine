@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 /// <summary>
 /// Provides methods for your Console game
 /// </summary>
-public abstract class ConsoleGame : IDisposable
+public abstract class NexusConsoleGame : IDisposable
 {
     private static bool hasInstance;
 
@@ -15,7 +15,7 @@ public abstract class ConsoleGame : IDisposable
     /// </summary>
     public static NexusSize ScreenSize { get; }
 
-    static ConsoleGame()
+    static NexusConsoleGame()
     {
         ScreenSize = new NexusSize(Native.GetSystemMetrics(0), Native.GetSystemMetrics(1));
 
@@ -28,17 +28,17 @@ public abstract class ConsoleGame : IDisposable
     /// <summary>
     /// The settings of the game
     /// </summary>
-    protected ConsoleGameSettings Settings { get; }
+    protected NexusConsoleGameSettings Settings { get; }
 
     /// <summary>
     /// Renders all graphics
     /// </summary>
-    protected ConsoleGraphic Graphic { get; }
+    protected NexusConsoleGraphic Graphic { get; }
 
     /// <summary>
     /// Provides useful utility functions
     /// </summary>
-    protected ConsoleGameUtil Utility { get; }
+    protected NexusConsoleGameUtil Utility { get; }
 
     /// <summary>
     /// <see langword="true"/> if the game is running, otherwise <see langword="false"/>
@@ -76,9 +76,9 @@ public abstract class ConsoleGame : IDisposable
     public NexusColor Background => Settings.ColorPalette.Color1;
 
     /// <summary>
-    /// Initializes the <see cref="ConsoleGame"/>
+    /// Initializes the <see cref="NexusConsoleGame"/>
     /// </summary>
-    protected ConsoleGame()
+    protected NexusConsoleGame()
     {
         if (hasInstance) throw new NexusEngineException("There is already a Console Game instance running.\nPlease dispose it before running a new Console Game");
 
@@ -87,17 +87,17 @@ public abstract class ConsoleGame : IDisposable
         IsRunning = false;
 
         _cts = new CancellationTokenSource();
-        _console = new CmdConsole(ConsoleGameSettings.Default, _cts);
+        _console = new CmdConsole(NexusConsoleGameSettings.Default, _cts);
 
-        Settings = ConsoleGameSettings.Default;
-        Graphic = new ConsoleGraphic(_console);
-        Utility = new ConsoleGameUtil(_console, Settings);
+        Settings = NexusConsoleGameSettings.Default;
+        Graphic = new NexusConsoleGraphic(_console);
+        Utility = new NexusConsoleGameUtil(_console, Settings);
 
         Settings.Updated += OnSettingsUpdated;
     }
 
     /// <summary>
-    /// Starts the game and pauses the current thread while the game is running until the <see cref="ConsoleGameSettings.StopGameKey"/> is pressed
+    /// Starts the game and pauses the current thread while the game is running until the <see cref="NexusConsoleGameSettings.StopGameKey"/> is pressed
     /// </summary>
     public void Start()
     {
@@ -197,9 +197,9 @@ public abstract class ConsoleGame : IDisposable
     {
         switch (propertyName)
         {
-            case nameof(ConsoleGameSettings.Title): _console.UpdateTitle(Settings.Title); break;
-            case nameof(ConsoleGameSettings.ColorPalette): _console.UpdateColorPalette(Settings.ColorPalette); break;
-            case nameof(ConsoleGameSettings.Font): _console.UpdateFont(Settings.Font); break;
+            case nameof(NexusConsoleGameSettings.Title): _console.UpdateTitle(Settings.Title); break;
+            case nameof(NexusConsoleGameSettings.ColorPalette): _console.UpdateColorPalette(Settings.ColorPalette); break;
+            case nameof(NexusConsoleGameSettings.Font): _console.UpdateFont(Settings.Font); break;
         }
     }
 

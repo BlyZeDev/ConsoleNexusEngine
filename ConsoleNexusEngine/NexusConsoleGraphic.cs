@@ -1,13 +1,13 @@
 ﻿namespace ConsoleNexusEngine;
 
 /// <summary>
-/// The graphics engine for <see cref="ConsoleGame"/>
+/// The graphics engine for <see cref="NexusConsoleGame"/>
 /// </summary>
-public sealed partial class ConsoleGraphic
+public sealed partial class NexusConsoleGraphic
 {
     private readonly CmdConsole _console;
 
-    internal ConsoleGraphic(CmdConsole console) => _console = console;
+    internal NexusConsoleGraphic(CmdConsole console) => _console = console;
 
     /// <summary>
     /// Gets a pixel in the console at a specific position

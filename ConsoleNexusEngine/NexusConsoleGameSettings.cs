@@ -1,13 +1,11 @@
 ﻿namespace ConsoleNexusEngine;
 
-using System.Threading;
-
 /// <summary>
-/// The settings for <see cref="ConsoleGame"/>
+/// The settings for <see cref="NexusConsoleGame"/>
 /// </summary>
-public sealed record ConsoleGameSettings
+public sealed record NexusConsoleGameSettings
 {
-    internal static ConsoleGameSettings Default => new();
+    internal static NexusConsoleGameSettings Default => new();
 
     private string title;
     private NexusFont font;
@@ -82,10 +80,10 @@ public sealed record ConsoleGameSettings
 
     internal event EventHandler<string>? Updated;
 
-    private ConsoleGameSettings()
+    private NexusConsoleGameSettings()
     {
         title = "ConsoleGame";
-        font = new TerminalFont(new NexusSize(10));
+        font = new NexusFont("Terminal", new NexusSize(10));
         colorPalette = new DefaultColorPalette();
         stopGameKey = NexusKey.Escape;
         inputTypes = NexusInputType.All;

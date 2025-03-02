@@ -84,9 +84,9 @@ public sealed class NexusUpdate
         => new NexusUpdate(Hour / frequency, action);
 
     /// <summary>
-    /// Call this inside <see cref="ConsoleGame.Update(NexusInputCollection)"/>
+    /// Call this inside <see cref="NexusConsoleGame.Update(NexusInputCollection)"/>
     /// </summary>
-    /// <param name="deltaTime">Pass <see cref="ConsoleGame.DeltaTime"/> here</param>
+    /// <param name="deltaTime">Pass <see cref="NexusConsoleGame.DeltaTime"/> here</param>
     public void Update(in double deltaTime)
     {
         timeSince += deltaTime;
@@ -100,10 +100,10 @@ public sealed class NexusUpdate
     }
 
     /// <summary>
-    /// Call this inside <see cref="ConsoleGame.Update(NexusInputCollection)"/>
+    /// Call this inside <see cref="NexusConsoleGame.Update(NexusInputCollection)"/>
     /// </summary>
-    /// <param name="deltaTime">Pass <see cref="ConsoleGame.DeltaTime"/> here</param>
-    /// <param name="inputs">Pass the input collection from <see cref="ConsoleGame.Update(NexusInputCollection)"/> here</param>
+    /// <param name="deltaTime">Pass <see cref="NexusConsoleGame.DeltaTime"/> here</param>
+    /// <param name="inputs">Pass the input collection from <see cref="NexusConsoleGame.Update(NexusInputCollection)"/> here</param>
     public void Update(in double deltaTime, in NexusInputCollection inputs)
     {
         timeSince += deltaTime;

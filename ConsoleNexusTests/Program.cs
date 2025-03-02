@@ -4,6 +4,7 @@ using ConsoleNexusEngine;
 using ConsoleNexusEngine.Graphics;
 using ConsoleNexusEngine.Helpers;
 using ConsoleNexusEngine.IO;
+using ConsoleNexusEngine.Sound;
 
 sealed class Program
 {
@@ -26,13 +27,15 @@ sealed class Program
     }
 }
 
-public sealed class Game : ConsoleGame
+public sealed class Game : NexusConsoleGame
 {
     private readonly NexusUpdate _everySecond;
+    private readonly NexusSound _sound;
+    private readonly NexusSound _sfx;
 
     public Game()
     {
-        Settings.Font = new ConsolasFont(new NexusSize(5));
+        Settings.Font = new NexusFont("Terminal", new NexusSize(10));
         Settings.ColorPalette = new CGAColorPalette();
 
         _everySecond = NexusUpdate.DoEvery(TimeSpan.FromMicroseconds(1), (inputs) =>
@@ -41,16 +44,27 @@ public sealed class Game : ConsoleGame
             DebugView(inputs);
             Graphic.Render();
         });
+        _sound = new NexusSound(@"C:\Users\leons\Downloads\testaudio.mp3", new NexusVolume(50), true);
+        _sfx = new NexusSound(@"C:\Users\leons\Downloads\sfx.wav", new NexusVolume(25), false);
     }
 
     protected override void Load()
     {
-
+        _sound.Play();
     }
 
     protected override void Update(NexusInputCollection inputs)
     {
         _everySecond.Update(DeltaTime);
+
+        if (inputs.Keys.Contains(NexusKey.Return))
+        {
+            if (_sfx.State is NexusPlayerState.NotStarted) _sfx.Play();
+            else _sfx.Restart();
+        }
+
+        if (inputs.Keys.Contains(NexusKey.Up)) _sound.Volume += 5;
+        if (inputs.Keys.Contains(NexusKey.Down)) _sound.Volume -= 5;
     }
 
     protected override void OnCrash(Exception exception)

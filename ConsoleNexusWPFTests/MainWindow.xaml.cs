@@ -23,7 +23,7 @@ public sealed partial class MainWindow : Window
     }
 }
 
-public sealed class Game : ConsoleGame
+public sealed class Game : NexusConsoleGame
 {
     private readonly NexusEllipse _ellipse;
     private NexusCoord currentPos;

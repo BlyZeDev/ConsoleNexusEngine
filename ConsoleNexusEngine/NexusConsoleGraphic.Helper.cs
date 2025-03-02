@@ -1,6 +1,6 @@
 ﻿namespace ConsoleNexusEngine;
 
-public sealed partial class ConsoleGraphic
+public sealed partial class NexusConsoleGraphic
 {
     private void DrawSprite(in NexusCoord start, ISprite sprite)
     {

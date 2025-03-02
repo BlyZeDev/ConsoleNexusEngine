@@ -3,7 +3,7 @@
 /// <summary>
 /// Represents a font for the console game
 /// </summary>
-public abstract record NexusFont
+public sealed record NexusFont
 {
     /// <summary>
     /// The name of the font
@@ -16,7 +16,7 @@ public abstract record NexusFont
     public NexusSize Size { get; }
 
     /// <summary>
-    /// Initializes a new NexusFont
+    /// Initializes <see cref="NexusFont"/> from the specified font size
     /// </summary>
     /// <param name="name">The name of the font</param>
     /// <param name="size">The size of the font</param>
@@ -24,7 +24,7 @@ public abstract record NexusFont
     /// Keep in mind that some characters might not work in a font.<br/>
     /// I would recommend to test if the characters you need are included.
     /// </remarks>
-    protected NexusFont(string name, in NexusSize size)
+    public NexusFont(string name, in NexusSize size)
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(size.Width, 1, nameof(size));
         ArgumentOutOfRangeException.ThrowIfLessThan(size.Height, 1, nameof(size));
