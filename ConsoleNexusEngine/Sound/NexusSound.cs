@@ -78,9 +78,18 @@ public sealed record NexusSound : IDisposable
     /// <summary>
     /// Plays the sound
     /// </summary>
-    public void Play()
+    /// <param name="forceRestart"><see langword="true"/> if the sound should restart if it's already playing</param>
+    public void Play(in bool forceRestart = false)
     {
-        if (State is NexusPlayerState.Playing) return;
+        if (forceRestart)
+        {
+            _wave.Stop();
+            State = NexusPlayerState.Finished;
+        }
+        else
+        {
+            if (State is NexusPlayerState.Playing) return;
+        }
 
         if (State is NexusPlayerState.Finished) _stream.Position = 0;
 
@@ -108,20 +117,6 @@ public sealed record NexusSound : IDisposable
 
         _wave.Stop();
         State = NexusPlayerState.Finished;
-    }
-
-    /// <summary>
-    /// Restarts the sound
-    /// </summary>
-    public void Restart()
-    {
-        if (State is NexusPlayerState.NotStarted) return;
-
-        _wave.Stop();
-
-        State = NexusPlayerState.Finished;
-
-        Play();
     }
 
     /// <summary>

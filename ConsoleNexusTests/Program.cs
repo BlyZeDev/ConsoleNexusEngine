@@ -59,8 +59,7 @@ public sealed class Game : NexusConsoleGame
 
         if (inputs.Keys.Contains(NexusKey.Return))
         {
-            if (_sfx.State is NexusPlayerState.NotStarted) _sfx.Play();
-            else _sfx.Restart();
+            _sfx.Play();
         }
 
         if (inputs.Keys.Contains(NexusKey.Up)) _sound.Volume += 5;

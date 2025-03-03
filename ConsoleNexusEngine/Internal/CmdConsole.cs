@@ -397,8 +397,8 @@ internal sealed class CmdConsole
             (NexusBatteryType)battery.BatteryType,
             (NexusBatteryLevel)battery.BatteryLevel,
             (NexusXInput)gamepad.wButtons,
-            gamepad.bLeftTrigger is byte.MaxValue,
-            gamepad.bRightTrigger is byte.MaxValue,
+            gamepad.bLeftTrigger == byte.MaxValue,
+            gamepad.bRightTrigger == byte.MaxValue,
             gamepad.sThumbLX, gamepad.sThumbLY, gamepad.sThumbRX, gamepad.sThumbRY);
     }
 }
