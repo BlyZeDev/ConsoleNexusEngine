@@ -11,7 +11,6 @@ public sealed record NexusConsoleGameSettings
     private NexusFont font;
     private NexusColorPalette colorPalette;
     private NexusKey stopGameKey;
-    private NexusInputType inputTypes;
 
     /// <summary>
     /// The title the console should have
@@ -65,19 +64,6 @@ public sealed record NexusConsoleGameSettings
         }
     }
 
-    /// <summary>
-    /// The allowed inputs types
-    /// </summary>
-    public NexusInputType InputTypes
-    {
-        get => inputTypes;
-        set
-        {
-            inputTypes = value;
-            Update(nameof(InputTypes));
-        }
-    }
-
     internal event EventHandler<string>? Updated;
 
     private NexusConsoleGameSettings()
@@ -86,7 +72,6 @@ public sealed record NexusConsoleGameSettings
         font = new NexusFont("Terminal", new NexusSize(10));
         colorPalette = new DefaultColorPalette();
         stopGameKey = NexusKey.Escape;
-        inputTypes = NexusInputType.All;
     }
 
     private void Update(string propertyName) => Updated?.Invoke(this, propertyName);

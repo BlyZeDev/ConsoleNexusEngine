@@ -19,20 +19,15 @@ internal sealed class CmdConsole
     private readonly nint _handle;
     private readonly nint _standardInput;
     private readonly nint _standardOutput;
-    private readonly HashSet<NexusKey> _currentPressedKeys;
-    private readonly ImmutableArray<NexusGamepad>.Builder _gamepads;
-
-    private readonly CancellationTokenSource _cts;
 
     private readonly DefaultConsole _defaultConsole;
 
-    private NexusCoord currentMousePos;
-
     public ConsoleBuffer Buffer { get; }
 
-    public CmdConsole(NexusConsoleGameSettings settings, CancellationTokenSource cts)
+    public NexusKey StopGameKey { get; set; }
+
+    public CmdConsole(NexusConsoleGameSettings settings)
     {
-        _cts = cts;
         _handle = Native.GetConsoleWindow();
 
         var needsAllocation = _handle == nint.Zero;
@@ -46,96 +41,62 @@ internal sealed class CmdConsole
         _standardInput = Native.GetStdHandle(STD_INPUT);
         _standardOutput = Native.GetStdHandle(STD_OUTPUT);
 
-        _currentPressedKeys = [];
-        _gamepads = ImmutableArray.CreateBuilder<NexusGamepad>(4);
-
         _defaultConsole = SaveDefaultConsole(needsAllocation);
-
-        currentMousePos = NexusCoord.MaxValue;
 
         var size = Initialize(settings);
 
         Buffer = new ConsoleBuffer(_standardOutput, size.Width, size.Height);
     }
 
-    public NexusInputCollection ReadInput(in NexusKey stopGameKey, in NexusInputType inputType)
+    public void ReadKeyboardMouseInput(NexusKeyCollection collection, ref NexusCoord currentMousePos)
     {
-        if (inputType is NexusInputType.None)
-        {
-            Native.FlushConsoleInputBuffer(_standardInput);
-            return NexusInputCollection.Empty;
-        }
-
-        if (inputType.FastHasFlag(NexusInputType.Gamepad))
-        {
-            for (uint i = 0; i < NexusGamepad.MaxGamepads; i++)
-            {
-                _gamepads.Add(GetGamepadState(i));
-            }
-        }
-        else
-        {
-            for (int i = 0; i < NexusGamepad.MaxGamepads; i++)
-            {
-                _gamepads.Add(NexusGamepad.Empty);
-            }
-        }
-
-        _currentPressedKeys.RemoveWhere(key => !IsKeyPressed(key));
+        collection.RemoveWhere(key => !IsKeyPressed(key));
 
         Native.GetNumberOfConsoleInputEvents(_standardInput, out var numEventsRead);
 
-        if (numEventsRead == 0 && _currentPressedKeys.Count == 0)
-            return new NexusInputCollection(currentMousePos, [], _gamepads.MoveToImmutable());
+        if (numEventsRead == 0 && collection.Count == 0) return;
 
         var buffer = new INPUT_RECORD[numEventsRead];
 
         Native.PeekConsoleInput(_standardInput, buffer, numEventsRead, out _);
         Native.FlushConsoleInputBuffer(_standardInput);
-        
+
         foreach (var input in buffer.AsSpan())
         {
             switch (input.EventType)
             {
                 case 1:
-                    if (inputType.FastHasFlag(NexusInputType.Keyboard) && input.KeyEvent.KeyDown)
-                    {
-                        var key = (NexusKey)input.KeyEvent.VirtualKeyCode;
+                    var key = (NexusKey)input.KeyEvent.VirtualKeyCode;
 
-                        _currentPressedKeys.Add(key);
-
-                        if (key == stopGameKey) _cts.Cancel();
-                    }
+                    collection.Add(key);
                     break;
 
                 case 2:
-                    if (inputType.FastHasFlag(NexusInputType.Mouse))
+                    currentMousePos = NexusCoord.FromCOORD(input.MouseEvent.MousePosition);
+
+                    var mouseKeys = input.MouseEvent.EventFlags switch
                     {
-                        currentMousePos = NexusCoord.FromCOORD(input.MouseEvent.MousePosition);
+                        MOUSE_MOVED => [],
+                        MOUSE_WHEELED => [input.MouseEvent.ButtonState >> 31 == 1 ? NexusKey.MouseWheelDown : NexusKey.MouseWheelUp],
+                        MOUSE_HWHEELED => [input.MouseEvent.ButtonState >> 31 == 1 ? NexusKey.MouseWheelLeft : NexusKey.MouseWheelRight],
+                        _ => GetMouseButtons(input.MouseEvent.ButtonState)
+                    };
 
-                        var mouseKeys = input.MouseEvent.EventFlags switch
-                        {
-                            MOUSE_MOVED => [],
-                            MOUSE_WHEELED => [input.MouseEvent.ButtonState >> 31 == 1 ? NexusKey.MouseWheelDown : NexusKey.MouseWheelUp],
-                            MOUSE_HWHEELED => [input.MouseEvent.ButtonState >> 31 == 1 ? NexusKey.MouseWheelLeft : NexusKey.MouseWheelRight],
-                            _ => GetMouseButtons(input.MouseEvent.ButtonState)
-                        };
-
-                        foreach (var mouseKey in mouseKeys)
-                        {
-                            if (mouseKey == stopGameKey) _cts.Cancel();
-
-                            _currentPressedKeys.Add(mouseKey);
-                        }
+                    foreach (var mouseKey in mouseKeys)
+                    {
+                        collection.Add(mouseKey);
                     }
                     break;
             }
         }
+    }
 
-        return new NexusInputCollection(
-            currentMousePos,
-            _currentPressedKeys.Count == 0 ? [] : _currentPressedKeys.ToImmutableArray(),
-            _gamepads.MoveToImmutable());
+    public void ReadGamepads(NexusGamepad[] gamepads)
+    {
+        for (uint i = 0; i < NexusGamepad.MaxGamepads; i++)
+        {
+            gamepads[i] = GetGamepadState(i);
+        }
     }
 
     public void UpdateTitle(string title) => Native.SetWindowText(_handle, title);
@@ -225,6 +186,8 @@ internal sealed class CmdConsole
     }
 
     public int MessageBox(string caption, string message, uint type) => Native.MessageBox(_handle, message, caption, type | 0x00001000 | 0x00040000);
+
+    public bool IsKeyPressed(in NexusKey key) => (Native.GetAsyncKeyState((int)key) & 0x8000) != 0;
 
     private DefaultConsole SaveDefaultConsole(in bool newlyAllocated)
     {
@@ -362,8 +325,6 @@ internal sealed class CmdConsole
 
         Buffer.ChangeDimensions(csbe.dwSize.X, csbe.dwSize.Y);
     }
-
-    private static bool IsKeyPressed(in NexusKey key) => (Native.GetAsyncKeyState((int)key) & 0b1000) != 0;
 
     private static ReadOnlySpan<NexusKey> GetMouseButtons(in uint buttonState)
     {

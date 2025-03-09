@@ -2,9 +2,6 @@
 
 internal static class Extensions
 {
-    public static bool FastHasFlag(this NexusInputType type, NexusInputType flag)
-        => (type & flag) != NexusInputType.None;
-
     public static bool IsInRange(in this NexusCoord coord, in NexusCoord start, in NexusCoord end)
         => coord.X >= start.X && coord.Y >= start.Y && coord.X <= end.X && coord.Y <= end.Y;
 

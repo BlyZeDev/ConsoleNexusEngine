@@ -38,10 +38,10 @@ public sealed class Game : NexusConsoleGame
         Settings.Font = new NexusFont("Terminal", new NexusSize(10));
         Settings.ColorPalette = new CGAColorPalette();
 
-        _everySecond = NexusUpdate.DoEvery(TimeSpan.FromMicroseconds(1), (inputs) =>
+        _everySecond = NexusUpdate.DoEvery(TimeSpan.FromMicroseconds(1), () =>
         {
             Graphic.Clear();
-            DebugView(inputs);
+            DebugView();
             Graphic.Render();
         });
         _sound = new NexusSound(@"C:\Users\leons\Downloads\testaudio.mp3", new NexusVolume(50), true);
@@ -53,17 +53,18 @@ public sealed class Game : NexusConsoleGame
         _sound.Play();
     }
 
-    protected override void Update(NexusInputCollection inputs)
+    protected override void Update()
     {
         _everySecond.Update(DeltaTime);
+        Input.Update();
 
-        if (inputs.Keys.Contains(NexusKey.Return))
+        if (Input.Keys.Contains(NexusKey.Return))
         {
-            _sfx.Play();
+            _sfx.Play(true);
         }
 
-        if (inputs.Keys.Contains(NexusKey.Up)) _sound.Volume += 5;
-        if (inputs.Keys.Contains(NexusKey.Down)) _sound.Volume -= 5;
+        if (Input.Keys.Contains(NexusKey.Up)) _sound.Volume += 5;
+        if (Input.Keys.Contains(NexusKey.Down)) _sound.Volume -= 5;
     }
 
     protected override void OnCrash(Exception exception)
@@ -76,9 +77,9 @@ public sealed class Game : NexusConsoleGame
 
     }
 
-    private void DebugView(in NexusInputCollection inputs)
+    private void DebugView()
     {
-        var gamepad = inputs.Gamepads[0];
+        var gamepad = Input.Gamepad1;
 
         Graphic.ClearRow(0);
         Graphic.ClearRow(1);

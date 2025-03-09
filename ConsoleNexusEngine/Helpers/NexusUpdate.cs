@@ -10,10 +10,10 @@ public sealed class NexusUpdate
     private const double Hour = 3600;
 
     private readonly double _intervalSeconds;
-    private readonly Action<NexusInputCollection> _action;
+    private readonly Action _action;
     private double timeSince;
 
-    private NexusUpdate(in double intervalSeconds, Action<NexusInputCollection> action)
+    private NexusUpdate(in double intervalSeconds, Action action)
     {
         _intervalSeconds = intervalSeconds;
         _action = action;
@@ -26,7 +26,7 @@ public sealed class NexusUpdate
     /// </summary>
     /// <param name="interval">The interval to invoke <paramref name="action"/></param>
     /// <param name="action">The action to invoke</param>
-    public static NexusUpdate DoEvery(in TimeSpan interval, Action<NexusInputCollection> action)
+    public static NexusUpdate DoEvery(in TimeSpan interval, Action action)
         => new NexusUpdate(interval.TotalSeconds, action);
 
     /// <summary>
@@ -35,14 +35,14 @@ public sealed class NexusUpdate
     /// <param name="frequency">The amount of times in an <paramref name="interval"/></param>
     /// <param name="interval">The interval to invoke <paramref name="action"/></param>
     /// <param name="action">The action to invoke</param>
-    public static NexusUpdate DoEvery(in int frequency, in TimeSpan interval, Action<NexusInputCollection> action)
+    public static NexusUpdate DoEvery(in int frequency, in TimeSpan interval, Action action)
         => new NexusUpdate(interval.TotalSeconds / frequency, action);
 
     /// <summary>
     /// Invokes <paramref name="action"/> every second
     /// </summary>
     /// <param name="action">The action to invoke</param>
-    public static NexusUpdate DoEverySecond(Action<NexusInputCollection> action)
+    public static NexusUpdate DoEverySecond(Action action)
         => new NexusUpdate(Second, action);
 
     /// <summary>
@@ -50,14 +50,14 @@ public sealed class NexusUpdate
     /// </summary>
     /// <param name="frequency">The amount of times in a second</param>
     /// <param name="action">The action to invoke</param>
-    public static NexusUpdate DoEverySecond(in int frequency, Action<NexusInputCollection> action)
+    public static NexusUpdate DoEverySecond(in int frequency, Action action)
         => new NexusUpdate(Second / frequency, action);
 
     /// <summary>
     /// Invokes <paramref name="action"/> every minute
     /// </summary>
     /// <param name="action">The action to invoke</param>
-    public static NexusUpdate DoEveryMinute(Action<NexusInputCollection> action)
+    public static NexusUpdate DoEveryMinute(Action action)
         => new NexusUpdate(Minute, action);
 
     /// <summary>
@@ -65,14 +65,14 @@ public sealed class NexusUpdate
     /// </summary>
     /// <param name="frequency">The amount of times in a minute</param>
     /// <param name="action">The action to invoke</param>
-    public static NexusUpdate DoEveryMinute(in int frequency, Action<NexusInputCollection> action)
+    public static NexusUpdate DoEveryMinute(in int frequency, Action action)
         => new NexusUpdate(Minute / frequency, action);
 
     /// <summary>
     /// Invokes <paramref name="action"/> every hour
     /// </summary>
     /// <param name="action">The action to invoke</param>
-    public static NexusUpdate DoEveryHour(Action<NexusInputCollection> action)
+    public static NexusUpdate DoEveryHour(Action action)
         => new NexusUpdate(Hour, action);
 
     /// <summary>
@@ -80,11 +80,11 @@ public sealed class NexusUpdate
     /// </summary>
     /// <param name="frequency">The amount of times in an hour</param>
     /// <param name="action">The action to invoke</param>
-    public static NexusUpdate DoEveryHour(in int frequency, Action<NexusInputCollection> action)
+    public static NexusUpdate DoEveryHour(in int frequency, Action action)
         => new NexusUpdate(Hour / frequency, action);
 
     /// <summary>
-    /// Call this inside <see cref="NexusConsoleGame.Update(NexusInputCollection)"/>
+    /// Call this inside <see cref="NexusConsoleGame.Update"/>
     /// </summary>
     /// <param name="deltaTime">Pass <see cref="NexusConsoleGame.DeltaTime"/> here</param>
     public void Update(in double deltaTime)
@@ -95,24 +95,7 @@ public sealed class NexusUpdate
         {
             timeSince -= _intervalSeconds;
 
-            _action(NexusInputCollection.Empty);
-        }
-    }
-
-    /// <summary>
-    /// Call this inside <see cref="NexusConsoleGame.Update(NexusInputCollection)"/>
-    /// </summary>
-    /// <param name="deltaTime">Pass <see cref="NexusConsoleGame.DeltaTime"/> here</param>
-    /// <param name="inputs">Pass the input collection from <see cref="NexusConsoleGame.Update(NexusInputCollection)"/> here</param>
-    public void Update(in double deltaTime, in NexusInputCollection inputs)
-    {
-        timeSince += deltaTime;
-
-        if (timeSince >= _intervalSeconds)
-        {
-            timeSince -= _intervalSeconds;
-
-            _action(inputs);
+            _action();
         }
     }
 }

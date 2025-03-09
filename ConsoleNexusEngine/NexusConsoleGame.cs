@@ -36,6 +36,11 @@ public abstract class NexusConsoleGame : IDisposable
     protected NexusConsoleGraphic Graphic { get; }
 
     /// <summary>
+    /// Contains all input information
+    /// </summary>
+    protected NexusConsoleInput Input { get; }
+
+    /// <summary>
     /// Provides useful utility functions
     /// </summary>
     protected NexusConsoleGameUtil Utility { get; }
@@ -87,10 +92,11 @@ public abstract class NexusConsoleGame : IDisposable
         IsRunning = false;
 
         _cts = new CancellationTokenSource();
-        _console = new CmdConsole(NexusConsoleGameSettings.Default, _cts);
+        _console = new CmdConsole(NexusConsoleGameSettings.Default);
 
         Settings = NexusConsoleGameSettings.Default;
         Graphic = new NexusConsoleGraphic(_console);
+        Input = new NexusConsoleInput(_console);
         Utility = new NexusConsoleGameUtil(_console, Settings);
 
         Settings.Updated += OnSettingsUpdated;
@@ -147,8 +153,7 @@ public abstract class NexusConsoleGame : IDisposable
     /// <summary>
     /// Called every frame
     /// </summary>
-    /// <param name="inputs">The inputs made during the last frame</param>
-    protected abstract void Update(NexusInputCollection inputs);
+    protected abstract void Update();
 
     /// <summary>
     /// Called if a fatal exception happens and the game is about to crash
@@ -189,7 +194,9 @@ public abstract class NexusConsoleGame : IDisposable
                 frameCount = 0;
             }
 
-            Update(_console.ReadInput(Settings.StopGameKey, Settings.InputTypes));
+            Update();
+
+            if (_console.IsKeyPressed(Settings.StopGameKey)) _cts.Cancel();
         }
     }
 
@@ -200,6 +207,7 @@ public abstract class NexusConsoleGame : IDisposable
             case nameof(NexusConsoleGameSettings.Title): _console.UpdateTitle(Settings.Title); break;
             case nameof(NexusConsoleGameSettings.ColorPalette): _console.UpdateColorPalette(Settings.ColorPalette); break;
             case nameof(NexusConsoleGameSettings.Font): _console.UpdateFont(Settings.Font); break;
+            case nameof(NexusConsoleGameSettings.StopGameKey): _console.StopGameKey = Settings.StopGameKey; break;
         }
     }
 
