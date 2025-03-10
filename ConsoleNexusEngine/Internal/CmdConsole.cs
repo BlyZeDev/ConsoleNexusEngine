@@ -3,7 +3,6 @@
 using System.Collections.Immutable;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading;
 
 internal sealed class CmdConsole
 {
@@ -20,6 +19,8 @@ internal sealed class CmdConsole
     private readonly nint _standardInput;
     private readonly nint _standardOutput;
 
+    private readonly ImmutableArray<NexusKey> _mouseWheels;
+    private readonly ImmutableArray<NexusKey> _mouseButtons;
     private readonly DefaultConsole _defaultConsole;
 
     public ConsoleBuffer Buffer { get; }
@@ -41,6 +42,21 @@ internal sealed class CmdConsole
         _standardInput = Native.GetStdHandle(STD_INPUT);
         _standardOutput = Native.GetStdHandle(STD_OUTPUT);
 
+        _mouseWheels =
+        [
+            NexusKey.MouseWheelLeft,
+            NexusKey.MouseWheelRight,
+            NexusKey.MouseWheelDown,
+            NexusKey.MouseWheelUp
+        ];
+        _mouseButtons =
+        [
+            NexusKey.MouseLeft,
+            NexusKey.MouseMiddle,
+            NexusKey.MouseRight,
+            NexusKey.XButton1,
+            NexusKey.XButton2
+        ];
         _defaultConsole = SaveDefaultConsole(needsAllocation);
 
         var size = Initialize(settings);
@@ -48,19 +64,18 @@ internal sealed class CmdConsole
         Buffer = new ConsoleBuffer(_standardOutput, size.Width, size.Height);
     }
 
-    public void ReadKeyboardMouseInput(NexusKeyCollection collection, ref NexusCoord currentMousePos)
+    public void ReadKeyboardMouseInput(HashSet<NexusKey> currentPressedKeys, ref NexusCoord currentMousePos)
     {
-        collection.RemoveWhere(key => !IsKeyPressed(key));
+        currentPressedKeys.ExceptWith(_mouseWheels);
 
         Native.GetNumberOfConsoleInputEvents(_standardInput, out var numEventsRead);
-
-        if (numEventsRead == 0 && collection.Count == 0) return;
+        if (numEventsRead == 0) return;
 
         var buffer = new INPUT_RECORD[numEventsRead];
 
         Native.PeekConsoleInput(_standardInput, buffer, numEventsRead, out _);
         Native.FlushConsoleInputBuffer(_standardInput);
-
+        
         foreach (var input in buffer.AsSpan())
         {
             switch (input.EventType)
@@ -68,7 +83,8 @@ internal sealed class CmdConsole
                 case 1:
                     var key = (NexusKey)input.KeyEvent.VirtualKeyCode;
 
-                    collection.Add(key);
+                    if (input.KeyEvent.KeyDown) currentPressedKeys.Add(key);
+                    else currentPressedKeys.Remove(key);
                     break;
 
                 case 2:
@@ -82,9 +98,10 @@ internal sealed class CmdConsole
                         _ => GetMouseButtons(input.MouseEvent.ButtonState)
                     };
 
+                    currentPressedKeys.ExceptWith(_mouseButtons);
                     foreach (var mouseKey in mouseKeys)
                     {
-                        collection.Add(mouseKey);
+                        currentPressedKeys.Add(mouseKey);
                     }
                     break;
             }
@@ -186,8 +203,6 @@ internal sealed class CmdConsole
     }
 
     public int MessageBox(string caption, string message, uint type) => Native.MessageBox(_handle, message, caption, type | 0x00001000 | 0x00040000);
-
-    public bool IsKeyPressed(in NexusKey key) => (Native.GetAsyncKeyState((int)key) & 0x8000) != 0;
 
     private DefaultConsole SaveDefaultConsole(in bool newlyAllocated)
     {
@@ -328,13 +343,15 @@ internal sealed class CmdConsole
 
     private static ReadOnlySpan<NexusKey> GetMouseButtons(in uint buttonState)
     {
-        if (buttonState is 0) return [];
+        if (buttonState == 0) return [];
 
         var builder = new SpanBuilder<NexusKey>();
 
-        if ((buttonState & 0b0001) != 0) builder.Append(NexusKey.MouseLeft);
-        if ((buttonState & 0b0010) != 0) builder.Append(NexusKey.MouseRight);
-        if ((buttonState & 0b0100) != 0) builder.Append(NexusKey.MouseMiddle);
+        if ((buttonState & 0x01) != 0) builder.Append(NexusKey.MouseLeft);
+        if ((buttonState & 0x02) != 0) builder.Append(NexusKey.MouseRight);
+        if ((buttonState & 0x04) != 0) builder.Append(NexusKey.MouseMiddle);
+        if ((buttonState & 0x08) != 0) builder.Append(NexusKey.XButton1);
+        if ((buttonState & 0x10) != 0) builder.Append(NexusKey.XButton2);
 
         return builder.AsReadOnlySpan();
     }

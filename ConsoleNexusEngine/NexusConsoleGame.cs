@@ -196,7 +196,7 @@ public abstract class NexusConsoleGame : IDisposable
 
             Update();
 
-            if (_console.IsKeyPressed(Settings.StopGameKey)) _cts.Cancel();
+            if (IsKeyPressed(Settings.StopGameKey)) _cts.Cancel();
         }
     }
 
@@ -218,4 +218,6 @@ public abstract class NexusConsoleGame : IDisposable
 
         return (double)timestamp / frequency;
     }
+
+    private static bool IsKeyPressed(in NexusKey key) => (Native.GetAsyncKeyState((int)key) & 0x8000) != 0;
 }

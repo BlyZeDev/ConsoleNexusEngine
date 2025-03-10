@@ -5,6 +5,7 @@ using ConsoleNexusEngine.Graphics;
 using ConsoleNexusEngine.Helpers;
 using ConsoleNexusEngine.IO;
 using ConsoleNexusEngine.Sound;
+using System.Diagnostics;
 
 sealed class Program
 {
@@ -30,8 +31,6 @@ sealed class Program
 public sealed class Game : NexusConsoleGame
 {
     private readonly NexusUpdate _everySecond;
-    private readonly NexusSound _sound;
-    private readonly NexusSound _sfx;
 
     public Game()
     {
@@ -44,27 +43,17 @@ public sealed class Game : NexusConsoleGame
             DebugView();
             Graphic.Render();
         });
-        _sound = new NexusSound(@"C:\Users\leons\Downloads\testaudio.mp3", new NexusVolume(50), true);
-        _sfx = new NexusSound(@"C:\Users\leons\Downloads\sfx.wav", new NexusVolume(25), false);
     }
 
     protected override void Load()
     {
-        _sound.Play();
+
     }
 
     protected override void Update()
     {
         _everySecond.Update(DeltaTime);
         Input.Update();
-
-        if (Input.Keys.Contains(NexusKey.Return))
-        {
-            _sfx.Play(true);
-        }
-
-        if (Input.Keys.Contains(NexusKey.Up)) _sound.Volume += 5;
-        if (Input.Keys.Contains(NexusKey.Down)) _sound.Volume -= 5;
     }
 
     protected override void OnCrash(Exception exception)

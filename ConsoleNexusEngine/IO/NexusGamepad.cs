@@ -1,5 +1,6 @@
 ﻿namespace ConsoleNexusEngine.IO;
 
+using System.Collections.Immutable;
 using System.Timers;
 
 /// <summary>
@@ -12,7 +13,7 @@ public readonly record struct NexusGamepad
     /// </summary>
     public const int MaxGamepads = 4;
 
-    private static readonly Timer[] _vibrationTimers;
+    private static readonly ImmutableArray<Timer> _vibrationTimers;
 
     static NexusGamepad()
     {
@@ -177,6 +178,6 @@ public readonly record struct NexusGamepad
 
         _ = Native.XInputSetState(_id, ref vibration);
 
-        _vibrationTimers[_id].Start();
+        _vibrationTimers[(int)_id].Start();
     }
 }
