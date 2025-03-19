@@ -8,13 +8,13 @@ internal static class Extensions
     public static bool IsInRange(in this NexusCoord coord, in NexusCoord start, in NexusSize range)
         => coord.X >= start.X && coord.Y >= start.Y && coord.X <= start.X + range.Width && coord.Y <= start.Y + range.Height;
 
-    public static int GetKey(this IReadOnlyList<NexusColor> colors, in NexusColor color)
+    public static IEnumerable<int> GetKeys(this IReadOnlyList<NexusColor> colors, NexusColor color)
     {
         for (int i = 0; i < colors.Count; i++)
         {
-            if (colors[i] == color) return i;
+            if (colors[i] == color) yield return i;
         }
 
-        return -1;
+        yield return -1;
     }
 }

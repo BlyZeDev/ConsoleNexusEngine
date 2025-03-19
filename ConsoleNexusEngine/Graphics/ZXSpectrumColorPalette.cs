@@ -25,5 +25,5 @@ public sealed record ZXSpectrumColorPalette : NexusColorPalette
         new NexusColor(0xFFFF00),
         new NexusColor(0xD8D8D8),
         new NexusColor(0xFFFFFF),
-        new NexusColor(0xF0F0F0)];
+        new NexusColor(0x000000)];
 }

@@ -5,12 +5,12 @@ using System.Collections.Immutable;
 using System.Linq;
 
 /// <summary>
-/// Represents a color palette with 16 unique colors for the console
+/// Represents a color palette with 16 colors for the console
 /// </summary>
 public abstract record NexusColorPalette : IEnumerable<NexusColor>
 {
     /// <summary>
-    /// The maximum amount of different colors that can be in a color palette
+    /// The maximum amount of colors that can be in a color palette
     /// </summary>
     public const int MaxColorCount = 16;
 
@@ -115,19 +115,29 @@ public abstract record NexusColorPalette : IEnumerable<NexusColor>
             throw new NullReferenceException($"{nameof(Colors)} was default");
         
         if (Colors.Length != MaxColorCount)
-            throw new InvalidOperationException($"{nameof(Colors)} must contain exactly 16 unique colors");
-
-        if (new HashSet<NexusColor>(Colors).Count != MaxColorCount)
-            throw new InvalidOperationException($"{nameof(Colors)} must contain exactly 16 unique colors");
+            throw new InvalidOperationException($"{nameof(Colors)} must contain exactly 16 colors");
     }
 
     /// <summary>
-    /// Get the index of the specified color or <see cref="NexusColorIndex.Invalid"/> if not found
+    /// Get the first index of the specified color or <see cref="NexusColorIndex.Invalid"/> if not found
     /// </summary>
     /// <param name="color">The color to check for</param>
     /// <returns><see cref="NexusColorIndex"/></returns>
     public NexusColorIndex GetIndex(in NexusColor color)
-        => NexusColorIndex.UnClamped(Colors.GetKey(color));
+        => NexusColorIndex.UnClamped(Colors.GetKeys(color).First());
+
+    /// <summary>
+    /// Get all indices of the specified color or <see cref="Enumerable.Empty{TResult}"/> if not found
+    /// </summary>
+    /// <param name="color">The color to check for</param>
+    /// <returns><see cref="IEnumerable{NexusColorIndex}"/> of <see cref="NexusColorIndex"/></returns>
+    public IEnumerable<NexusColorIndex> GetIndices(NexusColor color)
+    {
+        foreach (var index in Colors.GetKeys(color))
+        {
+            yield return NexusColorIndex.UnClamped(index);
+        }
+    }
 
     /// <summary>
     /// Get the color at a specific index

@@ -25,5 +25,5 @@ public sealed record MSXColorPalette : NexusColorPalette
         new NexusColor(0x7E75F0),
         new NexusColor(0x64DAEE),
         new NexusColor(0xB565B3),
-        new NexusColor(0xF0F0F0)];
+        new NexusColor(0x000000)];
 }
