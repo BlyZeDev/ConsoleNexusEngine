@@ -75,10 +75,9 @@ public sealed class Game : NexusConsoleGame
         Graphic.DrawText(new NexusCoord(0, 7), new NexusText("Left Thumb Y: " + gamepad.LeftThumbY, NexusColorIndex.Color8));
         Graphic.DrawText(new NexusCoord(0, 8), new NexusText("Right Thumb X: " + gamepad.RightThumbX, NexusColorIndex.Color9));
         Graphic.DrawText(new NexusCoord(0, 9), new NexusText("Right Thumb Y: " + gamepad.RightThumbY, NexusColorIndex.Color10));
-        Graphic.DrawText(new NexusCoord(0, 10), new NexusText("FPS: " + FramesPerSecond + " FPS", NexusColorIndex.Color3));
+        Graphic.DrawText(new NexusCoord(0, 10), new NexusText("FPS: " + FramesPerSecond, NexusColorIndex.Color3));
         Graphic.DrawText(new NexusCoord(0, 11), new NexusText("Width: " + BufferSize.Width, NexusColorIndex.Color3));
         Graphic.DrawText(new NexusCoord(0, 12), new NexusText("Height: " + BufferSize.Height, NexusColorIndex.Color3));
-        Graphic.DrawText(new NexusCoord(0, 13), new NexusText("Counter: " + counter, NexusColorIndex.Color4));
 
         //Debug.WriteLine(DateTime.Now + " - " + (Input.Keys.IsDefaultOrEmpty ? "NO KEY IS PRESSED" : string.Join(',', Input.Keys)) + " - " + Input.MousePosition);
     }

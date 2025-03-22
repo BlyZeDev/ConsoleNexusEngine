@@ -116,29 +116,24 @@ public abstract class NexusConsoleGame : IDisposable
         _cts.Token.WaitHandle.WaitOne();
     }
 
-    /// <summary>
-    /// Stops the game
-    /// </summary>
-    public void Stop()
-    {
-        _cts.Cancel();
-
-        CleanUp();
-
-        _console.ResetToDefault();
-    }
-
     /// <inheritdoc/>
     public void Dispose()
     {
-        if (IsRunning) Stop();
+        Stop();
+        CleanUp();
+
+        _console.ResetToDefault();
 
         _cts.Dispose();
-
         GC.SuppressFinalize(this);
 
         hasInstance = false;
     }
+
+    /// <summary>
+    /// Stops the game
+    /// </summary>
+    protected void Stop() => _cts.Cancel();
 
     /// <summary>
     /// Called once before the start of the game.<br/>

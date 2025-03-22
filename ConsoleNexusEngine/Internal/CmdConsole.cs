@@ -69,55 +69,51 @@ internal sealed class CmdConsole
         Native.PeekConsoleInput(_standardInput, bufferPtr, numEventsRead, out _);
         Native.FlushConsoleInputBuffer(_standardInput);
 
-        var builder = ImmutableArray.CreateBuilder<NexusKey>(numEventsRead);
         for (int i = 0; i < numEventsRead; i++)
         {
             ref var current = ref bufferPtr[i];
 
-            switch (current.EventType)
+            if (current.EventType == 1)
             {
-                case 1:
-                    var key = (NexusKey)current.KeyEvent.VirtualKeyCode;
+                var key = (NexusKey)current.KeyEvent.VirtualKeyCode;
 
-                    if (current.KeyEvent.KeyDown) _currentlyPressedKeys.Add(key);
-                    else _currentlyPressedKeys.Remove(key);
-                    break;
+                if (current.KeyEvent.KeyDown) _currentlyPressedKeys.Add(key);
+                else _currentlyPressedKeys.Remove(key);
+            }
+            else if (current.EventType == 2)
+            {
+                currentMousePos = NativeConverter.ToNexusCoord(current.MouseEvent.MousePosition);
 
-                case 2:
-                    currentMousePos = NativeConverter.ToNexusCoord(current.MouseEvent.MousePosition);
+                switch (current.MouseEvent.EventFlags)
+                {
+                    case MOUSE_MOVED: break;
+                    case MOUSE_WHEELED: _currentlyPressedKeys.Add((current.MouseEvent.ButtonState & 0x80000000) == 0 ? NexusKey.MouseWheelUp : NexusKey.MouseWheelDown); break;
+                    case MOUSE_HWHEELED: _currentlyPressedKeys.Add((current.MouseEvent.ButtonState & 0x80000000) == 0 ? NexusKey.MouseWheelRight : NexusKey.MouseWheelLeft); break;
+                    default:
+                        {
+                            var buttonState = current.MouseEvent.ButtonState;
 
-                    switch (current.MouseEvent.EventFlags)
-                    {
-                        case MOUSE_MOVED: break;
-                        case MOUSE_WHEELED: _currentlyPressedKeys.Add((current.MouseEvent.ButtonState & 0x80000000) == 0 ? NexusKey.MouseWheelUp : NexusKey.MouseWheelDown); break;
-                        case MOUSE_HWHEELED: _currentlyPressedKeys.Add((current.MouseEvent.ButtonState & 0x80000000) == 0 ? NexusKey.MouseWheelRight : NexusKey.MouseWheelLeft); break;
-                        default:
-                            {
-                                var buttonState = current.MouseEvent.ButtonState;
+                            if ((buttonState & 0x01) == 0) _currentlyPressedKeys.Remove(NexusKey.MouseLeft);
+                            else _currentlyPressedKeys.Add(NexusKey.MouseLeft);
 
-                                if ((buttonState & 0x01) == 0) _currentlyPressedKeys.Remove(NexusKey.MouseLeft);
-                                else _currentlyPressedKeys.Add(NexusKey.MouseLeft);
+                            if ((buttonState & 0x02) == 0) _currentlyPressedKeys.Remove(NexusKey.MouseRight);
+                            else _currentlyPressedKeys.Add(NexusKey.MouseRight);
 
-                                if ((buttonState & 0x02) == 0) _currentlyPressedKeys.Remove(NexusKey.MouseRight);
-                                else _currentlyPressedKeys.Add(NexusKey.MouseRight);
+                            if ((buttonState & 0x04) == 0) _currentlyPressedKeys.Remove(NexusKey.MouseMiddle);
+                            else _currentlyPressedKeys.Add(NexusKey.MouseMiddle);
 
-                                if ((buttonState & 0x04) == 0) _currentlyPressedKeys.Remove(NexusKey.MouseMiddle);
-                                else _currentlyPressedKeys.Add(NexusKey.MouseMiddle);
+                            if ((buttonState & 0x08) == 0) _currentlyPressedKeys.Remove(NexusKey.XButton1);
+                            else _currentlyPressedKeys.Add(NexusKey.XButton1);
 
-                                if ((buttonState & 0x08) == 0) _currentlyPressedKeys.Remove(NexusKey.XButton1);
-                                else _currentlyPressedKeys.Add(NexusKey.XButton1);
-
-                                if ((buttonState & 0x10) == 0) _currentlyPressedKeys.Remove(NexusKey.XButton2);
-                                else _currentlyPressedKeys.Add(NexusKey.XButton2);
-                            }
-                            break;
-                    }
-                    break;
+                            if ((buttonState & 0x10) == 0) _currentlyPressedKeys.Remove(NexusKey.XButton2);
+                            else _currentlyPressedKeys.Add(NexusKey.XButton2);
+                        }
+                        break;
+                }
             }
         }
 
-        builder.AddRange(_currentlyPressedKeys);
-        return builder.DrainToImmutable();
+        return _currentlyPressedKeys.ToImmutableArray();
     }
 
     public void ReadGamepads(NexusGamepad[] gamepads)

@@ -64,7 +64,7 @@ internal sealed unsafe class ConsoleBuffer
             Unsafe.InitBlockUnaligned(ptr, 0, (uint)(charInfoBuffer.Length * sizeof(CHAR_INFO)));
         }
 
-        SetRenderArea(lastRendered.Left, lastRendered.Top, lastRendered.Right, lastRendered.Bottom);
+        needsRender = true;
     }
 
     public CHAR_INFO GetChar(in int x, in int y) => charInfoBuffer[IndexDimensions.Get1D(x, y, Width)];
@@ -111,6 +111,7 @@ internal sealed unsafe class ConsoleBuffer
 
     private void SetRenderArea(in int startX, in int startY, in int endX, in int endY)
     {
+        lastRendered = renderArea;
         renderArea.Left = (short)Math.Min(startX, renderArea.Left);
         renderArea.Top = (short)Math.Min(startY, renderArea.Top);
         renderArea.Right = (short)Math.Max(endX, renderArea.Right);
