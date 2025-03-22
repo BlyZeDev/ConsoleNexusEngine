@@ -8,7 +8,7 @@
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
     <Authors>BlyZe</Authors>
-    <Version>8.2.2</Version>
+    <Version>8.2.5</Version>
     <Title>$(AssemblyName)</Title>
     <Description>A powerful and easy to use engine to create console games</Description>
     <PackageProjectUrl>https://github.com/BlyZeYT/ConsoleNexus-Engine</PackageProjectUrl>
@@ -16,8 +16,8 @@
     <RepositoryUrl>https://github.com/BlyZeYT/ConsoleNexus-Engine</RepositoryUrl>
     <PackageTags>engine, console engine, blyze, console nexus, console nexus engine, nexus engine, console, console game</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageReleaseNotes>- Fixed Stop() not working correctly if called inside the game itself
-- Renamed StopGameKey to ForceStopKey</PackageReleaseNotes>
+    <PackageReleaseNotes>- Fixed: Input not being 100% accurate at times
+- Small optimizations</PackageReleaseNotes>
     <PackAsTool>False</PackAsTool>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <IncludeSymbols>True</IncludeSymbols>
