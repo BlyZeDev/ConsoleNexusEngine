@@ -202,7 +202,7 @@ internal sealed class CmdConsole
         Console.Clear();
     }
 
-    public int MessageBox(string caption, string message, uint type) => Native.MessageBox(_handle, message, caption, type | 0x00001000 | 0x00040000);
+    public int MessageBox(string caption, string message, in uint type) => Native.MessageBox(_handle, message, caption, type | 0x00001000 | 0x00040000);
 
     private DefaultConsole SaveDefaultConsole(in bool newlyAllocated)
     {

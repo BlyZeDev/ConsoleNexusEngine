@@ -3,9 +3,6 @@
 using ConsoleNexusEngine;
 using ConsoleNexusEngine.Graphics;
 using ConsoleNexusEngine.Helpers;
-using ConsoleNexusEngine.IO;
-using ConsoleNexusEngine.Sound;
-using System.Diagnostics;
 
 sealed class Program
 {
@@ -20,11 +17,10 @@ sealed class Program
         using (var game = new Game())
         {
             game.Start();
-
-            game.Stop();
         }
 
         Console.Write("Test");
+        Console.Clear();
     }
 }
 

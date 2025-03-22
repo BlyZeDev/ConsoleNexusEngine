@@ -10,7 +10,7 @@ public sealed record NexusConsoleGameSettings
     private string title;
     private NexusFont font;
     private NexusColorPalette colorPalette;
-    private NexusKey stopGameKey;
+    private NexusKey forceStopKey;
 
     /// <summary>
     /// The title the console should have
@@ -52,15 +52,15 @@ public sealed record NexusConsoleGameSettings
     }
 
     /// <summary>
-    /// The key that stops the game if pressed
+    /// The key that forces the game to stop if pressed
     /// </summary>
-    public NexusKey StopGameKey
+    public NexusKey ForceStopKey
     {
-        get => stopGameKey;
+        get => forceStopKey;
         set
         {
-            stopGameKey = value;
-            Update(nameof(StopGameKey));
+            forceStopKey = value;
+            Update(nameof(ForceStopKey));
         }
     }
 
@@ -71,7 +71,7 @@ public sealed record NexusConsoleGameSettings
         title = "ConsoleGame";
         font = new NexusFont("Terminal", new NexusSize(10));
         colorPalette = new DefaultColorPalette();
-        stopGameKey = NexusKey.Escape;
+        forceStopKey = NexusKey.Escape;
     }
 
     private void Update(string propertyName) => Updated?.Invoke(this, propertyName);

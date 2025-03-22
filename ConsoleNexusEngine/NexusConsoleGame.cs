@@ -48,12 +48,12 @@ public abstract class NexusConsoleGame : IDisposable
     /// <summary>
     /// <see langword="true"/> if the game is running, otherwise <see langword="false"/>
     /// </summary>
-    public bool IsRunning { get; private set; }
+    public bool IsRunning => !_cts.IsCancellationRequested;
 
     /// <summary>
     /// The total amount of rendered frames
     /// </summary>
-    public int TotalFrameCount { get; private set; }
+    public uint TotalFrameCount { get; private set; }
 
     /// <summary>
     /// The time elapsed since the last frame in total seconds
@@ -89,8 +89,6 @@ public abstract class NexusConsoleGame : IDisposable
 
         hasInstance = true;
 
-        IsRunning = false;
-
         _cts = new CancellationTokenSource();
         _console = new CmdConsole(NexusConsoleGameSettings.Default);
 
@@ -103,15 +101,13 @@ public abstract class NexusConsoleGame : IDisposable
     }
 
     /// <summary>
-    /// Starts the game and pauses the current thread while the game is running until the <see cref="NexusConsoleGameSettings.StopGameKey"/> is pressed
+    /// Starts the game and pauses the current thread while the game is running until the <see cref="NexusConsoleGameSettings.ForceStopKey"/> is pressed
     /// </summary>
     public void Start()
     {
         if (_cts.IsCancellationRequested) throw new NexusEngineException("Can't restart a console game");
 
         Load();
-
-        IsRunning = true;
 
         StartTime = DateTimeOffset.Now.DateTime;
 
@@ -125,7 +121,7 @@ public abstract class NexusConsoleGame : IDisposable
     /// </summary>
     public void Stop()
     {
-        IsRunning = false;
+        _cts.Cancel();
 
         CleanUp();
 
@@ -196,7 +192,7 @@ public abstract class NexusConsoleGame : IDisposable
 
             Update();
 
-            if (IsKeyPressed(Settings.StopGameKey)) _cts.Cancel();
+            if (IsKeyPressed(Settings.ForceStopKey)) _cts.Cancel();
         }
     }
 
@@ -207,7 +203,7 @@ public abstract class NexusConsoleGame : IDisposable
             case nameof(NexusConsoleGameSettings.Title): _console.UpdateTitle(Settings.Title); break;
             case nameof(NexusConsoleGameSettings.ColorPalette): _console.UpdateColorPalette(Settings.ColorPalette); break;
             case nameof(NexusConsoleGameSettings.Font): _console.UpdateFont(Settings.Font); break;
-            case nameof(NexusConsoleGameSettings.StopGameKey): _console.StopGameKey = Settings.StopGameKey; break;
+            case nameof(NexusConsoleGameSettings.ForceStopKey): _console.StopGameKey = Settings.ForceStopKey; break;
         }
     }
 
