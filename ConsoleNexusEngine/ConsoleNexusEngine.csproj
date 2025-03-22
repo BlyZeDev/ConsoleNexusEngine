@@ -8,7 +8,7 @@
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
     <Authors>BlyZe</Authors>
-    <Version>8.2.1</Version>
+    <Version>8.2.2</Version>
     <Title>$(AssemblyName)</Title>
     <Description>A powerful and easy to use engine to create console games</Description>
     <PackageProjectUrl>https://github.com/BlyZeYT/ConsoleNexus-Engine</PackageProjectUrl>
@@ -16,11 +16,8 @@
     <RepositoryUrl>https://github.com/BlyZeYT/ConsoleNexus-Engine</RepositoryUrl>
     <PackageTags>engine, console engine, blyze, console nexus, console nexus engine, nexus engine, console, console game</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageReleaseNotes>- ColorPalette colors no longer have to be unique
-- All behaviour that depended on this now just return the first found index of the searched color
-- Added GetIndices to NexusColorPalette to get all indices of a searched color
-
-- Bumped System.Drawing,Common to 9.0.3</PackageReleaseNotes>
+    <PackageReleaseNotes>- Fixed Stop() not working correctly if called inside the game itself
+- Renamed StopGameKey to ForceStopKey</PackageReleaseNotes>
     <PackAsTool>False</PackAsTool>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <IncludeSymbols>True</IncludeSymbols>
