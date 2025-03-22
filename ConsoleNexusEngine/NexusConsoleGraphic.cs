@@ -18,7 +18,7 @@ public sealed partial class NexusConsoleGraphic
     {
         ThrowIfOutOfBounds(coordinate);
 
-        return Converter.ToNexusChar(_console.Buffer.GetChar(coordinate.X, coordinate.Y));
+        return NativeConverter.ToNexusChar(_console.Buffer.GetChar(coordinate.X, coordinate.Y));
     }
 
     /// <summary>

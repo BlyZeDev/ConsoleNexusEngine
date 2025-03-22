@@ -33,7 +33,7 @@ public sealed partial class NexusConsoleGraphic
     private void SetChar(in NexusCoord coordinate, in NexusChar character)
         => SetChar(coordinate.X, coordinate.Y, character);
 
-    private void SetChar(in int x, in int y, in NexusChar character) => _console.Buffer.SetChar(x, y, Converter.ToCharInfo(character));
+    private void SetChar(in int x, in int y, in NexusChar character) => _console.Buffer.SetChar(x, y, NativeConverter.ToCharInfo(character));
 
     private void ThrowIfOutOfBounds(in NexusCoord coord)
         => ThrowIfOutOfBounds(coord.X, coord.Y);

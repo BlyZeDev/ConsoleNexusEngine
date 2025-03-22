@@ -1,6 +1,6 @@
 ﻿namespace ConsoleNexusEngine.Internal;
 
-internal static class Converter
+internal static class NativeConverter
 {
     public static CHAR_INFO ToCharInfo(in NexusChar character) => ToCharInfo(character.Value, character.Foreground, character.Background);
 
@@ -15,4 +15,6 @@ internal static class Converter
 
     public static NexusChar ToNexusChar(CHAR_INFO charInfo)
         => new NexusChar(charInfo.UnicodeChar, new NexusColorIndex(charInfo.Attributes & 0x0F), new NexusColorIndex((charInfo.Attributes >> 4) & 0x0F));
+
+    public static NexusCoord ToNexusCoord(COORD coord) => new NexusCoord(coord.X, coord.Y);
 }

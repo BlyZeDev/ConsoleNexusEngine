@@ -23,6 +23,7 @@ internal sealed unsafe class ConsoleBuffer
 
     private bool needsRender;
     private SMALL_RECT renderArea;
+    private SMALL_RECT lastRendered;
 
     public short Width { get; private set; }
     public short Height { get; private set; }
@@ -43,6 +44,7 @@ internal sealed unsafe class ConsoleBuffer
             Right = Width,
             Bottom = Height
         };
+        lastRendered = renderArea;
     }
 
     public void ChangeDimensions(in int width, in int height)
@@ -62,14 +64,14 @@ internal sealed unsafe class ConsoleBuffer
             Unsafe.InitBlockUnaligned(ptr, 0, (uint)(charInfoBuffer.Length * sizeof(CHAR_INFO)));
         }
 
-        needsRender = true;
+        SetRenderArea(lastRendered.Left, lastRendered.Top, lastRendered.Right, lastRendered.Bottom);
     }
 
-    public CHAR_INFO GetChar(in int x, in int y) => charInfoBuffer[MathHelper.GetIndex(x, y, Width)];
+    public CHAR_INFO GetChar(in int x, in int y) => charInfoBuffer[IndexDimensions.Get1D(x, y, Width)];
 
     public void SetChar(in int x, in int y, CHAR_INFO character)
     {
-        ref var current = ref charInfoBuffer[MathHelper.GetIndex(x, y, Width)];
+        ref var current = ref charInfoBuffer[IndexDimensions.Get1D(x, y, Width)];
 
         if (Unsafe.ReadUnaligned<long>(Unsafe.AsPointer(ref current)) == Unsafe.ReadUnaligned<long>(&character))
             return;
@@ -103,6 +105,7 @@ internal sealed unsafe class ConsoleBuffer
                 (SMALL_RECT*)Unsafe.AsPointer(ref renderArea));
         }
 
+        lastRendered = renderArea;
         renderArea = _defaultRenderArea;
     }
 

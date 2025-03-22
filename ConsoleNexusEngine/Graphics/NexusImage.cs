@@ -125,7 +125,7 @@ public readonly struct NexusImage : ISprite
                     {
                         pixel = row + x * pixelSize;
 
-                        pixels[x, y] = Converter.ToCharInfo(
+                        pixels[x, y] = NativeConverter.ToCharInfo(
                             GetAlphaLevel(pixel[3]),
                             processor.Process(new NexusColor(pixel[2], pixel[1], pixel[0])),
                             0);

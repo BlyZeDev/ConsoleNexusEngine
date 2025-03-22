@@ -73,11 +73,11 @@ public readonly struct NexusEllipse : INexusShape, ISprite
     private static ReadOnlyMemory2D<CHAR_INFO> CreateSprite(Bitmap bitmap, in NexusChar character)
     {
         var sprite = new Memory2D<CHAR_INFO>(bitmap.Width, bitmap.Height);
-        var charInfo = Converter.ToCharInfo(character);
+        var charInfo = NativeConverter.ToCharInfo(character);
 
         unsafe
         {
-            var data = bitmap.LockBitsReadOnly();
+            var data = bitmap.LockBitsReadOnly(PixelFormat.Format16bppRgb555);
             var pixelSize = Image.GetPixelFormatSize(PixelFormat.Format16bppRgb555) / 8;
 
             var scan0 = (byte*)data.Scan0;

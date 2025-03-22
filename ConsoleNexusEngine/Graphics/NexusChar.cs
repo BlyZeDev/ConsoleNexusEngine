@@ -51,7 +51,7 @@ public readonly record struct NexusChar : ISprite
         Foreground = foreground;
         Background = background;
 
-        _sprite = new ReadOnlyMemory2D<CHAR_INFO>(Converter.ToCharInfo(this));
+        _sprite = new ReadOnlyMemory2D<CHAR_INFO>(NativeConverter.ToCharInfo(this));
     }
 
     /// <summary>

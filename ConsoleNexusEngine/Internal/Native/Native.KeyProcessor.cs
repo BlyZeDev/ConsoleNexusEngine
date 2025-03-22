@@ -2,7 +2,7 @@
 
 using System.Runtime.InteropServices;
 
-internal static partial class Native
+internal static unsafe partial class Native
 {
     [LibraryImport(User32)]
     public static partial short GetAsyncKeyState(int vKey);
@@ -13,7 +13,7 @@ internal static partial class Native
 
     [DllImport(Kernel32)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static extern bool PeekConsoleInput(nint hConsoleInput, [Out] INPUT_RECORD[] lpBuffer, int nLength, out int lpNumberOfEventsRead);
+    public static extern bool PeekConsoleInput(nint hConsoleInput, [Out] INPUT_RECORD* lpBuffer, int nLength, out int lpNumberOfEventsRead);
 
     [LibraryImport(Kernel32)]
     [return: MarshalAs(UnmanagedType.Bool)]

@@ -121,7 +121,7 @@ public sealed record NexusFiggleText : ISprite
         {
             for (int y = 0; y < sprite.Height; y++)
             {
-                sprite[x, y] = Converter.ToCharInfo(text[y][x], foreground, background);
+                sprite[x, y] = NativeConverter.ToCharInfo(text[y][x], foreground, background);
             }
         }
 

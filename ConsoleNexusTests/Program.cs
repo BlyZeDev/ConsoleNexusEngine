@@ -26,19 +26,12 @@ sealed class Program
 
 public sealed class Game : NexusConsoleGame
 {
-    private readonly NexusUpdate _everySecond;
+    private int counter;
 
     public Game()
     {
         Settings.Font = new NexusFont("Terminal", new NexusSize(10));
         Settings.ColorPalette = new CGAColorPalette();
-
-        _everySecond = NexusUpdate.DoEvery(TimeSpan.FromMicroseconds(1), () =>
-        {
-            Graphic.Clear();
-            DebugView();
-            Graphic.Render();
-        });
     }
 
     protected override void Load()
@@ -48,8 +41,14 @@ public sealed class Game : NexusConsoleGame
 
     protected override void Update()
     {
-        _everySecond.Update(DeltaTime);
         Input.Update();
+        Input.UpdateGamepads();
+
+        Graphic.Clear();
+
+        DebugView();
+
+        Graphic.Render();
     }
 
     protected override void OnCrash(Exception exception)
@@ -66,20 +65,6 @@ public sealed class Game : NexusConsoleGame
     {
         var gamepad = Input.Gamepad1;
 
-        Graphic.ClearRow(0);
-        Graphic.ClearRow(1);
-        Graphic.ClearRow(2);
-        Graphic.ClearRow(3);
-        Graphic.ClearRow(4);
-        Graphic.ClearRow(5);
-        Graphic.ClearRow(6);
-        Graphic.ClearRow(7);
-        Graphic.ClearRow(8);
-        Graphic.ClearRow(9);
-        Graphic.ClearRow(10);
-        Graphic.ClearRow(11);
-        Graphic.ClearRow(12);
-
         Graphic.DrawText(new NexusCoord(0, 0), new NexusText("Type: " + gamepad.Type, NexusColorIndex.Color1));
         Graphic.DrawText(new NexusCoord(0, 1), new NexusText("Battery Type: " + gamepad.BatteryType, NexusColorIndex.Color2));
         Graphic.DrawText(new NexusCoord(0, 2), new NexusText("Battery Level: " + gamepad.BatteryLevel, NexusColorIndex.Color8));
@@ -93,5 +78,8 @@ public sealed class Game : NexusConsoleGame
         Graphic.DrawText(new NexusCoord(0, 10), new NexusText("FPS: " + FramesPerSecond + " FPS", NexusColorIndex.Color3));
         Graphic.DrawText(new NexusCoord(0, 11), new NexusText("Width: " + BufferSize.Width, NexusColorIndex.Color3));
         Graphic.DrawText(new NexusCoord(0, 12), new NexusText("Height: " + BufferSize.Height, NexusColorIndex.Color3));
+        Graphic.DrawText(new NexusCoord(0, 13), new NexusText("Counter: " + counter, NexusColorIndex.Color4));
+
+        //Debug.WriteLine(DateTime.Now + " - " + (Input.Keys.IsDefaultOrEmpty ? "NO KEY IS PRESSED" : string.Join(',', Input.Keys)) + " - " + Input.MousePosition);
     }
 }

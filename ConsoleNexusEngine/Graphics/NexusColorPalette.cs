@@ -124,7 +124,7 @@ public abstract record NexusColorPalette : IEnumerable<NexusColor>
     /// <param name="color">The color to check for</param>
     /// <returns><see cref="NexusColorIndex"/></returns>
     public NexusColorIndex GetIndex(in NexusColor color)
-        => NexusColorIndex.UnClamped(Colors.GetKeys(color).First());
+        => NexusColorIndex.UnClamped(GetKeys(color).First());
 
     /// <summary>
     /// Get all indices of the specified color or <see cref="Enumerable.Empty{TResult}"/> if not found
@@ -133,7 +133,7 @@ public abstract record NexusColorPalette : IEnumerable<NexusColor>
     /// <returns><see cref="IEnumerable{NexusColorIndex}"/> of <see cref="NexusColorIndex"/></returns>
     public IEnumerable<NexusColorIndex> GetIndices(NexusColor color)
     {
-        foreach (var index in Colors.GetKeys(color))
+        foreach (var index in GetKeys(color))
         {
             yield return NexusColorIndex.UnClamped(index);
         }
@@ -155,4 +155,14 @@ public abstract record NexusColorPalette : IEnumerable<NexusColor>
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     internal NexusColor this[in int index] => Colors[index];
+
+    private IEnumerable<int> GetKeys(NexusColor color)
+    {
+        for (int i = 0; i < Colors.Length; i++)
+        {
+            if (Colors[i] == color) yield return i;
+        }
+
+        yield return -1;
+    }
 }

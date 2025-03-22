@@ -5,10 +5,8 @@ using System.Drawing.Imaging;
 
 internal static class ImageHelper
 {
-    public static BitmapData LockBitsReadOnly(this Bitmap bitmap)
-        => bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, PixelFormat.Format16bppRgb555);
-
-    public static void UnlockBits(this Bitmap bitmap, BitmapData data) => bitmap.UnlockBits(data);
+    public static BitmapData LockBitsReadOnly(this Bitmap bitmap, in PixelFormat format)
+        => bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, format);
 
     public static Bitmap Resize(Bitmap bitmap, in NexusSize? size)
     {
@@ -24,8 +22,6 @@ internal static class ImageHelper
         return resized;
     }
 
-    public static NexusSize GetSize(in int width, in int height, in float percentage)
-        => percentage <= 0
-        ? new NexusSize(width, height)
-        : new NexusSize((int)(width * percentage), (int)(height * percentage));
+    public static NexusSize? GetSize(in int width, in int height, in float percentage)
+        => percentage <= 0 ? null : new NexusSize((int)(width * percentage), (int)(height * percentage));
 }

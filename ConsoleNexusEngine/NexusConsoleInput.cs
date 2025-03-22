@@ -9,14 +9,13 @@ public sealed class NexusConsoleInput
 {
     private readonly CmdConsole _console;
     private readonly NexusGamepad[] _gamepads;
-    private readonly HashSet<NexusKey> currentPressedKeys;
 
     private NexusCoord currentMousePos;
 
     /// <summary>
     /// The keys that were pressed at the last time <see cref="Update"/> was called
     /// </summary>
-    public ImmutableArray<NexusKey> Keys => currentPressedKeys.ToImmutableArray();
+    public ImmutableArray<NexusKey> Keys { get; private set; }
 
     /// <summary>
     /// The position of the mouse at the last time <see cref="Update"/> was called
@@ -47,14 +46,12 @@ public sealed class NexusConsoleInput
     {
         _console = console;
         _gamepads = new NexusGamepad[4];
-
-        currentPressedKeys = [];
     }
 
     /// <summary>
     /// Updates <see cref="Keys"/> and <see cref="MousePosition"/>
     /// </summary>
-    public void Update() => _console.ReadKeyboardMouseInput(currentPressedKeys, ref currentMousePos);
+    public void Update() => Keys = _console.ReadKeyboardMouseInput(ref currentMousePos);
 
     /// <summary>
     /// Updates <see cref="Gamepad1"/>, <see cref="Gamepad2"/>, <see cref="Gamepad3"/>, <see cref="Gamepad4"/>

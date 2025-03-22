@@ -94,7 +94,7 @@ public sealed record NexusText : ISprite
         foreach (var letter in text)
         {
             index++;
-            sprite[index] = Converter.ToCharInfo(letter, foreground, background);
+            sprite[index] = NativeConverter.ToCharInfo(letter, foreground, background);
         }
 
         return sprite.ToReadOnly();

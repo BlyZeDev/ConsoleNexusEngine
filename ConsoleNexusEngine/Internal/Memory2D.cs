@@ -1,7 +1,5 @@
 ﻿namespace ConsoleNexusEngine.Internal;
 
-using System;
-
 internal readonly struct Memory2D<T> where T : struct
 {
     private readonly Memory<T> _memory;
@@ -24,16 +22,7 @@ internal readonly struct Memory2D<T> where T : struct
 
     public readonly ref T this[in int i] => ref _memory.Span[i];
 
-    public readonly ref T this[in int x, in int y] => ref _memory.Span[MathHelper.GetIndex(x, y, Width)];
-
-    public readonly Memory2D<T> Resize(in int width, in int height)
-    {
-        var newMemory = new T[width * height].AsMemory();
-
-        _memory.TryCopyTo(newMemory);
-
-        return new Memory2D<T>(newMemory, width, height);
-    }
+    public readonly ref T this[in int x, in int y] => ref _memory.Span[IndexDimensions.Get1D(x, y, Width)];
 
     public readonly ReadOnlyMemory2D<T> ToReadOnly() => new(_memory, Width, Height);
 }
