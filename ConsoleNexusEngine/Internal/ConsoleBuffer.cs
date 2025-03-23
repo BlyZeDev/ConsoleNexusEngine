@@ -23,7 +23,6 @@ internal sealed unsafe class ConsoleBuffer
 
     private bool needsRender;
     private SMALL_RECT renderArea;
-    private SMALL_RECT lastRendered;
 
     public short Width { get; private set; }
     public short Height { get; private set; }
@@ -44,7 +43,6 @@ internal sealed unsafe class ConsoleBuffer
             Right = Width,
             Bottom = Height
         };
-        lastRendered = renderArea;
     }
 
     public void ChangeDimensions(in int width, in int height)
@@ -81,10 +79,15 @@ internal sealed unsafe class ConsoleBuffer
     }
 
     public void BlockSetChar(in ReadOnlySpan<CHAR_INFO> characterBlock, in int sourceIndex, in int destIndex, in int blockWidth)
-    {
-        characterBlock.Slice(sourceIndex, blockWidth).CopyTo(charInfoBuffer.AsSpan(destIndex, blockWidth));
+        => characterBlock.Slice(sourceIndex, blockWidth).CopyTo(charInfoBuffer.AsSpan(destIndex, blockWidth));
 
-        SetRenderArea(destIndex % Width, destIndex / Width, (destIndex + blockWidth - 1) % Width, (destIndex + blockWidth - 1) / Width);
+    public void SetRenderArea(in int startX, in int startY, in int endX, in int endY)
+    {
+        renderArea.Left = (short)Math.Min(startX, renderArea.Left);
+        renderArea.Top = (short)Math.Min(startY, renderArea.Top);
+        renderArea.Right = (short)Math.Max(startX + endX, renderArea.Left + renderArea.Right);
+        renderArea.Bottom = (short)Math.Max(startY + endY, renderArea.Top + renderArea.Bottom);
+        needsRender = true;
     }
 
     public void RenderBuffer()
@@ -105,17 +108,6 @@ internal sealed unsafe class ConsoleBuffer
                 (SMALL_RECT*)Unsafe.AsPointer(ref renderArea));
         }
 
-        lastRendered = renderArea;
         renderArea = _defaultRenderArea;
-    }
-
-    private void SetRenderArea(in int startX, in int startY, in int endX, in int endY)
-    {
-        lastRendered = renderArea;
-        renderArea.Left = (short)Math.Min(startX, renderArea.Left);
-        renderArea.Top = (short)Math.Min(startY, renderArea.Top);
-        renderArea.Right = (short)Math.Max(endX, renderArea.Right);
-        renderArea.Bottom = (short)Math.Max(endY, renderArea.Bottom);
-        needsRender = true;
     }
 }

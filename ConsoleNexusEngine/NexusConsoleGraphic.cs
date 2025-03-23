@@ -27,7 +27,7 @@ public sealed partial class NexusConsoleGraphic
     /// <param name="coordinate">The coordinates where the character should be drawn</param>
     /// <param name="character">The character to draw</param>
     public void DrawPixel(in NexusCoord coordinate, in NexusChar character)
-        => DrawSprite(coordinate, character);
+        => SetChar(coordinate, character);
 
     /// <summary>
     /// Draws a text in the console at a specific position
