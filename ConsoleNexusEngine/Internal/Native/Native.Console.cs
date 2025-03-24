@@ -1,7 +1,6 @@
 ﻿namespace ConsoleNexusEngine.Internal;
 
 using System.Runtime.InteropServices;
-using System.Text;
 
 internal static unsafe partial class Native
 {
@@ -19,26 +18,6 @@ internal static unsafe partial class Native
     [LibraryImport(Kernel32)]
     public static partial nint GetConsoleWindow();
 
-    [LibraryImport(User32)]
-    public static partial int ShowWindow(nint hWnd, int nCmdShow);
-
-    [DllImport(User32)]
-    public static extern int GetWindowTextLength(nint hWnd);
-
-    [DllImport(User32)]
-    public static extern int GetWindowText(nint hWnd, StringBuilder title, int maxCount);
-
-    [DllImport(User32)]
-    public static extern bool SetWindowText(nint hWnd, string title);
-
-    [LibraryImport(User32)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool GetWindowRect(nint hWnd, ref RECT lpRect);
-
-    [LibraryImport(User32)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool SetWindowPos(nint hWnd, nint hWndInsertAfter, int x, int y, int cx, int cy, uint uFlags);
-
     [DllImport(Kernel32)]
     public static extern bool GetConsoleCursorInfo(nint hConsoleOutput, out CONSOLE_CURSOR_INFO lpConsoleCursorInfo);
 
@@ -50,19 +29,6 @@ internal static unsafe partial class Native
 
     [DllImport(Kernel32)]
     public static extern bool SetConsoleScreenBufferInfoEx(nint hConsoleOutput, [In] ref CONSOLE_SCREEN_BUFFER_INFO_EX csbe);
-
-    [LibraryImport(User32)]
-    public static partial int GetSystemMetrics(int nIndex);
-
-    [DllImport(User32)]
-    public static extern int GetWindowLong(nint hWnd, int nIndex);
-
-    [DllImport(User32)]
-    public static extern int SetWindowLong(nint hWnd, int nIndex, int dwNewLong);
-
-    [LibraryImport(User32)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool SetForegroundWindow(nint hWnd);
 
     [LibraryImport(Kernel32)]
     [return: MarshalAs(UnmanagedType.Bool)]
@@ -83,7 +49,7 @@ internal static unsafe partial class Native
     [DllImport(Kernel32, CharSet = CharSet.Unicode)]
     public static extern bool WriteConsoleOutput(
         [In] nint hConsoleOutput,
-        [In] CHAR_INFO* lpBuffer,
+        [In] CHARINFO* lpBuffer,
         [In] COORD dwBufferSize,
         [In] COORD dwBufferCoord,
         [In] SMALL_RECT* lpWriteRegion);

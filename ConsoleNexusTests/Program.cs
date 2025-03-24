@@ -78,6 +78,8 @@ public sealed class Game : NexusConsoleGame
         Graphic.DrawText(new NexusCoord(10, 10), new NexusText("FPS: " + FramesPerSecond, NexusColorIndex.Color3));
         Graphic.DrawText(new NexusCoord(11, 11), new NexusText("Width: " + BufferSize.Width, NexusColorIndex.Color3));
         Graphic.DrawText(new NexusCoord(12, 12), new NexusText("Height: " + BufferSize.Height, NexusColorIndex.Color3));
+        var text = new NexusText(new string('X', BufferSize.Width / 2), NexusColorIndex.Color4);
+        Graphic.DrawText(new NexusCoord((BufferSize.Width - text.Size.Width) / 4, 13), text);
 
         //Debug.WriteLine(DateTime.Now + " - " + (Input.Keys.IsDefaultOrEmpty ? "NO KEY IS PRESSED" : string.Join(',', Input.Keys)) + " - " + Input.MousePosition);
     }

@@ -41,10 +41,10 @@ public sealed partial class NexusConsoleGraphic
 
     private void ThrowIfOutOfBounds(in int x, in int y)
     {
-        if (_console.Buffer.Width < 0 || _console.Buffer.Width < x)
+        if (x < 0 || x > _console.Buffer.Width)
             throw new ArgumentOutOfRangeException(nameof(x), "The coordinate is not in bounds of the console buffer");
 
-        if (_console.Buffer.Height < 0 || _console.Buffer.Height < y)
+        if (y < 0 || y > _console.Buffer.Height)
             throw new ArgumentOutOfRangeException(nameof(y), "The coordinate is not in bounds of the console buffer");
     }
 }

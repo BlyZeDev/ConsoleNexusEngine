@@ -14,9 +14,9 @@ public readonly struct NexusImage : ISprite
     private const char DarkBlock = '▓';
     private const char FullBlock = '█';
 
-    private readonly ReadOnlyMemory2D<CHAR_INFO> _sprite;
+    private readonly ReadOnlyMemory2D<CHARINFO> _sprite;
 
-    ReadOnlyMemory2D<CHAR_INFO> ISprite.Sprite => _sprite;
+    ReadOnlyMemory2D<CHARINFO> ISprite.Sprite => _sprite;
 
     /// <summary>
     /// <inheritdoc/> image
@@ -96,11 +96,11 @@ public readonly struct NexusImage : ISprite
         }
     }
 
-    private static ReadOnlyMemory2D<CHAR_INFO> CreateSprite(Bitmap bitmap, NexusColorProcessor processor, in NexusSize? size)
+    private static ReadOnlyMemory2D<CHARINFO> CreateSprite(Bitmap bitmap, NexusColorProcessor processor, in NexusSize? size)
     {
         var resized = ImageHelper.Resize(bitmap, size);
 
-        var pixels = new Memory2D<CHAR_INFO>(resized.Width, resized.Height);
+        var pixels = new Memory2D<CHARINFO>(resized.Width, resized.Height);
 
         var data = resized.LockBits(
             new Rectangle(0, 0, resized.Width, resized.Height),

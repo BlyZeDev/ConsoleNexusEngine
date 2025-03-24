@@ -19,7 +19,7 @@ internal sealed unsafe class ConsoleBuffer
 
     private readonly nint _standardOutput;
 
-    private CHAR_INFO[] charInfoBuffer;
+    private CHARINFO[] charInfoBuffer;
 
     private bool needsRender;
     private SMALL_RECT renderArea;
@@ -34,7 +34,7 @@ internal sealed unsafe class ConsoleBuffer
         Width = (short)width;
         Height = (short)height;
 
-        charInfoBuffer = new CHAR_INFO[Width * Height];
+        charInfoBuffer = new CHARINFO[Width * Height];
         needsRender = false;
         renderArea = new SMALL_RECT
         {
@@ -57,17 +57,17 @@ internal sealed unsafe class ConsoleBuffer
 
     public void ClearBuffer()
     {
-        fixed (CHAR_INFO* ptr = &charInfoBuffer[0])
+        fixed (CHARINFO* ptr = &charInfoBuffer[0])
         {
-            Unsafe.InitBlockUnaligned(ptr, 0, (uint)(charInfoBuffer.Length * sizeof(CHAR_INFO)));
+            Unsafe.InitBlockUnaligned(ptr, 0, (uint)(charInfoBuffer.Length * sizeof(CHARINFO)));
         }
 
         needsRender = true;
     }
 
-    public CHAR_INFO GetChar(in int x, in int y) => charInfoBuffer[IndexDimensions.Get1D(x, y, Width)];
+    public CHARINFO GetChar(in int x, in int y) => charInfoBuffer[IndexDimensions.Get1D(x, y, Width)];
 
-    public void SetChar(in int x, in int y, CHAR_INFO character)
+    public void SetChar(in int x, in int y, CHARINFO character)
     {
         ref var current = ref charInfoBuffer[IndexDimensions.Get1D(x, y, Width)];
 
@@ -78,7 +78,7 @@ internal sealed unsafe class ConsoleBuffer
         SetRenderArea(x, y, x, y);
     }
 
-    public void BlockSetChar(in ReadOnlySpan<CHAR_INFO> characterBlock, in int sourceIndex, in int destIndex, in int blockWidth)
+    public void BlockSetChar(in ReadOnlySpan<CHARINFO> characterBlock, in int sourceIndex, in int destIndex, in int blockWidth)
         => characterBlock.Slice(sourceIndex, blockWidth).CopyTo(charInfoBuffer.AsSpan(destIndex, blockWidth));
 
     public void SetRenderArea(in int startX, in int startY, in int endX, in int endY)
@@ -94,7 +94,7 @@ internal sealed unsafe class ConsoleBuffer
     {
         if (!needsRender) return;
 
-        fixed (CHAR_INFO* arrayPtr = &charInfoBuffer[0])
+        fixed (CHARINFO* arrayPtr = &charInfoBuffer[0])
         {
             Native.WriteConsoleOutput(
                 _standardOutput,

@@ -8,9 +8,9 @@ using System.Drawing.Imaging;
 /// </summary>
 public readonly struct NexusRectangle : INexusShape, ISprite
 {
-    private readonly ReadOnlyMemory2D<CHAR_INFO> _sprite;
+    private readonly ReadOnlyMemory2D<CHARINFO> _sprite;
 
-    readonly ReadOnlyMemory2D<CHAR_INFO> ISprite.Sprite => _sprite;
+    readonly ReadOnlyMemory2D<CHARINFO> ISprite.Sprite => _sprite;
 
     /// <inheritdoc/>
     public readonly NexusSize Size { get; }
@@ -70,9 +70,9 @@ public readonly struct NexusRectangle : INexusShape, ISprite
         return result;
     }
 
-    private static ReadOnlyMemory2D<CHAR_INFO> CreateSprite(Bitmap bitmap, in NexusChar character)
+    private static ReadOnlyMemory2D<CHARINFO> CreateSprite(Bitmap bitmap, in NexusChar character)
     {
-        var sprite = new Memory2D<CHAR_INFO>(bitmap.Width, bitmap.Height);
+        var sprite = new Memory2D<CHARINFO>(bitmap.Width, bitmap.Height);
         var charInfo = NativeConverter.ToCharInfo(character);
 
         unsafe

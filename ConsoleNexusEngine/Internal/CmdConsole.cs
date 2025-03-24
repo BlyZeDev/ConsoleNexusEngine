@@ -300,12 +300,18 @@ internal sealed class CmdConsole
 
         Native.SetConsoleScreenBufferInfoEx(_standardOutput, ref csbe);
 
+        var monitorInfo = new MONITORINFO
+        {
+            cbSize = Marshal.SizeOf<MONITORINFO>()
+        };
+        Native.GetMonitorInfo(Native.MonitorFromWindow(_handle, 1), ref monitorInfo);
+
         Native.SetWindowPos(
             _handle,
             nint.Zero,
-            0, 0,
-            Native.GetSystemMetrics(0),
-            Native.GetSystemMetrics(1),
+            monitorInfo.rcWork.Left, monitorInfo.rcWork.Top,
+            monitorInfo.rcWork.Right - monitorInfo.rcWork.Left,
+            monitorInfo.rcWork.Bottom - monitorInfo.rcWork.Top,
             0x0040 | 0x0020);
 
         Native.GetConsoleScreenBufferInfoEx(_standardOutput, ref csbe);
