@@ -65,7 +65,7 @@ public sealed class Game : NexusConsoleGame
     {
         var gamepad = Input.Gamepad1;
 
-        Graphic.DrawText(new NexusCoord(0, 0), new NexusText("Type: " + gamepad.Type, NexusColorIndex.Color1));
+        //Graphic.DrawText(new NexusCoord(0, 0), new NexusText("Type: " + gamepad.Type, NexusColorIndex.Color1));
         Graphic.DrawText(new NexusCoord(1, 1), new NexusText("Battery Type: " + gamepad.BatteryType, NexusColorIndex.Color2));
         Graphic.DrawText(new NexusCoord(2, 2), new NexusText("Battery Level: " + gamepad.BatteryLevel, NexusColorIndex.Color8));
         Graphic.DrawText(new NexusCoord(3, 3), new NexusText("Buttons: " + gamepad.Buttons, NexusColorIndex.Color4));
@@ -79,7 +79,9 @@ public sealed class Game : NexusConsoleGame
         Graphic.DrawText(new NexusCoord(11, 11), new NexusText("Width: " + BufferSize.Width, NexusColorIndex.Color3));
         Graphic.DrawText(new NexusCoord(12, 12), new NexusText("Height: " + BufferSize.Height, NexusColorIndex.Color3));
         var text = new NexusText(new string('X', BufferSize.Width / 2), NexusColorIndex.Color4);
-        Graphic.DrawText(new NexusCoord((BufferSize.Width - text.Size.Width) / 4, 13), text);
+        Graphic.DrawText(new NexusCoord((BufferSize.Width - text.Size.Width) / 2, 13), text);
+
+        Graphic.DrawText(new NexusCoord(0, 0), new NexusText("Type: " + gamepad.Type, NexusColorIndex.Color1));
 
         //Debug.WriteLine(DateTime.Now + " - " + (Input.Keys.IsDefaultOrEmpty ? "NO KEY IS PRESSED" : string.Join(',', Input.Keys)) + " - " + Input.MousePosition);
     }

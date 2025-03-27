@@ -85,8 +85,8 @@ internal sealed unsafe class ConsoleBuffer
     {
         renderArea.Left = (short)Math.Min(startX, renderArea.Left);
         renderArea.Top = (short)Math.Min(startY, renderArea.Top);
-        renderArea.Right = (short)Math.Max(startX + endX, renderArea.Left + renderArea.Right);
-        renderArea.Bottom = (short)Math.Max(startY + endY, renderArea.Top + renderArea.Bottom);
+        renderArea.Right = (short)Math.Max(endX, renderArea.Right);
+        renderArea.Bottom = (short)Math.Max(endY, renderArea.Bottom);
         needsRender = true;
     }
 
