@@ -8,7 +8,7 @@
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
     <Authors>BlyZe</Authors>
-    <Version>8.2.9</Version>
+    <Version>8.2.10</Version>
     <Title>$(AssemblyName)</Title>
     <Description>A powerful and easy to use engine to create console games</Description>
     <PackageProjectUrl>https://github.com/BlyZeYT/ConsoleNexus-Engine</PackageProjectUrl>
@@ -16,9 +16,7 @@
     <RepositoryUrl>https://github.com/BlyZeYT/ConsoleNexus-Engine</RepositoryUrl>
     <PackageTags>engine, console engine, blyze, console nexus, console nexus engine, nexus engine, console, console game</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageReleaseNotes>Fixes:
-- Window cutoff on enabled Taskbar
-- Wrong calculation for bounds check</PackageReleaseNotes>
+    <PackageReleaseNotes>- Optimized sprite rendering</PackageReleaseNotes>
     <PackAsTool>False</PackAsTool>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <IncludeSymbols>True</IncludeSymbols>
