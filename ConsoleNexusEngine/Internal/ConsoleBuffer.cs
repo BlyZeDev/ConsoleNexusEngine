@@ -9,19 +9,13 @@ internal sealed unsafe class ConsoleBuffer
         X = 0,
         Y = 0
     };
-    private static readonly SMALL_RECT _defaultRenderArea = new SMALL_RECT
-    {
-        Left = short.MaxValue,
-        Bottom = short.MinValue,
-        Right = short.MinValue,
-        Top = short.MaxValue
-    };
 
     private readonly nint _standardOutput;
 
     private CHARINFO[] charInfoBuffer;
 
     private bool needsRender;
+    private COORD bufferSize;
     private SMALL_RECT renderArea;
 
     public short Width { get; private set; }
@@ -35,7 +29,15 @@ internal sealed unsafe class ConsoleBuffer
         Height = (short)height;
 
         charInfoBuffer = new CHARINFO[Width * Height];
+
         needsRender = false;
+
+        bufferSize = new COORD
+        {
+            X = Width,
+            Y = Height
+        };
+
         renderArea = new SMALL_RECT
         {
             Left = 0,
@@ -52,7 +54,32 @@ internal sealed unsafe class ConsoleBuffer
 
         Array.Resize(ref charInfoBuffer, Width * Height);
 
+        bufferSize = new COORD
+        {
+            X = Width,
+            Y = Height
+        };
         SetRenderArea(0, 0, Width, Height);
+    }
+
+    public void ClearChar(in int x, in int y)
+    {
+        fixed (CHARINFO* ptr = &charInfoBuffer[IndexDimensions.Get1D(x, y, Width)])
+        {
+            Unsafe.InitBlockUnaligned(ptr, 0, (uint)sizeof(CHARINFO));
+        }
+
+        needsRender = true;
+    }
+
+    public void BlockClearChar(in int startX, in int startY, in int endX, in int endY)
+    {
+        fixed (CHARINFO* ptr = &charInfoBuffer[IndexDimensions.Get1D(startX, startY, Width)])
+        {
+            Unsafe.InitBlockUnaligned(ptr, 0, (uint)(IndexDimensions.Get1D(endX, endY, Width) * sizeof(CHARINFO)));
+        }
+
+        needsRender = true;
     }
 
     public void ClearBuffer()
@@ -71,8 +98,8 @@ internal sealed unsafe class ConsoleBuffer
     {
         ref var current = ref charInfoBuffer[IndexDimensions.Get1D(x, y, Width)];
 
-        if (Unsafe.ReadUnaligned<long>(Unsafe.AsPointer(ref current)) == Unsafe.ReadUnaligned<long>(&character))
-            return;
+        if (current.UnicodeChar == character.UnicodeChar
+            && current.Attributes == character.Attributes) return;
 
         current = character;
         SetRenderArea(x, y, x, y);
@@ -85,8 +112,8 @@ internal sealed unsafe class ConsoleBuffer
     {
         renderArea.Left = (short)Math.Min(startX, renderArea.Left);
         renderArea.Top = (short)Math.Min(startY, renderArea.Top);
-        renderArea.Right = (short)Math.Max(startX + endX, renderArea.Left + renderArea.Right);
-        renderArea.Bottom = (short)Math.Max(startY + endY, renderArea.Top + renderArea.Bottom);
+        renderArea.Right = (short)(Math.Max(startX + endX, renderArea.Left + renderArea.Right) - 1);
+        renderArea.Bottom = (short)(Math.Max(startY + endY, renderArea.Top + renderArea.Bottom) - 1);
         needsRender = true;
     }
 
@@ -99,15 +126,9 @@ internal sealed unsafe class ConsoleBuffer
             Native.WriteConsoleOutput(
                 _standardOutput,
                 arrayPtr,
-                new COORD
-                {
-                    X = Width,
-                    Y = Height
-                },
+                bufferSize,
                 _defaultBufferCoord,
                 (SMALL_RECT*)Unsafe.AsPointer(ref renderArea));
         }
-
-        renderArea = _defaultRenderArea;
     }
 }

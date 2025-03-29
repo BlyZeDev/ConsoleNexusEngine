@@ -1,7 +1,17 @@
 ﻿namespace ConsoleNexusEngine;
 
+using ConsoleNexusEngine.Internal;
+
 public sealed partial class NexusConsoleGraphic
 {
+    private void ClearSprite(in NexusCoord start, in NexusCoord end)
+    {
+        ThrowIfOutOfBounds(start);
+        ThrowIfOutOfBounds(end.X, end.Y);
+
+        _console.Buffer.BlockClearChar(start.X, start.Y, end.X, end.Y);
+    }
+
     private void DrawSprite(in NexusCoord start, ISprite sprite)
     {
         ThrowIfOutOfBounds(start);
@@ -15,6 +25,7 @@ public sealed partial class NexusConsoleGraphic
         {
             _console.Buffer.BlockSetChar(spriteSpan, y * spriteWidth, (start.Y + y) * destWidth + start.X, spriteWidth);
         }
+
         _console.Buffer.SetRenderArea(start.X, start.Y, start.X + sprite.Sprite.Width, start.Y + sprite.Sprite.Height);
     }
 
@@ -43,7 +54,7 @@ public sealed partial class NexusConsoleGraphic
     {
         if (x < 0 || x > _console.Buffer.Width)
             throw new ArgumentOutOfRangeException(nameof(x), "The coordinate is not in bounds of the console buffer");
-
+        
         if (y < 0 || y > _console.Buffer.Height)
             throw new ArgumentOutOfRangeException(nameof(y), "The coordinate is not in bounds of the console buffer");
     }

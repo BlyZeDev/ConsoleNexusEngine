@@ -198,7 +198,7 @@ public sealed partial class NexusConsoleGraphic
     {
         ThrowIfOutOfBounds(coordinate);
 
-        SetChar(coordinate, NexusChar.Empty);
+        _console.Buffer.ClearChar(coordinate.X, coordinate.Y);
     }
 
     /// <summary>
@@ -221,15 +221,114 @@ public sealed partial class NexusConsoleGraphic
     /// <param name="start">The coordinate of the start point</param>
     /// <param name="end">The coordinate of the end point</param>
     public void ClearLine(in NexusCoord start, in NexusCoord end)
-        => DrawLine(start, end, NexusChar.Empty);
+    {
+        ThrowIfOutOfBounds(start);
+        ThrowIfOutOfBounds(end);
+
+        var startX = start.X;
+        var startY = start.Y;
+        var endX = end.X;
+        var endY = end.Y;
+
+        if (startX == endX)
+        {
+            var startCoord = Math.Min(startY, endY);
+            var endCoord = Math.Max(startY, endY);
+
+            for (int y = startCoord; y <= endCoord; y++)
+            {
+                _console.Buffer.ClearChar(startX, y);
+            }
+
+            return;
+        }
+
+        if (startY == endY)
+        {
+            var startCoord = Math.Min(startX, endX);
+            var endCoord = Math.Max(startX, endX);
+
+            for (int x = startCoord; x <= endCoord; x++)
+            {
+                _console.Buffer.ClearChar(x, startY);
+            }
+
+            return;
+        }
+
+        var width = endX - startX;
+        var height = endY - startY;
+
+        int dx1 = 0, dy1 = 0, dx2 = 0, dy2 = 0;
+
+        if (width < 0) dx1 = -1;
+        else if (width > 0) dx1 = 1;
+
+        if (height < 0) dy1 = -1;
+        else if (height > 0) dy1 = 1;
+
+        if (width < 0) dx2 = -1;
+        else if (width > 0) dx2 = 1;
+
+        var longest = Math.Abs(width);
+        var shortest = Math.Abs(height);
+
+        if (!(longest > shortest))
+        {
+            longest = Math.Abs(height);
+            shortest = Math.Abs(width);
+
+            if (height < 0) dy2 = -1;
+            else if (height > 0) dy2 = 1;
+
+            dx2 = 0;
+        }
+
+        var numerator = longest >> 1;
+
+        for (int i = 0; i <= longest; i++)
+        {
+            _console.Buffer.ClearChar(startX, startY);
+
+            numerator += shortest;
+
+            if (!(numerator < longest))
+            {
+                numerator -= longest;
+                startX += dx1;
+                startY += dy1;
+            }
+            else
+            {
+                startX += dx2;
+                startY += dy2;
+            }
+        }
+    }
 
     /// <summary>
-    /// Clears a shape from one coordinate to another
+    /// Clears a shape
+    /// </summary>
+    /// <param name="start">The top left coordinate of the start point</param>
+    /// <param name="size">The area to clear starting from <paramref name="start"/></param>
+    public void ClearBlock(in NexusCoord start, in NexusSize size)
+        => ClearSprite(start, new NexusCoord(start.X + size.Width, start.Y + size.Height));
+
+    /// <summary>
+    /// Clears a shape
+    /// </summary>
+    /// <param name="start">The top left coordinate of the start point</param>
+    /// <param name="end">The bottom right coordinate of the end point</param>
+    public void ClearBlock(in NexusCoord start, in NexusCoord end)
+        => ClearSprite(start, end);
+
+    /// <summary>
+    /// Clears a shape
     /// </summary>
     /// <param name="start">The top left coordinate of the start point</param>
     /// <param name="shape">The shape to clear</param>
     public void ClearShape(in NexusCoord start, INexusShape shape)
-        => DrawShape(start, shape, NexusChar.Empty);
+        => ClearBlock(start, shape.Size);
 
     /// <summary>
     /// Clears the current buffer of the console
