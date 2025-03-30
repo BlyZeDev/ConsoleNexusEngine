@@ -25,8 +25,6 @@ public sealed partial class NexusConsoleGraphic
         {
             _console.Buffer.BlockSetChar(spriteSpan, y * spriteWidth, (start.Y + y) * destWidth + start.X, spriteWidth);
         }
-
-        _console.Buffer.SetRenderArea(start.X, start.Y, start.X + sprite.Sprite.Width, start.Y + sprite.Sprite.Height);
     }
 
     private void DrawShape(in NexusCoord start, INexusShape shape, in NexusChar character)
