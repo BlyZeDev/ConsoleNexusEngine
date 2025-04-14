@@ -15,7 +15,7 @@ public sealed partial class NexusConsoleGraphic
     private void DrawSprite(in NexusCoord start, ISprite sprite)
     {
         ThrowIfOutOfBounds(start);
-        ThrowIfOutOfBounds(start.X + sprite.Sprite.Width, start.Y + sprite.Sprite.Height);
+        ThrowIfOutOfBounds(start.X + sprite.Sprite.Width - 1, start.Y + sprite.Sprite.Height - 1);
 
         var destWidth = _console.Buffer.Width;
         var spriteWidth = sprite.Size.Width;
@@ -30,7 +30,7 @@ public sealed partial class NexusConsoleGraphic
     private void DrawShape(in NexusCoord start, INexusShape shape, in NexusChar character)
     {
         ThrowIfOutOfBounds(start);
-        ThrowIfOutOfBounds(start.X + shape.Size.Width, start.Y + shape.Size.Height);
+        ThrowIfOutOfBounds(start.X + shape.Size.Width - 1, start.Y + shape.Size.Height - 1);
 
         var drawable = shape.Draw();
 

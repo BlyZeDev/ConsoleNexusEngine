@@ -64,6 +64,8 @@ public sealed class Game : NexusConsoleGame
     private void DebugView()
     {
         var gamepad = Input.Gamepad1;
+
+        Graphic.DrawShape(NexusCoord.MinValue, new NexusRectangle(BufferSize, new NexusChar(' ', NexusColorIndex.Color11, NexusColorIndex.Color11), true));
         
         Graphic.DrawText(new NexusCoord(0, 0), new NexusText("Type: " + gamepad.Type, NexusColorIndex.Color1));
         Graphic.DrawText(new NexusCoord(1, 1), new NexusText("Battery Type: " + gamepad.BatteryType, NexusColorIndex.Color2));
@@ -85,6 +87,9 @@ public sealed class Game : NexusConsoleGame
         Graphic.DrawPixel(new NexusCoord(BufferSize.Width - 1, BufferSize.Height - 1), new NexusChar(' ', NexusColorIndex.Color14, NexusColorIndex.Color14));
 
         Graphic.DrawPixel(new NexusCoord(BufferSize.Width / 2, BufferSize.Height / 2), new NexusChar('X', NexusColorIndex.Color11));
+
+        Graphic.DrawShape(NexusCoord.MinValue, new NexusRectangle(new NexusSize(1, 1), new NexusChar(' ', NexusColorIndex.Color11, NexusColorIndex.Color12), true));
+        Graphic.DrawShape(NexusCoord.MinValue, new NexusEllipse(BufferSize, new NexusChar(' ', NexusColorIndex.Color11, NexusColorIndex.Color12), true));
 
         //Debug.WriteLine(DateTime.Now + " - " + (Input.Keys.IsDefaultOrEmpty ? "NO KEY IS PRESSED" : string.Join(',', Input.Keys)) + " - " + Input.MousePosition);
     }

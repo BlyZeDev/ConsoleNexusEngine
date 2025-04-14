@@ -8,7 +8,7 @@
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
     <Authors>BlyZe</Authors>
-    <Version>8.2.14</Version>
+    <Version>8.2.15</Version>
     <Title>$(AssemblyName)</Title>
     <Description>A powerful and easy to use engine to create console games</Description>
     <PackageProjectUrl>https://github.com/BlyZeYT/ConsoleNexus-Engine</PackageProjectUrl>
@@ -17,12 +17,7 @@
     <PackageTags>engine, console engine, blyze, console nexus, console nexus engine, nexus engine, console, console game</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReleaseNotes>Fixes:
-- Added missing OutOfBounds check for SetChar
-- Off by one error in ThrowIfOutOfBounds
-
-Improvements:
-- IgnoreColorPaletteAttribute -&gt; IncludeColorPaletteAttribute
-- NexusColor now allows raw uint values</PackageReleaseNotes>
+- DrawSprite off by one error fixed</PackageReleaseNotes>
     <PackAsTool>False</PackAsTool>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <IncludeSymbols>True</IncludeSymbols>

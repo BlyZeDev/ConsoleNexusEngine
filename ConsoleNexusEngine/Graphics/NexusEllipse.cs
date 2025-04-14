@@ -29,6 +29,9 @@ public readonly struct NexusEllipse : INexusShape, ISprite
     /// <param name="fill"><see langword="true"/> if the shape is filled, otherwise <see langword="false"/></param>
     public NexusEllipse(in NexusSize size, in NexusChar character, in bool fill)
     {
+        ArgumentOutOfRangeException.ThrowIfZero(size.Width, nameof(size.Width));
+        ArgumentOutOfRangeException.ThrowIfZero(size.Height, nameof(size.Height));
+
         var bitmap = new Bitmap(size.Width, size.Height, PixelFormat.Format16bppRgb555);
 
         Size = size;
