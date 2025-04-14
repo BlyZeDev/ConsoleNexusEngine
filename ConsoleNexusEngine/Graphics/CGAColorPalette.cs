@@ -6,6 +6,7 @@ using System.Collections.Immutable;
 /// The color palette of IBM's original Color Graphics Adapter<br/>
 /// <see href="https://en.wikipedia.org/wiki/Color_Graphics_Adapter"/>
 /// </summary>
+[IncludeColorPalette]
 public sealed record CGAColorPalette : NexusColorPalette
 {
     /// <inheritdoc/>

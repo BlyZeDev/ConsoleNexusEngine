@@ -9,7 +9,6 @@ using System.Net.Http;
 /// <summary>
 /// The color palette created from an image
 /// </summary>
-[IgnoreColorPalette]
 public sealed record ImageColorPalette : NexusColorPalette
 {
     /// <summary>

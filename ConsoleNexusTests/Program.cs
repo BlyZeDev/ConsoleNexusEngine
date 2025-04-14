@@ -30,7 +30,7 @@ public sealed class Game : NexusConsoleGame
 
     public Game()
     {
-        Settings.Font = new NexusFont("Consolas", new NexusSize(15));
+        Settings.Font = new NexusFont("Consolas", new NexusSize(10));
         Settings.ColorPalette = new CGAColorPalette();
     }
 
@@ -78,7 +78,12 @@ public sealed class Game : NexusConsoleGame
         Graphic.DrawText(new NexusCoord(10, 10), new NexusText("FPS: " + FramesPerSecond, NexusColorIndex.Color3));
         Graphic.DrawText(new NexusCoord(11, 11), new NexusText("Width: " + BufferSize.Width, NexusColorIndex.Color3));
         Graphic.DrawText(new NexusCoord(12, 12), new NexusText("Height: " + BufferSize.Height, NexusColorIndex.Color3));
-        
+
+        Graphic.DrawLine(new NexusCoord(BufferSize.Width - 5, 0), new NexusCoord(BufferSize.Width - 1, 4), new NexusChar(' ', NexusColorIndex.Color14, NexusColorIndex.Color14));
+        Graphic.DrawLine(new NexusCoord(BufferSize.Width - 1, 0), new NexusCoord(BufferSize.Width - 5, 4), new NexusChar(' ', NexusColorIndex.Color14, NexusColorIndex.Color14));
+
+        Graphic.DrawPixel(new NexusCoord(BufferSize.Width - 1, BufferSize.Height - 1), new NexusChar(' ', NexusColorIndex.Color14, NexusColorIndex.Color14));
+
         Graphic.DrawPixel(new NexusCoord(BufferSize.Width / 2, BufferSize.Height / 2), new NexusChar('X', NexusColorIndex.Color11));
 
         //Debug.WriteLine(DateTime.Now + " - " + (Input.Keys.IsDefaultOrEmpty ? "NO KEY IS PRESSED" : string.Join(',', Input.Keys)) + " - " + Input.MousePosition);

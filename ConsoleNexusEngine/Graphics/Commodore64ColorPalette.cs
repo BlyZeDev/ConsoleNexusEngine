@@ -6,6 +6,7 @@ using System.Collections.Immutable;
 /// The color palette of the Commodore 64<br/>
 /// <see href="https://de.wikipedia.org/wiki/Commodore_64"/>
 /// </summary>
+[IncludeColorPalette]
 public sealed record Commodore64ColorPalette : NexusColorPalette
 {
     /// <inheritdoc/>

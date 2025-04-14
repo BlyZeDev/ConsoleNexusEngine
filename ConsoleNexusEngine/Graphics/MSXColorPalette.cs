@@ -6,6 +6,7 @@ using System.Collections.Immutable;
 /// The color palette of the MSX (only 15 colors)<br/>
 /// <see href="https://en.wikipedia.org/wiki/MSX2"/>
 /// </summary>
+[IncludeColorPalette]
 public sealed record MSXColorPalette : NexusColorPalette
 {
     /// <inheritdoc/>

@@ -19,7 +19,7 @@ public sealed class NexusConsoleGameUtil
 
         foreach (var colorPalette in AppDomain.CurrentDomain.GetAssemblies()
             .SelectMany(x => x.GetTypes())
-            .Where(x => x.IsClass && !x.IsAbstract && x.IsSubclassOf(type) && x.GetCustomAttribute<IgnoreColorPaletteAttribute>() is null))
+            .Where(x => x.IsClass && !x.IsAbstract && x.IsSubclassOf(type) && x.GetCustomAttribute<IncludeColorPaletteAttribute>() is not null))
         {
             colorPalettes.Add((NexusColorPalette)Activator.CreateInstance(colorPalette)!);
         }

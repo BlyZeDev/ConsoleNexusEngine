@@ -5,6 +5,7 @@ using System.Collections.Immutable;
 /// <summary>
 /// The default windows console color palette
 /// </summary>
+[IncludeColorPalette]
 public sealed record DefaultColorPalette : NexusColorPalette
 {
     /// <inheritdoc/>

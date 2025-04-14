@@ -22,7 +22,11 @@ public readonly partial record struct NexusColor : ISpanParsable<NexusColor>, IP
     /// </summary>
     public readonly byte B => (byte)_value;
 
-    internal NexusColor(in uint color) => _value = color;
+    /// <summary>
+    /// Initializes a color from RGB
+    /// </summary>
+    /// <param name="color">The first byte is the red component.<br/>The second byte is the green component.<br/>The third byte is the blue component.<br/>The fourth byte is unused</param>
+    public NexusColor(in uint color) => _value = color;
 
     /// <summary>
     /// Initializes a black color

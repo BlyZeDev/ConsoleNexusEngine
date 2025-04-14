@@ -109,7 +109,7 @@ public abstract record NexusColorPalette : IEnumerable<NexusColor>
     /// <exception cref="InvalidOperationException"></exception>
     protected NexusColorPalette(ImmutableArray<NexusColor> colors = default)
     {
-        if (!colors.IsDefault) Colors = colors;
+        Colors = colors;
 
         if (Colors.IsDefault)
             throw new NullReferenceException($"{nameof(Colors)} was default");

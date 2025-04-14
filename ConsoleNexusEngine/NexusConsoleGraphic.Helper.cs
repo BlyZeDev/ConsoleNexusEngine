@@ -29,6 +29,9 @@ public sealed partial class NexusConsoleGraphic
 
     private void DrawShape(in NexusCoord start, INexusShape shape, in NexusChar character)
     {
+        ThrowIfOutOfBounds(start);
+        ThrowIfOutOfBounds(start.X + shape.Size.Width, start.Y + shape.Size.Height);
+
         var drawable = shape.Draw();
 
         for (int x = 0; x < shape.Size.Width; x++)
@@ -41,7 +44,11 @@ public sealed partial class NexusConsoleGraphic
     }
 
     private void SetChar(in NexusCoord coordinate, in NexusChar character)
-        => SetChar(coordinate.X, coordinate.Y, character);
+    {
+        ThrowIfOutOfBounds(coordinate);
+
+        SetChar(coordinate.X, coordinate.Y, character);
+    }
 
     private void SetChar(in int x, in int y, in NexusChar character) => _console.Buffer.SetChar(x, y, NativeConverter.ToCharInfo(character));
 
@@ -50,10 +57,10 @@ public sealed partial class NexusConsoleGraphic
 
     private void ThrowIfOutOfBounds(in int x, in int y)
     {
-        if (x < 0 || x > _console.Buffer.Width)
+        if (x < 0 || x >= _console.Buffer.Width)
             throw new ArgumentOutOfRangeException(nameof(x), "The coordinate is not in bounds of the console buffer");
         
-        if (y < 0 || y > _console.Buffer.Height)
+        if (y < 0 || y >= _console.Buffer.Height)
             throw new ArgumentOutOfRangeException(nameof(y), "The coordinate is not in bounds of the console buffer");
     }
 }

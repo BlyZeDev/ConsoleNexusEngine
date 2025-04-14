@@ -6,6 +6,7 @@ using System.Collections.Immutable;
 /// The color palette of the old Windows<br/>
 /// <see href="https://de.wikipedia.org/wiki/Microsoft_Windows_1.0"/>
 /// </summary>
+[IncludeColorPalette]
 public sealed record WindowsColorPalette : NexusColorPalette
 {
     /// <inheritdoc/>

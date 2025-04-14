@@ -5,6 +5,7 @@ using System.Collections.Immutable;
 /// <summary>
 /// A grayscale color palette
 /// </summary>
+[IncludeColorPalette]
 public sealed record GrayscaleColorPalette : NexusColorPalette
 {
     /// <inheritdoc/>

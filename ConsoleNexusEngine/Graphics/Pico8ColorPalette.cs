@@ -6,6 +6,7 @@ using System.Collections.Immutable;
 /// The color palette of the Pico-8<br/>
 /// <see href="https://de.wikipedia.org/wiki/Pico-8"/>
 /// </summary>
+[IncludeColorPalette]
 public sealed record Pico8ColorPalette : NexusColorPalette
 {
     /// <inheritdoc/>
