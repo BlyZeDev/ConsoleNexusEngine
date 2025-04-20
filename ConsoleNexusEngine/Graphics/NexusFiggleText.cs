@@ -7,16 +7,10 @@ using System.Linq;
 /// <summary>
 /// Represents a figgle text in the console
 /// </summary>
-public sealed record NexusFiggleText : ISprite
+public sealed record NexusFiggleText : INexusSprite
 {
-    private readonly ReadOnlyMemory2D<CHARINFO> _sprite;
-
-    ReadOnlyMemory2D<CHARINFO> ISprite.Sprite => _sprite;
-
-    /// <summary>
-    /// <inheritdoc/> figgle text
-    /// </summary>
-    public NexusSize Size => new NexusSize(_sprite.Width, _sprite.Height);
+    /// <inheritdoc/>
+    public NexusSpriteMap Sprite { get; }
 
     /// <summary>
     /// The text lines itself
@@ -54,7 +48,7 @@ public sealed record NexusFiggleText : ISprite
         Background = background;
         FiggleFont = figgleFont;
 
-        _sprite = CreateSprite(text, foreground, background, new NexusSize(longestLength, text.Length));
+        Sprite = CreateSprite(text, foreground, background, new NexusSize(longestLength, text.Length));
     }
 
     /// <summary>
@@ -73,7 +67,7 @@ public sealed record NexusFiggleText : ISprite
     /// <param name="figgleFont">The Figgle Font that is used on the <paramref name="value"/></param>
     /// <param name="foreground">The foreground color of the text</param>
     /// <param name="background">The background color of the text</param>
-    public NexusFiggleText(in char value, FiggleFont figgleFont, in NexusColorIndex foreground, in NexusColorIndex background)
+    public NexusFiggleText(char value, FiggleFont figgleFont, in NexusColorIndex foreground, in NexusColorIndex background)
         : this(value.ToString(), figgleFont, foreground, background) { }
 
     /// <summary>
@@ -82,7 +76,7 @@ public sealed record NexusFiggleText : ISprite
     /// <param name="value">The text itself</param>
     /// <param name="figgleFont">The Figgle Font that is used on the <paramref name="value"/></param>
     /// <param name="foreground">The foreground color of the text</param>
-    public NexusFiggleText(in char value, FiggleFont figgleFont, in NexusColorIndex foreground)
+    public NexusFiggleText(char value, FiggleFont figgleFont, in NexusColorIndex foreground)
         : this(value.ToString(), figgleFont, foreground, NexusColorIndex.Background) { }
 
     /// <summary>
@@ -113,18 +107,18 @@ public sealed record NexusFiggleText : ISprite
         return values;
     }
 
-    private static ReadOnlyMemory2D<CHARINFO> CreateSprite(in ReadOnlySpan<string> text, in NexusColorIndex foreground, in NexusColorIndex background, in NexusSize size)
+    private static NexusSpriteMap CreateSprite(in ReadOnlySpan<string> text, in NexusColorIndex foreground, in NexusColorIndex background, in NexusSize size)
     {
-        var sprite = new Memory2D<CHARINFO>(size.Width, size.Height);
+        var sprite = new NexusWritableSpriteMap(size.Width, size.Height);
 
         for (int x = 0; x < sprite.Width; x++)
         {
             for (int y = 0; y < sprite.Height; y++)
             {
-                sprite[x, y] = NativeConverter.ToCharInfo(text[y][x], foreground, background);
+                sprite._spriteMap[IndexDimensions.Get1D(x, y, sprite.Width)] = NativeConverter.ToCharInfo(text[y][x], foreground, background);
             }
         }
 
-        return sprite.ToReadOnly();
+        return sprite.AsReadOnly();
     }
 }

@@ -27,7 +27,7 @@ public readonly record struct NexusFramerate : IMinMaxValue<NexusFramerate>
     /// </summary>
     /// <param name="framerate">Frames per second</param>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
-    public NexusFramerate(in int framerate)
+    public NexusFramerate(int framerate)
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(framerate, 0, nameof(framerate));
 
@@ -44,7 +44,7 @@ public readonly record struct NexusFramerate : IMinMaxValue<NexusFramerate>
     /// Implicitly converts <see cref="int"/> to <see cref="NexusFramerate"/>
     /// </summary>
     /// <param name="framerate">Framerate to convert</param>
-    public static implicit operator NexusFramerate(in int framerate) => new(framerate);
+    public static implicit operator NexusFramerate(int framerate) => new(framerate);
 
     /// <inheritdoc/>
     public override readonly string ToString() => Value.ToString();

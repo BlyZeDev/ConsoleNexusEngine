@@ -26,7 +26,7 @@ public readonly partial record struct NexusColor : ISpanParsable<NexusColor>, IP
     /// Initializes a color from RGB
     /// </summary>
     /// <param name="color">The first byte is the red component.<br/>The second byte is the green component.<br/>The third byte is the blue component.<br/>The fourth byte is unused</param>
-    public NexusColor(in uint color) => _value = color;
+    public NexusColor(uint color) => _value = color;
 
     /// <summary>
     /// Initializes a black color
@@ -39,7 +39,7 @@ public readonly partial record struct NexusColor : ISpanParsable<NexusColor>, IP
     /// <param name="r">Red component</param>
     /// <param name="g">Green component</param>
     /// <param name="b">Blue component</param>
-    public NexusColor(in byte r, in byte g, in byte b) : this(FromRgb(r, g, b)) { }
+    public NexusColor(byte r, byte g, byte b) : this(FromRgb(r, g, b)) { }
 
     /// <summary>
     /// 1.0 is <see cref="White"/>, 0.0 is <see cref="Black"/>
@@ -47,6 +47,13 @@ public readonly partial record struct NexusColor : ISpanParsable<NexusColor>, IP
     /// <returns><see cref="float"/> between 0.0 and 1.0</returns>
     public readonly float GetLuminance()
         => (0.2126f * R + 0.7152f * G + 0.0722f * B) / 255f;
+
+    /// <summary>
+    /// Inverses the color
+    /// </summary>
+    /// <returns><see cref="NexusColor"/></returns>
+    public readonly NexusColor Inverse()
+        => new NexusColor((byte)(byte.MaxValue - R), (byte)(byte.MaxValue - G), (byte)(byte.MaxValue - B));
 
     /// <summary>
     /// Format: "[R={<see cref="R"/>},G={<see cref="G"/>},B={<see cref="B"/>}]"

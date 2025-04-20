@@ -5,16 +5,12 @@ using System.Linq;
 /// <summary>
 /// Represents a text in the console
 /// </summary>
-public sealed record NexusText : ISprite
+public sealed record NexusText : INexusSprite
 {
-    private readonly ReadOnlyMemory2D<CHARINFO> _sprite;
-
-    ReadOnlyMemory2D<CHARINFO> ISprite.Sprite => _sprite;
-
     /// <summary>
-    /// <inheritdoc/> text
+    /// <inheritdoc/>
     /// </summary>
-    public NexusSize Size => new NexusSize(_sprite.Width, _sprite.Height);
+    public NexusSpriteMap Sprite { get; }
 
     /// <summary>
     /// The text itself
@@ -43,14 +39,14 @@ public sealed record NexusText : ISprite
     /// <param name="foreground">The foreground color of the text</param>
     /// <param name="background">The background color of the text</param>
     /// <param name="textDirection">The flow direction of the text</param>
-    public NexusText(string value, in NexusColorIndex foreground, in NexusColorIndex background, in NexusTextDirection textDirection = NexusTextDirection.Horizontal)
+    public NexusText(string value, in NexusColorIndex foreground, in NexusColorIndex background, NexusTextDirection textDirection = NexusTextDirection.Horizontal)
     {
         Value = value;
         Foreground = foreground;
         Background = background;
         TextDirection = textDirection;
 
-        _sprite = CreateSprite(value, Foreground, Background, TextDirection);
+        Sprite = CreateSprite(value, Foreground, Background, TextDirection);
     }
 
     /// <summary>
@@ -59,7 +55,7 @@ public sealed record NexusText : ISprite
     /// <param name="value">The text itself</param>
     /// <param name="foreground">The foreground color of the text</param>
     /// <param name="textDirection">The flow direction of the text</param>
-    public NexusText(string value, in NexusColorIndex foreground, in NexusTextDirection textDirection = NexusTextDirection.Horizontal)
+    public NexusText(string value, in NexusColorIndex foreground, NexusTextDirection textDirection = NexusTextDirection.Horizontal)
         : this(value, foreground, NexusColorIndex.Background, textDirection) { }
 
     /// <summary>
@@ -69,7 +65,7 @@ public sealed record NexusText : ISprite
     /// <param name="foreground">The foreground color of the text</param>
     /// <param name="background">The background color of the text</param>
     /// <param name="textDirection">The flow direction of the text</param>
-    public NexusText(object? value, in NexusColorIndex foreground, in NexusColorIndex background, in NexusTextDirection textDirection = NexusTextDirection.Horizontal)
+    public NexusText(object? value, in NexusColorIndex foreground, in NexusColorIndex background, NexusTextDirection textDirection = NexusTextDirection.Horizontal)
         : this(value?.ToString() ?? "", foreground, background, textDirection) { }
 
     /// <summary>
@@ -78,25 +74,24 @@ public sealed record NexusText : ISprite
     /// <param name="value">The text itself</param>
     /// <param name="foreground">The foreground color of the text</param>
     /// <param name="textDirection">The flow direction of the text</param>
-    public NexusText(object? value, in NexusColorIndex foreground, in NexusTextDirection textDirection = NexusTextDirection.Horizontal)
+    public NexusText(object? value, in NexusColorIndex foreground, NexusTextDirection textDirection = NexusTextDirection.Horizontal)
         : this(value?.ToString() ?? "", foreground, NexusColorIndex.Background, textDirection) { }
 
-    private static ReadOnlyMemory2D<CHARINFO> CreateSprite(string value, in NexusColorIndex foreground, in NexusColorIndex background, in NexusTextDirection direction)
+    private static NexusSpriteMap CreateSprite(string value, in NexusColorIndex foreground, in NexusColorIndex background, NexusTextDirection direction)
     {
         var isHorizontal = direction is NexusTextDirection.Horizontal or NexusTextDirection.HorizontalRightToLeft;
 
-        var sprite = new Memory2D<CHARINFO>(isHorizontal ? value.Length : 1, isHorizontal ? 1 : value.Length);
+        var sprite = new NexusWritableSpriteMap(isHorizontal ? value.Length : 1, isHorizontal ? 1 : value.Length);
 
-        var text = direction is NexusTextDirection.HorizontalRightToLeft or NexusTextDirection.VerticalRightToLeft
-            ? value.Reverse() : value;
+        var text = direction is NexusTextDirection.HorizontalRightToLeft or NexusTextDirection.VerticalRightToLeft ? value.Reverse() : value;
 
         var index = -1;
         foreach (var letter in text)
         {
             index++;
-            sprite[index] = NativeConverter.ToCharInfo(letter, foreground, background);
+            sprite._spriteMap[index] = NativeConverter.ToCharInfo(letter, foreground, background);
         }
 
-        return sprite.ToReadOnly();
+        return sprite.AsReadOnly();
     }
 }

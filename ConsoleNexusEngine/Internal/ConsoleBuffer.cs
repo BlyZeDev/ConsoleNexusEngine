@@ -1,8 +1,6 @@
 ﻿namespace ConsoleNexusEngine.Internal;
 
-using System.Runtime.CompilerServices;
-
-internal sealed unsafe class ConsoleBuffer
+internal sealed class ConsoleBuffer
 {
     private static readonly COORD _defaultBufferCoord = new COORD
     {
@@ -16,66 +14,37 @@ internal sealed unsafe class ConsoleBuffer
 
     private COORD bufferSize;
 
-    public short Width { get; private set; }
-    public short Height { get; private set; }
+    public short Width => bufferSize.X;
+    public short Height => bufferSize.Y;
 
-    public ConsoleBuffer(in nint standardOutput, in int width, in int height)
+    public ConsoleBuffer(nint standardOutput, int width, int height)
     {
         _standardOutput = standardOutput;
 
-        Width = (short)width;
-        Height = (short)height;
+        bufferSize = new COORD
+        {
+            X = (short)width,
+            Y = (short)height
+        };
 
         charInfoBuffer = new CHARINFO[Width * Height];
-
-        bufferSize = new COORD
-        {
-            X = Width,
-            Y = Height
-        };
     }
 
-    public void ChangeDimensions(in int width, in int height)
+    public void ChangeDimensions(int width, int height)
     {
-        Width = (short)width;
-        Height = (short)height;
+        bufferSize.X = (short)width;
+        bufferSize.Y = (short)height;
 
         Array.Resize(ref charInfoBuffer, Width * Height);
-
-        bufferSize = new COORD
-        {
-            X = Width,
-            Y = Height
-        };
     }
 
-    public void ClearChar(in int x, in int y)
-    {
-        fixed (CHARINFO* ptr = &charInfoBuffer[IndexDimensions.Get1D(x, y, Width)])
-        {
-            Unsafe.InitBlockUnaligned(ptr, 0, (uint)sizeof(CHARINFO));
-        }
-    }
+    public void ClearChar(int x, int y) => Array.Clear(charInfoBuffer, IndexDimensions.Get1D(x, y, Width), 1);
 
-    public void BlockClearChar(in int startX, in int startY, in int endX, in int endY)
-    {
-        fixed (CHARINFO* ptr = &charInfoBuffer[IndexDimensions.Get1D(startX, startY, Width)])
-        {
-            Unsafe.InitBlockUnaligned(ptr, 0, (uint)(IndexDimensions.Get1D(endX, endY, Width) * sizeof(CHARINFO)));
-        }
-    }
+    public void ClearBuffer() => Array.Clear(charInfoBuffer);
 
-    public void ClearBuffer()
-    {
-        fixed (CHARINFO* ptr = &charInfoBuffer[0])
-        {
-            Unsafe.InitBlockUnaligned(ptr, 0, (uint)(charInfoBuffer.Length * sizeof(CHARINFO)));
-        }
-    }
+    public CHARINFO GetChar(int x, int y) => charInfoBuffer[IndexDimensions.Get1D(x, y, Width)];
 
-    public CHARINFO GetChar(in int x, in int y) => charInfoBuffer[IndexDimensions.Get1D(x, y, Width)];
-
-    public void SetChar(in int x, in int y, CHARINFO character)
+    public void SetChar(int x, int y, CHARINFO character)
     {
         ref var current = ref charInfoBuffer[IndexDimensions.Get1D(x, y, Width)];
 
@@ -85,10 +54,10 @@ internal sealed unsafe class ConsoleBuffer
         current = character;
     }
 
-    public void BlockSetChar(in ReadOnlySpan<CHARINFO> characterBlock, in int sourceIndex, in int destIndex, in int blockWidth)
+    public void BlockSetChar(in ReadOnlySpan<CHARINFO> characterBlock, int sourceIndex, int destIndex, int blockWidth)
         => characterBlock.Slice(sourceIndex, blockWidth).CopyTo(charInfoBuffer.AsSpan(destIndex, blockWidth));
 
-    public void RenderBuffer()
+    public unsafe void RenderBuffer()
     {
         var renderArea = new SMALL_RECT
         {

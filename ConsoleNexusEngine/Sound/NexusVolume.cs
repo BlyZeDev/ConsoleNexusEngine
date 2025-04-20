@@ -44,24 +44,24 @@ public readonly record struct NexusVolume
     /// <summary>
     /// Initializes a Volume instance
     /// </summary>
-    public NexusVolume(in int volume) : this(volume / 100f) { }
+    public NexusVolume(int volume) : this(volume / 100f) { }
 
     /// <summary>
     /// Initializes a Volume instance
     /// </summary>
-    public NexusVolume(in float volume) => _value = Math.Clamp(volume, 0, 1);
+    public NexusVolume(float volume) => _value = Math.Clamp(volume, 0, 1);
 
     /// <inheritdoc/>
     public static explicit operator int(in NexusVolume volume) => volume.Value;
 
     /// <inheritdoc/>
-    public static explicit operator NexusVolume(in int volume) => new(volume);
+    public static explicit operator NexusVolume(int volume) => new(volume);
 
     /// <inheritdoc/>
     public static explicit operator float(in NexusVolume volume) => volume._value;
 
     /// <inheritdoc/>
-    public static explicit operator NexusVolume(in float volume) => new(volume);
+    public static explicit operator NexusVolume(float volume) => new(volume);
 
     /// <inheritdoc/>
     public static NexusVolume operator +(NexusVolume left, NexusVolume right)

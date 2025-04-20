@@ -8,42 +8,42 @@ public readonly partial record struct NexusColor
     /// <summary>
     /// [R=255,G=255,B=255]
     /// </summary>
-    public static NexusColor White => new(0xFFFFFF);
+    public static NexusColor White => new NexusColor(0xFFFFFF);
 
     /// <summary>
     /// [R=0,G=0,B=0]
     /// </summary>
-    public static NexusColor Black => new(0x000000);
+    public static NexusColor Black => new NexusColor(0x000000);
 
     /// <summary>
     /// [R=255,G=0,B=0]
     /// </summary>
-    public static NexusColor Red => new(0xFF0000);
+    public static NexusColor Red => new NexusColor(0xFF0000);
 
     /// <summary>
     /// [R=0,G=255,B=0]
     /// </summary>
-    public static NexusColor Green => new(0x00FF00);
+    public static NexusColor Green => new NexusColor(0x00FF00);
 
     /// <summary>
     /// [R=0,G=0,B=255]
     /// </summary>
-    public static NexusColor Blue => new(0x0000FF);
+    public static NexusColor Blue => new NexusColor(0x0000FF);
 
     /// <summary>
     /// [R=255,G=0,B=255]
     /// </summary>
-    public static NexusColor Magenta => new(0xFF00FF);
+    public static NexusColor Magenta => new NexusColor(0xFF00FF);
 
     /// <summary>
     /// [R=255,G=255,B=0]
     /// </summary>
-    public static NexusColor Yellow => new(0x00FFFF);
+    public static NexusColor Yellow => new NexusColor(0x00FFFF);
 
     /// <summary>
     /// [R=0,G=255,B=255]
     /// </summary>
-    public static NexusColor Cyan => new(0xFFFF00);
+    public static NexusColor Cyan => new NexusColor(0xFFFF00);
 
     /// <summary>
     /// Parses the color from a HEX value
@@ -103,6 +103,6 @@ public readonly partial record struct NexusColor
     public static bool TryParse([NotNullWhen(true)] string? hex, IFormatProvider? provider, [MaybeNullWhen(false)] out NexusColor result)
         => TryParse(hex.AsSpan(), null, out result);
 
-    private static uint FromRgb(in byte r, in byte g, in byte b)
+    private static uint FromRgb(byte r, byte g, byte b)
         => ((uint)r << 16) | ((uint)g << 8) | b;
 }

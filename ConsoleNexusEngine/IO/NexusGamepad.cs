@@ -91,7 +91,7 @@ public readonly record struct NexusGamepad
     /// </summary>
     public static NexusGamepad Empty => new();
 
-    private readonly uint _id;
+    internal readonly uint _id;
 
     /// <summary>
     /// The type of the gamepad
@@ -148,7 +148,7 @@ public readonly record struct NexusGamepad
     /// </summary>
     public NexusGamepad() : this(-1, NexusGamepadType.Unknown, NexusBatteryType.Unknown, NexusBatteryLevel.Empty, 0, false, false, 0, 0, 0, 0) { }
 
-    internal NexusGamepad(in int id, in NexusGamepadType type, in NexusBatteryType batteryType, in NexusBatteryLevel batteryLevel, in NexusXInput inputs, in bool isLeftTriggerPressed, in bool isRightTriggerPressed, in int leftThumbX, in int leftThumbY, in int rightThumbX, in int rightThumbY)
+    internal NexusGamepad(int id, NexusGamepadType type, NexusBatteryType batteryType, NexusBatteryLevel batteryLevel, NexusXInput inputs, bool isLeftTriggerPressed, bool isRightTriggerPressed, int leftThumbX, int leftThumbY, int rightThumbX, int rightThumbY)
     {
         _id = (uint)id;
         Type = type;
@@ -168,7 +168,7 @@ public readonly record struct NexusGamepad
     /// </summary>
     /// <param name="lowFrequency">The vibration strength of the low-frequency motor</param>
     /// <param name="highFrequency">The vibration strength of the high-frequency motor</param>
-    public void Vibrate(in NexusVibrationLevel lowFrequency, in NexusVibrationLevel highFrequency)
+    public void Vibrate(NexusVibrationLevel lowFrequency, NexusVibrationLevel highFrequency)
     {
         var vibration = new XINPUT_VIBRATION
         {

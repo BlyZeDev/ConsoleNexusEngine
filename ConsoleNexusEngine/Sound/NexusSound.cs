@@ -57,7 +57,7 @@ public sealed record NexusSound : IDisposable
     /// <param name="filePath">The path to the file that should be played</param>
     /// <param name="volume">The volume of the played sound</param>
     /// <param name="shouldLoop"><see langword="true"/> if the sound should be looped, otherwise <see langword="false"/></param>
-    public NexusSound(string filePath, in NexusVolume volume, in bool shouldLoop = false)
+    public NexusSound(string filePath, in NexusVolume volume, bool shouldLoop = false)
     {
         _wave = new WaveOutEvent()
         {
@@ -79,7 +79,7 @@ public sealed record NexusSound : IDisposable
     /// Plays the sound
     /// </summary>
     /// <param name="forceRestart"><see langword="true"/> if the sound should restart if it's already playing</param>
-    public void Play(in bool forceRestart = false)
+    public void Play(bool forceRestart = false)
     {
         if (forceRestart)
         {
@@ -129,7 +129,7 @@ public sealed record NexusSound : IDisposable
     /// Rewinds the sound by the given period
     /// </summary>
     /// <param name="seconds">The period to rewind in seconds</param>
-    public void Rewind(in int seconds) => ChangePos(-seconds);
+    public void Rewind(int seconds) => ChangePos(-seconds);
 
     /// <summary>
     /// Forwards the sound by the given period
@@ -141,7 +141,7 @@ public sealed record NexusSound : IDisposable
     /// Forwards the sound by the given period
     /// </summary>
     /// <param name="seconds">The period to forward in seconds</param>
-    public void Forward(in int seconds) => ChangePos(seconds);
+    public void Forward(int seconds) => ChangePos(seconds);
 
     /// <summary>
     /// Jumps to a specific position
@@ -165,7 +165,7 @@ public sealed record NexusSound : IDisposable
         GC.SuppressFinalize(this);
     }
 
-    private void ChangePos(in int seconds) => _stream.Skip(seconds);
+    private void ChangePos(int seconds) => _stream.Skip(seconds);
 
     private void OnFinish(object? sender, StoppedEventArgs e) => Stop();
 }

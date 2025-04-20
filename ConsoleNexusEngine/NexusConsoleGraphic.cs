@@ -3,7 +3,7 @@
 /// <summary>
 /// The graphics engine for <see cref="NexusConsoleGame"/>
 /// </summary>
-public sealed partial class NexusConsoleGraphic
+public sealed class NexusConsoleGraphic
 {
     private readonly CmdConsole _console;
 
@@ -27,7 +27,11 @@ public sealed partial class NexusConsoleGraphic
     /// <param name="coordinate">The coordinates where the character should be drawn</param>
     /// <param name="character">The character to draw</param>
     public void DrawPixel(in NexusCoord coordinate, in NexusChar character)
-        => SetChar(coordinate, character);
+    {
+        ThrowIfOutOfBounds(coordinate);
+
+        SetChar(coordinate.X, coordinate.Y, character);
+    }
 
     /// <summary>
     /// Draws a text in the console at a specific position
@@ -175,19 +179,22 @@ public sealed partial class NexusConsoleGraphic
     }
 
     /// <summary>
-    /// Draws a shape from one coordinate to another
+    /// Draws a sprite to the console at a specific position
     /// </summary>
-    /// <param name="start">The top left coordinate of the start point</param>
-    /// <param name="shape">The shape to draw</param>
-    public void DrawShape(in NexusCoord start, INexusShape shape)
+    /// <param name="coordinate">The top left coordinates of the sprite</param>
+    /// <param name="sprite">The sprite to draw</param>
+    public void DrawSprite(in NexusCoord coordinate, INexusSprite sprite)
     {
-        if (shape is ISprite sprite)
+        ThrowIfOutOfBounds(coordinate);
+        ThrowIfOutOfBounds(coordinate.X + sprite.Sprite.Size.Width - 1, coordinate.Y + sprite.Sprite.Size.Height - 1);
+
+        var spriteWidth = sprite.Sprite.Size.Width;
+        var spriteSpan = sprite.Sprite._spriteMap.Span;
+
+        for (int y = 0; y < sprite.Sprite.Size.Height; y++)
         {
-            DrawSprite(start, sprite);
-            return;
+            _console.Buffer.BlockSetChar(spriteSpan, y * spriteWidth, (coordinate.Y + y) * _console.Buffer.Width + coordinate.X, spriteWidth);
         }
-        
-        DrawShape(start, shape, shape.Character);
     }
 
     /// <summary>
@@ -205,14 +212,14 @@ public sealed partial class NexusConsoleGraphic
     /// Clears a whole column
     /// </summary>
     /// <param name="column">The column to clear</param>
-    public void ClearColumn(in int column)
+    public void ClearColumn(int column)
         => ClearLine(new NexusCoord(column, 0), new NexusCoord(column, _console.Buffer.Height - 1));
 
     /// <summary>
     /// Clears a whole row
     /// </summary>
     /// <param name="row">The row to clear</param>
-    public void ClearRow(in int row)
+    public void ClearRow(int row)
         => ClearLine(new NexusCoord(0, row), new NexusCoord(_console.Buffer.Width - 1, row));
 
     /// <summary>
@@ -307,28 +314,23 @@ public sealed partial class NexusConsoleGraphic
     }
 
     /// <summary>
-    /// Clears a shape
+    /// Clears a sprite to the console at a specific position
     /// </summary>
-    /// <param name="start">The top left coordinate of the start point</param>
-    /// <param name="size">The area to clear starting from <paramref name="start"/></param>
-    public void ClearBlock(in NexusCoord start, in NexusSize size)
-        => ClearSprite(start, new NexusCoord(start.X + size.Width, start.Y + size.Height));
+    /// <param name="coordinate">The top left coordinates of the sprite</param>
+    /// <param name="sprite">The sprite to clear</param>
+    public void ClearSprite(in NexusCoord coordinate, INexusSprite sprite)
+    {
+        ThrowIfOutOfBounds(coordinate);
+        ThrowIfOutOfBounds(coordinate.X + sprite.Sprite.Size.Width - 1, coordinate.Y + sprite.Sprite.Size.Height - 1);
 
-    /// <summary>
-    /// Clears a shape
-    /// </summary>
-    /// <param name="start">The top left coordinate of the start point</param>
-    /// <param name="end">The bottom right coordinate of the end point</param>
-    public void ClearBlock(in NexusCoord start, in NexusCoord end)
-        => ClearSprite(start, end);
+        var spriteWidth = sprite.Sprite.Size.Width;
+        Span<CHARINFO> spriteSpan = stackalloc CHARINFO[sprite.Sprite._spriteMap.Length];
 
-    /// <summary>
-    /// Clears a shape
-    /// </summary>
-    /// <param name="start">The top left coordinate of the start point</param>
-    /// <param name="shape">The shape to clear</param>
-    public void ClearShape(in NexusCoord start, INexusShape shape)
-        => ClearBlock(start, shape.Size);
+        for (int y = 0; y < sprite.Sprite.Size.Height; y++)
+        {
+            _console.Buffer.BlockSetChar(spriteSpan, y * spriteWidth, (coordinate.Y + y) * _console.Buffer.Width + coordinate.X, spriteWidth);
+        }
+    }
 
     /// <summary>
     /// Clears the current buffer of the console
@@ -339,4 +341,18 @@ public sealed partial class NexusConsoleGraphic
     /// Renders the buffer to the console
     /// </summary>
     public void Render() => _console.Buffer.RenderBuffer();
+
+    private void SetChar(int x, int y, NexusChar character) => _console.Buffer.SetChar(x, y, NativeConverter.ToCharInfo(character));
+
+    private void ThrowIfOutOfBounds(in NexusCoord coord)
+        => ThrowIfOutOfBounds(coord.X, coord.Y);
+
+    private void ThrowIfOutOfBounds(int x, int y)
+    {
+        if ((uint)x >= (uint)_console.Buffer.Width)
+            throw new ArgumentOutOfRangeException(nameof(x), "The coordinate is not in bounds of the console buffer");
+
+        if ((uint)y >= (uint)_console.Buffer.Height)
+            throw new ArgumentOutOfRangeException(nameof(y), "The coordinate is not in bounds of the console buffer");
+    }
 }

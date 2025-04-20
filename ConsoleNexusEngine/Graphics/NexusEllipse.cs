@@ -6,20 +6,10 @@ using System.Drawing.Imaging;
 /// <summary>
 /// Represents an ellipse shape
 /// </summary>
-public readonly struct NexusEllipse : INexusShape, ISprite
+public readonly struct NexusEllipse : INexusSprite
 {
-    private readonly ReadOnlyMemory2D<CHARINFO> _sprite;
-
-    readonly ReadOnlyMemory2D<CHARINFO> ISprite.Sprite => _sprite;
-
     /// <inheritdoc/>
-    public readonly NexusSize Size { get; }
-
-    /// <inheritdoc/>
-    public readonly NexusChar Character { get; }
-
-    /// <inheritdoc/>
-    public readonly bool Fill { get; }
+    public readonly NexusSpriteMap Sprite { get; }
 
     /// <summary>
     /// Initializes a new <see cref="NexusEllipse"/>
@@ -27,24 +17,20 @@ public readonly struct NexusEllipse : INexusShape, ISprite
     /// <param name="size">The size of the shape</param>
     /// <param name="character">The character to draw</param>
     /// <param name="fill"><see langword="true"/> if the shape is filled, otherwise <see langword="false"/></param>
-    public NexusEllipse(in NexusSize size, in NexusChar character, in bool fill)
+    public NexusEllipse(in NexusSize size, in NexusChar character, bool fill)
     {
         ArgumentOutOfRangeException.ThrowIfZero(size.Width, nameof(size.Width));
         ArgumentOutOfRangeException.ThrowIfZero(size.Height, nameof(size.Height));
 
         var bitmap = new Bitmap(size.Width, size.Height, PixelFormat.Format16bppRgb555);
 
-        Size = size;
-        Character = character;
-        Fill = fill;
-
         using (var graphics = Graphics.FromImage(bitmap))
         {
-            graphics.DrawEllipse(INexusShape.Red, 0, 0, size.Width - 1, size.Height - 1);
-            if (Fill) graphics.FillEllipse(INexusShape.Red.Brush, 0, 0, size.Width - 1, size.Height - 1);
+            graphics.DrawEllipse(Pens.Red, 0, 0, size.Width, size.Height);
+            if (fill) graphics.FillEllipse(Pens.Red.Brush, 0, 0, size.Width, size.Height);
         }
 
-        _sprite = CreateSprite(bitmap, Character);
+        Sprite = CreateSprite(bitmap, character);
     }
 
     /// <summary>
@@ -54,28 +40,12 @@ public readonly struct NexusEllipse : INexusShape, ISprite
     /// <param name="end">The coordinate of the end of the shape</param>
     /// <param name="character">The character to draw</param>
     /// <param name="fill"><see langword="true"/> if the shape is filled, otherwise <see langword="false"/></param>
-    public NexusEllipse(in NexusCoord start, in NexusCoord end, in NexusChar character, in bool fill)
+    public NexusEllipse(in NexusCoord start, in NexusCoord end, in NexusChar character, bool fill)
         : this(new NexusSize(end.X - start.X, end.Y - start.Y), character, fill) { }
 
-    /// <inheritdoc/>
-    public readonly bool[,] Draw()
+    private static NexusSpriteMap CreateSprite(Bitmap bitmap, in NexusChar character)
     {
-        var result = new bool[Size.Width, Size.Height];
-
-        for (int y = 0; y < Size.Height; y++)
-        {
-            for (int x = 0; x < Size.Width; x++)
-            {
-                result[x, y] = _sprite[x, y].UnicodeChar != char.MinValue;
-            }
-        }
-
-        return result;
-    }
-
-    private static ReadOnlyMemory2D<CHARINFO> CreateSprite(Bitmap bitmap, in NexusChar character)
-    {
-        var sprite = new Memory2D<CHARINFO>(bitmap.Width, bitmap.Height);
+        var sprite = new NexusWritableSpriteMap(bitmap.Width, bitmap.Height);
         var charInfo = NativeConverter.ToCharInfo(character);
 
         unsafe
@@ -95,13 +65,13 @@ public readonly struct NexusEllipse : INexusShape, ISprite
                 {
                     pixel = row + x * pixelSize;
 
-                    sprite[x, y] = ((pixel[1] & 0b01111100) >> 2 is 31) ? charInfo : default;
+                    sprite._spriteMap[IndexDimensions.Get1D(x, y, sprite.Width)] = ((pixel[1] & 0b01111100) >> 2 is 31) ? charInfo : default;
                 }
             }
 
             bitmap.UnlockBits(data);
         }
 
-        return sprite.ToReadOnly();
+        return sprite.AsReadOnly();
     }
 }

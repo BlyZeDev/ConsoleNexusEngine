@@ -7,7 +7,7 @@ internal sealed class LoopStream : WaveStream
     private readonly AudioFileReader _sourceStream;
     private readonly bool _isLooped;
 
-    public LoopStream(AudioFileReader sourceStream, in bool isLooped)
+    public LoopStream(AudioFileReader sourceStream, bool isLooped)
     {
         _sourceStream = sourceStream;
         _isLooped = isLooped;

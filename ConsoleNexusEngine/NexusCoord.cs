@@ -43,7 +43,7 @@ public readonly record struct NexusCoord
     /// </remarks>
     /// <param name="x">The X coordinate</param>
     /// <param name="y">The Y coordinate</param>
-    public NexusCoord(in int x, in int y)
+    public NexusCoord(int x, int y)
     {
         X = Math.Clamp(x, 0, int.MaxValue);
         Y = Math.Clamp(y, 0, int.MaxValue);

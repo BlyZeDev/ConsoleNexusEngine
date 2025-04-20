@@ -30,7 +30,7 @@ public sealed class Game : NexusConsoleGame
 
     public Game()
     {
-        Settings.Font = new NexusFont("Consolas", new NexusSize(10));
+        Settings.Font = new NexusFont("Consolas", new NexusSize(25));
         Settings.ColorPalette = new CGAColorPalette();
     }
 
@@ -65,7 +65,7 @@ public sealed class Game : NexusConsoleGame
     {
         var gamepad = Input.Gamepad1;
 
-        Graphic.DrawShape(NexusCoord.MinValue, new NexusRectangle(BufferSize, new NexusChar(' ', NexusColorIndex.Color11, NexusColorIndex.Color11), true));
+        Graphic.DrawSprite(NexusCoord.MinValue, new NexusRectangle(BufferSize, new NexusChar(' ', NexusColorIndex.Color11, NexusColorIndex.Color11), true));
         
         Graphic.DrawText(new NexusCoord(0, 0), new NexusText("Type: " + gamepad.Type, NexusColorIndex.Color1));
         Graphic.DrawText(new NexusCoord(1, 1), new NexusText("Battery Type: " + gamepad.BatteryType, NexusColorIndex.Color2));
@@ -77,6 +77,9 @@ public sealed class Game : NexusConsoleGame
         Graphic.DrawText(new NexusCoord(7, 7), new NexusText("Left Thumb Y: " + gamepad.LeftThumbY, NexusColorIndex.Color8));
         Graphic.DrawText(new NexusCoord(8, 8), new NexusText("Right Thumb X: " + gamepad.RightThumbX, NexusColorIndex.Color9));
         Graphic.DrawText(new NexusCoord(9, 9), new NexusText("Right Thumb Y: " + gamepad.RightThumbY, NexusColorIndex.Color10));
+
+        //Graphic.ClearSprite(NexusCoord.MinValue, new NexusRectangle(BufferSize, new NexusChar(' ', NexusColorIndex.Color11, NexusColorIndex.Color11), true));
+
         Graphic.DrawText(new NexusCoord(10, 10), new NexusText("FPS: " + FramesPerSecond, NexusColorIndex.Color3));
         Graphic.DrawText(new NexusCoord(11, 11), new NexusText("Width: " + BufferSize.Width, NexusColorIndex.Color3));
         Graphic.DrawText(new NexusCoord(12, 12), new NexusText("Height: " + BufferSize.Height, NexusColorIndex.Color3));
@@ -88,8 +91,8 @@ public sealed class Game : NexusConsoleGame
 
         Graphic.DrawPixel(new NexusCoord(BufferSize.Width / 2, BufferSize.Height / 2), new NexusChar('X', NexusColorIndex.Color11));
 
-        Graphic.DrawShape(NexusCoord.MinValue, new NexusRectangle(new NexusSize(1, 1), new NexusChar(' ', NexusColorIndex.Color11, NexusColorIndex.Color12), true));
-        Graphic.DrawShape(NexusCoord.MinValue, new NexusEllipse(BufferSize, new NexusChar(' ', NexusColorIndex.Color11, NexusColorIndex.Color12), true));
+        Graphic.DrawSprite(NexusCoord.MinValue, new NexusRectangle(new NexusSize(2, 2), new NexusChar(' ', NexusColorIndex.Color14, NexusColorIndex.Color14), true));
+        Graphic.ClearSprite(NexusCoord.MinValue, new NexusRectangle(new NexusSize(1, 1), new NexusChar(' ', NexusColorIndex.Color14, NexusColorIndex.Color14), true));
 
         //Debug.WriteLine(DateTime.Now + " - " + (Input.Keys.IsDefaultOrEmpty ? "NO KEY IS PRESSED" : string.Join(',', Input.Keys)) + " - " + Input.MousePosition);
     }

@@ -54,8 +54,8 @@ internal static class TaskHelper
 
     private sealed class ExclusiveSynchronizationContext : SynchronizationContext
     {
-        private readonly AutoResetEvent _workItemsWaiting = new(false);
-        private readonly Queue<Tuple<SendOrPostCallback, object?>> _items = new();
+        private readonly AutoResetEvent _workItemsWaiting = new AutoResetEvent(false);
+        private readonly Queue<(SendOrPostCallback, object?)> _items = new Queue<(SendOrPostCallback, object?)>();
         private bool done;
 
         public Exception? InnerException { get; set; }
@@ -67,7 +67,7 @@ internal static class TaskHelper
         {
             lock (_items)
             {
-                _items.Enqueue(Tuple.Create(d, state));
+                _items.Enqueue((d, state));
             }
 
             _workItemsWaiting.Set();
@@ -79,7 +79,7 @@ internal static class TaskHelper
         {
             while (!done)
             {
-                Tuple<SendOrPostCallback, object?>? task = null;
+                (SendOrPostCallback, object?)? task = null;
 
                 lock (_items)
                 {
@@ -91,7 +91,7 @@ internal static class TaskHelper
 
                 if (task is not null)
                 {
-                    task.Item1(task.Item2);
+                    task.Value.Item1(task.Value.Item2);
 
                     if (InnerException is not null)
                     {

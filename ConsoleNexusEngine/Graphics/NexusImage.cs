@@ -7,24 +7,18 @@ using System.Net.Http;
 /// <summary>
 /// Represents an image that can be rendered in the console
 /// </summary>
-public readonly struct NexusImage : ISprite
+public readonly struct NexusImage : INexusSprite
 {
     private const char LightBlock = '░';
     private const char MiddleBlock = '▒';
     private const char DarkBlock = '▓';
     private const char FullBlock = '█';
 
-    private readonly ReadOnlyMemory2D<CHARINFO> _sprite;
-
-    ReadOnlyMemory2D<CHARINFO> ISprite.Sprite => _sprite;
-
-    /// <summary>
-    /// <inheritdoc/> image
-    /// </summary>
-    public readonly NexusSize Size => new NexusSize(_sprite.Width, _sprite.Height);
+    /// <inheritdoc/>
+    public readonly NexusSpriteMap Sprite { get; }
 
     internal NexusImage(Bitmap bitmap, NexusColorProcessor imageProcessor, in NexusSize? size)
-        => _sprite = CreateSprite(bitmap, imageProcessor, size);
+        => Sprite = CreateSprite(bitmap, imageProcessor, size);
 
     /// <summary>
     /// Initializes a new NexusImage
@@ -48,7 +42,7 @@ public readonly struct NexusImage : ISprite
     /// <param name="filepath">The path to the image file</param>
     /// <param name="imageProcessor">The image processor that should be used</param>
     /// <param name="percentage">The desired percentage size of the bitmap</param>
-    public NexusImage(string filepath, NexusColorProcessor imageProcessor, in float percentage)
+    public NexusImage(string filepath, NexusColorProcessor imageProcessor, float percentage)
         : this((Bitmap)Image.FromFile(filepath), imageProcessor, percentage) { }
 
     /// <summary>
@@ -57,7 +51,7 @@ public readonly struct NexusImage : ISprite
     /// <param name="bitmap">The bitmap</param>
     /// <param name="imageProcessor">The image processor that should be used</param>
     /// <param name="percentage">The desired percentage size of the bitmap</param>
-    public NexusImage(Bitmap bitmap, NexusColorProcessor imageProcessor, in float percentage)
+    public NexusImage(Bitmap bitmap, NexusColorProcessor imageProcessor, float percentage)
         : this(bitmap, imageProcessor, ImageHelper.GetSize(bitmap.Width, bitmap.Height, percentage)) { }
 
     /// <summary>
@@ -96,11 +90,11 @@ public readonly struct NexusImage : ISprite
         }
     }
 
-    private static ReadOnlyMemory2D<CHARINFO> CreateSprite(Bitmap bitmap, NexusColorProcessor processor, in NexusSize? size)
+    private static NexusSpriteMap CreateSprite(Bitmap bitmap, NexusColorProcessor processor, in NexusSize? size)
     {
         var resized = ImageHelper.Resize(bitmap, size);
 
-        var pixels = new Memory2D<CHARINFO>(resized.Width, resized.Height);
+        var sprite = new NexusWritableSpriteMap(resized.Width, resized.Height);
 
         var data = resized.LockBits(
             new Rectangle(0, 0, resized.Width, resized.Height),
@@ -125,7 +119,7 @@ public readonly struct NexusImage : ISprite
                     {
                         pixel = row + x * pixelSize;
 
-                        pixels[x, y] = NativeConverter.ToCharInfo(
+                        sprite._spriteMap[IndexDimensions.Get1D(x, y, sprite.Width)] = NativeConverter.ToCharInfo(
                             GetAlphaLevel(pixel[3]),
                             processor.Process(new NexusColor(pixel[2], pixel[1], pixel[0])),
                             0);
@@ -138,10 +132,10 @@ public readonly struct NexusImage : ISprite
             resized.UnlockBits(data);
         }
 
-        return pixels.ToReadOnly();
+        return sprite.AsReadOnly();
     }
 
-    private static char GetAlphaLevel(in byte alpha)
+    private static char GetAlphaLevel(byte alpha)
     {
         return alpha switch
         {

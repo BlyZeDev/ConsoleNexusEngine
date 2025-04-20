@@ -3,21 +3,15 @@
 /// <summary>
 /// Represents a character in the console
 /// </summary>
-public readonly record struct NexusChar : ISprite
+public readonly record struct NexusChar : INexusSprite
 {
     /// <summary>
     /// Represents an empty <see cref="NexusChar"/>
     /// </summary>
     public static NexusChar Empty => new NexusChar();
 
-    private readonly ReadOnlyMemory2D<CHARINFO> _sprite;
-
-    readonly ReadOnlyMemory2D<CHARINFO> ISprite.Sprite => _sprite;
-
-    /// <summary>
-    /// <inheritdoc/> character
-    /// </summary>
-    public readonly NexusSize Size => new NexusSize(_sprite.Width, _sprite.Height);
+    /// <inheritdoc/>
+    public readonly NexusSpriteMap Sprite { get; }
 
     /// <summary>
     /// The character itself
@@ -25,12 +19,12 @@ public readonly record struct NexusChar : ISprite
     public readonly char Value { get; }
 
     /// <summary>
-    /// The foreground color of the text
+    /// The foreground color of the character
     /// </summary>
     public readonly NexusColorIndex Foreground { get; }
 
     /// <summary>
-    /// The background color of the text
+    /// The background color of the character
     /// </summary>
     public readonly NexusColorIndex Background { get; }
 
@@ -45,13 +39,13 @@ public readonly record struct NexusChar : ISprite
     /// <param name="value">The character itself</param>
     /// <param name="foreground">The foreground color of the character</param>
     /// <param name="background">The background color of the character</param>
-    public NexusChar(in char value, in NexusColorIndex foreground, in NexusColorIndex background)
+    public NexusChar(char value, in NexusColorIndex foreground, in NexusColorIndex background)
     {
         Value = value;
         Foreground = foreground;
         Background = background;
 
-        _sprite = new ReadOnlyMemory2D<CHARINFO>(NativeConverter.ToCharInfo(this));
+        Sprite = new NexusSpriteMap(NativeConverter.ToCharInfo(this));
     }
 
     /// <summary>
@@ -59,6 +53,6 @@ public readonly record struct NexusChar : ISprite
     /// </summary>
     /// <param name="value">The character itself</param>
     /// <param name="foreground">The foreground color of the character</param>
-    public NexusChar(in char value, in NexusColorIndex foreground)
+    public NexusChar(char value, in NexusColorIndex foreground)
         : this(value, foreground, NexusColorIndex.Background) { }
 }

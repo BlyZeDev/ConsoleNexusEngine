@@ -43,7 +43,7 @@ public readonly record struct NexusSize
     /// </remarks>
     /// <param name="width">The width</param>
     /// <param name="height">The height</param>
-    public NexusSize(in int width, in int height)
+    public NexusSize(int width, int height)
     {
         Width = Math.Clamp(width, 0, int.MaxValue);
         Height = Math.Clamp(height, 0, int.MaxValue);
@@ -56,7 +56,7 @@ public readonly record struct NexusSize
     /// The size is clamped between <see cref="MinValue"/> and <see cref="int.MaxValue"/>
     /// </remarks>
     /// <param name="dimensions">The width and height</param>
-    public NexusSize(in int dimensions) : this(dimensions, dimensions) { }
+    public NexusSize(int dimensions) : this(dimensions, dimensions) { }
 
     /// <summary>
     /// Converts this object to a <see cref="NexusCoord"/>

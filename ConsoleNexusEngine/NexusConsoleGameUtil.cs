@@ -42,7 +42,7 @@ public sealed class NexusConsoleGameUtil
     /// <param name="onlyColorPalette"><see langword="true"/> if only colors from the current <see cref="NexusColorPalette"/> should be included</param>
     /// <param name="pseudoRandom"><see langword="false"/> if it should be generated as a strong random</param>
     /// <returns><see cref="NexusColor"/></returns>
-    public NexusColor GetRandomColor(in bool onlyColorPalette, in bool pseudoRandom = true)
+    public NexusColor GetRandomColor(bool onlyColorPalette, bool pseudoRandom = true)
     {
         if (onlyColorPalette) return _settings.ColorPalette[GetRandomNumber(NexusColorPalette.MaxColorCount, pseudoRandom)];
 
@@ -60,7 +60,7 @@ public sealed class NexusConsoleGameUtil
     /// <param name="inBufferArea"><see langword="false"/> if the coordinate should be in range of the buffer area</param>
     /// <param name="pseudoRandom"><see langword="false"/> if it should be generated as a strong random</param>
     /// <returns><see cref="NexusCoord"/></returns>
-    public NexusCoord GetRandomCoord(in bool inBufferArea, in bool pseudoRandom = true)
+    public NexusCoord GetRandomCoord(bool inBufferArea, bool pseudoRandom = true)
         => inBufferArea ? GetRandomCoord(new NexusCoord(_console.Buffer.Width, _console.Buffer.Height), pseudoRandom) : new NexusCoord(GetRandomNumber(pseudoRandom), GetRandomNumber(pseudoRandom));
 
     /// <summary>
@@ -69,7 +69,7 @@ public sealed class NexusConsoleGameUtil
     /// <param name="maxCoord">The exclusive maximum coordinate</param>
     /// <param name="pseudoRandom"><see langword="false"/> if it should be generated as a strong random</param>
     /// <returns><see cref="NexusCoord"/></returns>
-    public NexusCoord GetRandomCoord(in NexusCoord maxCoord, in bool pseudoRandom = true)
+    public NexusCoord GetRandomCoord(in NexusCoord maxCoord, bool pseudoRandom = true)
         => GetRandomCoord(NexusCoord.MinValue, maxCoord, pseudoRandom);
 
     /// <summary>
@@ -79,7 +79,7 @@ public sealed class NexusConsoleGameUtil
     /// <param name="maxCoord">The exclusive maximum coordinate</param>
     /// <param name="pseudoRandom"><see langword="false"/> if it should be generated as a strong random</param>
     /// <returns><see cref="NexusCoord"/></returns>
-    public NexusCoord GetRandomCoord(in NexusCoord minCoord, in NexusCoord maxCoord, in bool pseudoRandom = true)
+    public NexusCoord GetRandomCoord(in NexusCoord minCoord, in NexusCoord maxCoord, bool pseudoRandom = true)
         => new(GetRandomNumber(minCoord.X, maxCoord.X, pseudoRandom), GetRandomNumber(minCoord.Y, maxCoord.Y, pseudoRandom));
 
     /// <summary>
@@ -88,7 +88,7 @@ public sealed class NexusConsoleGameUtil
     /// <param name="inBufferArea"><see langword="false"/> if the coordinate should be in range of the buffer area</param>
     /// <param name="pseudoRandom"><see langword="false"/> if it should be generated as a strong random</param>
     /// <returns><see cref="NexusSize"/></returns>
-    public NexusSize GetRandomSize(in bool inBufferArea, in bool pseudoRandom = true)
+    public NexusSize GetRandomSize(bool inBufferArea, bool pseudoRandom = true)
         => inBufferArea ? GetRandomSize(new NexusSize(_console.Buffer.Width, _console.Buffer.Height), pseudoRandom) : new NexusSize(GetRandomNumber(pseudoRandom), GetRandomNumber(pseudoRandom));
 
     /// <summary>
@@ -97,7 +97,7 @@ public sealed class NexusConsoleGameUtil
     /// <param name="maxSize">The exclusive maximum coordinate</param>
     /// <param name="pseudoRandom"><see langword="false"/> if it should be generated as a strong random</param>
     /// <returns><see cref="NexusSize"/></returns>
-    public NexusSize GetRandomSize(in NexusSize maxSize, in bool pseudoRandom = true)
+    public NexusSize GetRandomSize(in NexusSize maxSize, bool pseudoRandom = true)
         => GetRandomSize(NexusSize.MinValue, maxSize, pseudoRandom);
 
     /// <summary>
@@ -107,7 +107,7 @@ public sealed class NexusConsoleGameUtil
     /// <param name="maxSize">The exclusive maximum coordinate</param>
     /// <param name="pseudoRandom"><see langword="false"/> if it should be generated as a strong random</param>
     /// <returns><see cref="NexusSize"/></returns>
-    public NexusSize GetRandomSize(in NexusSize minSize, in NexusSize maxSize, in bool pseudoRandom = true)
+    public NexusSize GetRandomSize(in NexusSize minSize, in NexusSize maxSize, bool pseudoRandom = true)
         => new(GetRandomNumber(minSize.Width, maxSize.Width, pseudoRandom), GetRandomNumber(minSize.Height, maxSize.Height, pseudoRandom));
 
     /// <summary>
@@ -115,7 +115,7 @@ public sealed class NexusConsoleGameUtil
     /// </summary>
     /// <param name="pseudoRandom"><see langword="false"/> if it should be generated as a strong random</param>
     /// <returns><see cref="int"/></returns>
-    public int GetRandomNumber(in bool pseudoRandom = true)
+    public int GetRandomNumber(bool pseudoRandom = true)
         => GetRandomNumber(0, int.MaxValue, pseudoRandom);
 
     /// <summary>
@@ -124,7 +124,7 @@ public sealed class NexusConsoleGameUtil
     /// <param name="maxValue">Exclusive upper bounds</param>
     /// <param name="pseudoRandom"><see langword="false"/> if it should be generated as a strong random</param>
     /// <returns><see cref="int"/></returns>
-    public int GetRandomNumber(in int maxValue, in bool pseudoRandom = true)
+    public int GetRandomNumber(int maxValue, bool pseudoRandom = true)
         => GetRandomNumber(0, maxValue, pseudoRandom);
 
     /// <summary>
@@ -134,7 +134,7 @@ public sealed class NexusConsoleGameUtil
     /// <param name="maxValue">Exclusive upper bounds</param>
     /// <param name="pseudoRandom"><see langword="false"/> if it should be generated as a strong random</param>
     /// <returns><see cref="int"/></returns>
-    public int GetRandomNumber(in int minValue, in int maxValue, in bool pseudoRandom = true)
+    public int GetRandomNumber(int minValue, int maxValue, bool pseudoRandom = true)
         => pseudoRandom ? Random.Shared.Next(minValue, maxValue) : RandomNumberGenerator.GetInt32(minValue, maxValue);
 
     /// <summary>
@@ -144,7 +144,7 @@ public sealed class NexusConsoleGameUtil
     /// <param name="maxValue">Exclusive upper bounds</param>
     /// <param name="pseudoRandom"><see langword="false"/> if it should be generated as a strong random</param>
     /// <returns><see cref="char"/></returns>
-    public char GetRandomChar(in char minValue, in char maxValue, in bool pseudoRandom = true)
+    public char GetRandomChar(char minValue, char maxValue, bool pseudoRandom = true)
         => (char)GetRandomNumber(minValue, maxValue, pseudoRandom);
 
 
@@ -154,7 +154,7 @@ public sealed class NexusConsoleGameUtil
     /// <param name="maxValue">Exclusive upper bounds</param>
     /// <param name="pseudoRandom"><see langword="false"/> if it should be generated as a strong random</param>
     /// <returns><see cref="char"/></returns>
-    public char GetRandomChar(in char maxValue, in bool pseudoRandom = true)
+    public char GetRandomChar(char maxValue, bool pseudoRandom = true)
         => GetRandomChar(char.MinValue, maxValue, pseudoRandom);
 
     /// <summary>
@@ -162,7 +162,7 @@ public sealed class NexusConsoleGameUtil
     /// </summary>
     /// <param name="pseudoRandom"><see langword="false"/> if it should be generated as a strong random</param>
     /// <returns><see cref="char"/></returns>
-    public char GetRandomChar(in bool pseudoRandom = true)
+    public char GetRandomChar(bool pseudoRandom = true)
         => GetRandomChar(char.MinValue, char.MaxValue, pseudoRandom);
 
     /// <summary>
@@ -170,7 +170,7 @@ public sealed class NexusConsoleGameUtil
     /// </summary>
     /// <param name="pseudoRandom"><see langword="false"/> if it should be generated as a strong random</param>
     /// <returns><see cref="NexusColorPalette"/></returns>
-    public NexusColorPalette GetRandomColorPalette(in bool pseudoRandom = true)
+    public NexusColorPalette GetRandomColorPalette(bool pseudoRandom = true)
         => _colorPalettes[GetRandomNumber(_colorPalettes.Length, pseudoRandom)];
 
     /// <summary>
@@ -179,6 +179,6 @@ public sealed class NexusConsoleGameUtil
     /// <param name="caption">The title of the message box</param>
     /// <param name="message">The title of the message box</param>
     /// <param name="alertIcon">The icon that should be displayed</param>
-    public void ShowAlert(string caption, string message, in NexusAlertIcon alertIcon)
+    public void ShowAlert(string caption, string message, NexusAlertIcon alertIcon)
         => _console.MessageBox(caption, message, (uint)alertIcon);
 }
