@@ -186,12 +186,12 @@ public sealed class NexusConsoleGraphic
     public void DrawSprite(in NexusCoord coordinate, INexusSprite sprite)
     {
         ThrowIfOutOfBounds(coordinate);
-        ThrowIfOutOfBounds(coordinate.X + sprite.Sprite.Size.Width - 1, coordinate.Y + sprite.Sprite.Size.Height - 1);
+        ThrowIfOutOfBounds(coordinate.X + sprite.Map.Size.Width - 1, coordinate.Y + sprite.Map.Size.Height - 1);
 
-        var spriteWidth = sprite.Sprite.Size.Width;
-        var spriteSpan = sprite.Sprite._spriteMap.Span;
+        var spriteWidth = sprite.Map.Size.Width;
+        var spriteSpan = sprite.Map._spriteMap.Span;
 
-        for (int y = 0; y < sprite.Sprite.Size.Height; y++)
+        for (int y = 0; y < sprite.Map.Size.Height; y++)
         {
             _console.Buffer.BlockSetChar(spriteSpan, y * spriteWidth, (coordinate.Y + y) * _console.Buffer.Width + coordinate.X, spriteWidth);
         }
@@ -321,12 +321,12 @@ public sealed class NexusConsoleGraphic
     public void ClearSprite(in NexusCoord coordinate, INexusSprite sprite)
     {
         ThrowIfOutOfBounds(coordinate);
-        ThrowIfOutOfBounds(coordinate.X + sprite.Sprite.Size.Width - 1, coordinate.Y + sprite.Sprite.Size.Height - 1);
+        ThrowIfOutOfBounds(coordinate.X + sprite.Map.Size.Width - 1, coordinate.Y + sprite.Map.Size.Height - 1);
 
-        var spriteWidth = sprite.Sprite.Size.Width;
-        Span<CHARINFO> spriteSpan = stackalloc CHARINFO[sprite.Sprite._spriteMap.Length];
+        var spriteWidth = sprite.Map.Size.Width;
+        Span<CHARINFO> spriteSpan = stackalloc CHARINFO[sprite.Map._spriteMap.Length];
 
-        for (int y = 0; y < sprite.Sprite.Size.Height; y++)
+        for (int y = 0; y < sprite.Map.Size.Height; y++)
         {
             _console.Buffer.BlockSetChar(spriteSpan, y * spriteWidth, (coordinate.Y + y) * _console.Buffer.Width + coordinate.X, spriteWidth);
         }

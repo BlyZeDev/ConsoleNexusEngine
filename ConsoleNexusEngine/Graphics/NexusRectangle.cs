@@ -9,7 +9,7 @@ using System.Drawing.Imaging;
 public readonly struct NexusRectangle : INexusSprite
 {
     /// <inheritdoc/>
-    public readonly NexusSpriteMap Sprite { get; }
+    public readonly NexusSpriteMap Map { get; }
 
     /// <summary>
     /// Initializes a new <see cref="NexusRectangle"/>
@@ -30,7 +30,7 @@ public readonly struct NexusRectangle : INexusSprite
             if (fill) graphics.FillRectangle(Pens.Red.Brush, 0, 0, size.Width, size.Height);
         }
 
-        Sprite = CreateSprite(bitmap, character);
+        Map = CreateSprite(bitmap, character);
     }
 
     /// <summary>
@@ -45,7 +45,7 @@ public readonly struct NexusRectangle : INexusSprite
 
     private static NexusSpriteMap CreateSprite(Bitmap bitmap, in NexusChar character)
     {
-        var sprite = new NexusWritableSpriteMap(bitmap.Width, bitmap.Height);
+        var sprite = new NexusWritableSpriteMap(new NexusSize(bitmap.Width, bitmap.Height));
         var charInfo = NativeConverter.ToCharInfo(character);
 
         unsafe
@@ -65,7 +65,7 @@ public readonly struct NexusRectangle : INexusSprite
                 {
                     pixel = row + x * pixelSize;
 
-                    sprite._spriteMap[IndexDimensions.Get1D(x, y, sprite.Width)] = ((pixel[1] & 0b01111100) >> 2 is 31) ? charInfo : default;
+                    sprite._spriteMap[IndexDimensions.Get1D(x, y, sprite.Size.Width)] = ((pixel[1] & 0b01111100) >> 2 is 31) ? charInfo : default;
                 }
             }
 

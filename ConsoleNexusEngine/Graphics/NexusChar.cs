@@ -11,7 +11,7 @@ public readonly record struct NexusChar : INexusSprite
     public static NexusChar Empty => new NexusChar();
 
     /// <inheritdoc/>
-    public readonly NexusSpriteMap Sprite { get; }
+    public readonly NexusSpriteMap Map { get; }
 
     /// <summary>
     /// The character itself
@@ -45,7 +45,7 @@ public readonly record struct NexusChar : INexusSprite
         Foreground = foreground;
         Background = background;
 
-        Sprite = new NexusSpriteMap(NativeConverter.ToCharInfo(this));
+        Map = new NexusSpriteMap([NativeConverter.ToCharInfo(this)], new NexusSize(1));
     }
 
     /// <summary>

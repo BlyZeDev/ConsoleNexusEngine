@@ -8,5 +8,5 @@ public interface INexusSprite
     /// <summary>
     /// The sprite data that is rendered
     /// </summary>
-    public NexusSpriteMap Sprite { get; }
+    public NexusSpriteMap Map { get; }
 }

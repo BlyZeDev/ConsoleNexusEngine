@@ -31,6 +31,12 @@ public readonly record struct NexusSize
     public readonly int Height { get; }
 
     /// <summary>
+    /// The dimensions
+    /// </summary>
+    /// <remarks><see cref="Width"/> * <see cref="Height"/></remarks>
+    public readonly int Dimensions => Width * Height;
+
+    /// <summary>
     /// Initializes a new <see cref="NexusSize"/>
     /// </summary>
     public NexusSize() : this(0, 0) { }

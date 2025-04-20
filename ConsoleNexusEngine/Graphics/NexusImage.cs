@@ -15,10 +15,10 @@ public readonly struct NexusImage : INexusSprite
     private const char FullBlock = '█';
 
     /// <inheritdoc/>
-    public readonly NexusSpriteMap Sprite { get; }
+    public readonly NexusSpriteMap Map { get; }
 
     internal NexusImage(Bitmap bitmap, NexusColorProcessor imageProcessor, in NexusSize? size)
-        => Sprite = CreateSprite(bitmap, imageProcessor, size);
+        => Map = CreateSprite(bitmap, imageProcessor, size);
 
     /// <summary>
     /// Initializes a new NexusImage
@@ -94,7 +94,7 @@ public readonly struct NexusImage : INexusSprite
     {
         var resized = ImageHelper.Resize(bitmap, size);
 
-        var sprite = new NexusWritableSpriteMap(resized.Width, resized.Height);
+        var sprite = new NexusWritableSpriteMap(new NexusSize(resized.Width, resized.Height));
 
         var data = resized.LockBits(
             new Rectangle(0, 0, resized.Width, resized.Height),
@@ -119,7 +119,7 @@ public readonly struct NexusImage : INexusSprite
                     {
                         pixel = row + x * pixelSize;
 
-                        sprite._spriteMap[IndexDimensions.Get1D(x, y, sprite.Width)] = NativeConverter.ToCharInfo(
+                        sprite._spriteMap[IndexDimensions.Get1D(x, y, sprite.Size.Width)] = NativeConverter.ToCharInfo(
                             GetAlphaLevel(pixel[3]),
                             processor.Process(new NexusColor(pixel[2], pixel[1], pixel[0])),
                             0);

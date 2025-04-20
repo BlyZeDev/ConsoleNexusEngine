@@ -25,7 +25,7 @@ public sealed class NexusAnimation
 
         _images = Initialize(animation, imageProcessor, size);
 
-        Size = _images.Span[0].Sprite.Size;
+        Size = _images.Span[0].Map.Size;
 
         currentFrameIndex = -1;
     }

@@ -30,8 +30,8 @@ public sealed class Game : NexusConsoleGame
 
     public Game()
     {
-        Settings.Font = new NexusFont("Consolas", new NexusSize(25));
-        Settings.ColorPalette = new CGAColorPalette();
+        Settings.Font = new NexusFont("Consolas", new NexusSize(20));
+        Settings.ColorPalette = new WindowsColorPalette();
     }
 
     protected override void Load()

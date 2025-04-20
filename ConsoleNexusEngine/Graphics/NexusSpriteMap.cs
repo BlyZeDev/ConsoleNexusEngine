@@ -15,16 +15,13 @@ public readonly struct NexusSpriteMap
     /// <summary>
     /// Initializes an empty <see cref="NexusSpriteMap"/> with the specified dimensions
     /// </summary>
-    /// <param name="width">The width of the sprite map</param>
-    /// <param name="height">The height of the sprite map</param>
-    public NexusSpriteMap(int width, int height) : this(new CHARINFO[width * height], width, height) { }
+    /// <param name="size">The size of the sprite map</param>
+    public NexusSpriteMap(in NexusSize size) : this(new CHARINFO[size.Dimensions], size) { }
 
-    internal NexusSpriteMap(CHARINFO info) : this([info], 1, 1) { }
-
-    internal NexusSpriteMap(Span<CHARINFO> spriteMap, int width, int height)
+    internal NexusSpriteMap(Span<CHARINFO> spriteMap, in NexusSize size)
     {
         _spriteMap = new ReadOnlyMemory<CHARINFO>(spriteMap.ToArray());
-        Size = new NexusSize(width, height);
+        Size = size;
     }
 
     /// <summary>

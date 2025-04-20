@@ -10,7 +10,7 @@ public sealed record NexusText : INexusSprite
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public NexusSpriteMap Sprite { get; }
+    public NexusSpriteMap Map { get; }
 
     /// <summary>
     /// The text itself
@@ -46,7 +46,7 @@ public sealed record NexusText : INexusSprite
         Background = background;
         TextDirection = textDirection;
 
-        Sprite = CreateSprite(value, Foreground, Background, TextDirection);
+        Map = CreateSprite(value, Foreground, Background, TextDirection);
     }
 
     /// <summary>
@@ -81,7 +81,7 @@ public sealed record NexusText : INexusSprite
     {
         var isHorizontal = direction is NexusTextDirection.Horizontal or NexusTextDirection.HorizontalRightToLeft;
 
-        var sprite = new NexusWritableSpriteMap(isHorizontal ? value.Length : 1, isHorizontal ? 1 : value.Length);
+        var sprite = new NexusWritableSpriteMap(new NexusSize(isHorizontal ? value.Length : 1, isHorizontal ? 1 : value.Length));
 
         var text = direction is NexusTextDirection.HorizontalRightToLeft or NexusTextDirection.VerticalRightToLeft ? value.Reverse() : value;
 

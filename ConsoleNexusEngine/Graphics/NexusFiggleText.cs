@@ -10,7 +10,7 @@ using System.Linq;
 public sealed record NexusFiggleText : INexusSprite
 {
     /// <inheritdoc/>
-    public NexusSpriteMap Sprite { get; }
+    public NexusSpriteMap Map { get; }
 
     /// <summary>
     /// The text lines itself
@@ -48,7 +48,7 @@ public sealed record NexusFiggleText : INexusSprite
         Background = background;
         FiggleFont = figgleFont;
 
-        Sprite = CreateSprite(text, foreground, background, new NexusSize(longestLength, text.Length));
+        Map = CreateSprite(text, foreground, background, new NexusSize(longestLength, text.Length));
     }
 
     /// <summary>
@@ -109,13 +109,13 @@ public sealed record NexusFiggleText : INexusSprite
 
     private static NexusSpriteMap CreateSprite(in ReadOnlySpan<string> text, in NexusColorIndex foreground, in NexusColorIndex background, in NexusSize size)
     {
-        var sprite = new NexusWritableSpriteMap(size.Width, size.Height);
+        var sprite = new NexusWritableSpriteMap(size);
 
-        for (int x = 0; x < sprite.Width; x++)
+        for (int x = 0; x < sprite.Size.Width; x++)
         {
-            for (int y = 0; y < sprite.Height; y++)
+            for (int y = 0; y < sprite.Size.Height; y++)
             {
-                sprite._spriteMap[IndexDimensions.Get1D(x, y, sprite.Width)] = NativeConverter.ToCharInfo(text[y][x], foreground, background);
+                sprite._spriteMap[IndexDimensions.Get1D(x, y, sprite.Size.Width)] = NativeConverter.ToCharInfo(text[y][x], foreground, background);
             }
         }
 
