@@ -45,7 +45,9 @@ public readonly struct NexusRectangle : INexusSprite
 
     private static NexusSpriteMap CreateSprite(Bitmap bitmap, in NexusChar character)
     {
-        var sprite = new NexusWritableSpriteMap(new NexusSize(bitmap.Width, bitmap.Height));
+        var size = new NexusSize(bitmap.Width, bitmap.Height);
+
+        Span<CHARINFO> sprite = stackalloc CHARINFO[size.Dimensions];
         var charInfo = NativeConverter.ToCharInfo(character);
 
         unsafe
@@ -65,13 +67,13 @@ public readonly struct NexusRectangle : INexusSprite
                 {
                     pixel = row + x * pixelSize;
 
-                    sprite._spriteMap[IndexDimensions.Get1D(x, y, sprite.Size.Width)] = ((pixel[1] & 0b01111100) >> 2 is 31) ? charInfo : default;
+                    sprite[IndexDimensions.Get1D(x, y, size.Width)] = ((pixel[1] & 0b01111100) >> 2 is 31) ? charInfo : default;
                 }
             }
 
             bitmap.UnlockBits(data);
         }
 
-        return sprite.AsReadOnly();
+        return new NexusSpriteMap(sprite, size);
     }
 }

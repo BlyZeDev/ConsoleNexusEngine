@@ -93,13 +93,11 @@ public readonly struct NexusImage : INexusSprite
     private static NexusSpriteMap CreateSprite(Bitmap bitmap, NexusColorProcessor processor, in NexusSize? size)
     {
         var resized = ImageHelper.Resize(bitmap, size);
+        var newSize = new NexusSize(resized.Width, resized.Height);
 
-        var sprite = new NexusWritableSpriteMap(new NexusSize(resized.Width, resized.Height));
+        Span<CHARINFO> sprite = stackalloc CHARINFO[newSize.Dimensions];
 
-        var data = resized.LockBits(
-            new Rectangle(0, 0, resized.Width, resized.Height),
-            ImageLockMode.ReadOnly,
-            PixelFormat.Format32bppArgb);
+        var data = resized.LockBitsReadOnly(PixelFormat.Format32bppArgb);
 
         try
         {
@@ -119,7 +117,7 @@ public readonly struct NexusImage : INexusSprite
                     {
                         pixel = row + x * pixelSize;
 
-                        sprite._spriteMap[IndexDimensions.Get1D(x, y, sprite.Size.Width)] = NativeConverter.ToCharInfo(
+                        sprite[IndexDimensions.Get1D(x, y, newSize.Width)] = NativeConverter.ToCharInfo(
                             GetAlphaLevel(pixel[3]),
                             processor.Process(new NexusColor(pixel[2], pixel[1], pixel[0])),
                             0);
@@ -132,7 +130,7 @@ public readonly struct NexusImage : INexusSprite
             resized.UnlockBits(data);
         }
 
-        return sprite.AsReadOnly();
+        return new NexusSpriteMap(sprite, newSize);
     }
 
     private static char GetAlphaLevel(byte alpha)

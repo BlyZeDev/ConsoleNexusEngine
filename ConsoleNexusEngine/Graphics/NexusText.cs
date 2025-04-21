@@ -81,7 +81,8 @@ public sealed record NexusText : INexusSprite
     {
         var isHorizontal = direction is NexusTextDirection.Horizontal or NexusTextDirection.HorizontalRightToLeft;
 
-        var sprite = new NexusWritableSpriteMap(new NexusSize(isHorizontal ? value.Length : 1, isHorizontal ? 1 : value.Length));
+        var size = new NexusSize(isHorizontal ? value.Length : 1, isHorizontal ? 1 : value.Length);
+        Span<CHARINFO> sprite = stackalloc CHARINFO[size.Dimensions];
 
         var text = direction is NexusTextDirection.HorizontalRightToLeft or NexusTextDirection.VerticalRightToLeft ? value.Reverse() : value;
 
@@ -89,9 +90,9 @@ public sealed record NexusText : INexusSprite
         foreach (var letter in text)
         {
             index++;
-            sprite._spriteMap[index] = NativeConverter.ToCharInfo(letter, foreground, background);
+            sprite[index] = NativeConverter.ToCharInfo(letter, foreground, background);
         }
 
-        return sprite.AsReadOnly();
+        return new NexusSpriteMap(sprite, size);
     }
 }

@@ -18,7 +18,7 @@ public readonly struct NexusSpriteMap
     /// <param name="size">The size of the sprite map</param>
     public NexusSpriteMap(in NexusSize size) : this(new CHARINFO[size.Dimensions], size) { }
 
-    internal NexusSpriteMap(Span<CHARINFO> spriteMap, in NexusSize size)
+    internal NexusSpriteMap(in Span<CHARINFO> spriteMap, in NexusSize size)
     {
         _spriteMap = new ReadOnlyMemory<CHARINFO>(spriteMap.ToArray());
         Size = size;

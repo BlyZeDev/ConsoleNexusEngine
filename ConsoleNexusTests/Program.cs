@@ -27,6 +27,7 @@ sealed class Program
 public sealed class Game : NexusConsoleGame
 {
     private int counter;
+    private NexusCompoundSprite sprite;
 
     public Game()
     {
@@ -36,7 +37,10 @@ public sealed class Game : NexusConsoleGame
 
     protected override void Load()
     {
-
+        sprite = NexusCompoundSpriteBuilder.Create(new NexusRectangle(BufferSize, new NexusChar(' ', NexusColorIndex.Color11, NexusColorIndex.Color11), true))
+            .AddSprite(new NexusText("Width: " + BufferSize.Width, NexusColorIndex.Color3))
+            .AddSprite(new NexusCoord(0, 1), new NexusText("Height: " + BufferSize.Height, NexusColorIndex.Color3))
+            .Build();
     }
 
     protected override void Update()
@@ -46,7 +50,8 @@ public sealed class Game : NexusConsoleGame
 
         Graphic.Clear();
 
-        DebugView();
+        //DebugView();
+        Graphic.DrawSprite(NexusCoord.MinValue, sprite);
 
         Graphic.Render();
     }

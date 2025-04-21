@@ -109,16 +109,16 @@ public sealed record NexusFiggleText : INexusSprite
 
     private static NexusSpriteMap CreateSprite(in ReadOnlySpan<string> text, in NexusColorIndex foreground, in NexusColorIndex background, in NexusSize size)
     {
-        var sprite = new NexusWritableSpriteMap(size);
+        Span<CHARINFO> sprite = stackalloc CHARINFO[size.Dimensions];
 
-        for (int x = 0; x < sprite.Size.Width; x++)
+        for (int x = 0; x < size.Width; x++)
         {
-            for (int y = 0; y < sprite.Size.Height; y++)
+            for (int y = 0; y < size.Height; y++)
             {
-                sprite._spriteMap[IndexDimensions.Get1D(x, y, sprite.Size.Width)] = NativeConverter.ToCharInfo(text[y][x], foreground, background);
+                sprite[IndexDimensions.Get1D(x, y, size.Width)] = NativeConverter.ToCharInfo(text[y][x], foreground, background);
             }
         }
 
-        return sprite.AsReadOnly();
+        return new NexusSpriteMap(sprite, size);
     }
 }
