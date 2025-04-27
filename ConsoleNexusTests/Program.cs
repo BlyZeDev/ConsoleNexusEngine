@@ -37,9 +37,12 @@ public sealed class Game : NexusConsoleGame
 
     protected override void Load()
     {
-        sprite = NexusCompoundSpriteBuilder.Create(new NexusRectangle(BufferSize, new NexusChar(' ', NexusColorIndex.Color11, NexusColorIndex.Color11), true))
-            .AddSprite(new NexusText("Width: " + BufferSize.Width, NexusColorIndex.Color3))
+        sprite = new NexusCompoundSpriteBuilder(new NexusText("Width: " + BufferSize.Width, NexusColorIndex.Color3), '\0', '-')
             .AddSprite(new NexusCoord(0, 1), new NexusText("Height: " + BufferSize.Height, NexusColorIndex.Color3))
+            .AddSprite(new NexusCoord(5, 2), new NexusText("Lol Test", NexusColorIndex.Color3))
+            .AddSprite(new NexusCoord(25, 20), new NexusText("Lol Test", NexusColorIndex.Color3))
+            .AddSprite(new NexusCoord(25, 1), new NexusText("Height: " + BufferSize.Height, NexusColorIndex.Color3))
+            .AddSprite(new NexusCoord(0, 0), new NexusText("-\0+----------", NexusColorIndex.Color4))
             .Build();
     }
 

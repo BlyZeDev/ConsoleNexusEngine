@@ -11,7 +11,6 @@ internal sealed class ConsoleBuffer
     private readonly nint _standardOutput;
 
     private CHARINFO[] charInfoBuffer;
-
     private COORD bufferSize;
 
     public short Width => bufferSize.X;
