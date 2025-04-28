@@ -95,7 +95,7 @@ public readonly struct NexusImage : INexusSprite
         var resized = ImageHelper.Resize(bitmap, size);
         var newSize = new NexusSize(resized.Width, resized.Height);
 
-        Span<CHARINFO> sprite = stackalloc CHARINFO[newSize.Dimensions];
+        Span<CHARINFO> sprite = StackAlloc.Allow<CHARINFO>(newSize.Dimensions) ? stackalloc CHARINFO[newSize.Dimensions] : new CHARINFO[newSize.Dimensions];
 
         var data = resized.LockBitsReadOnly(PixelFormat.Format32bppArgb);
 

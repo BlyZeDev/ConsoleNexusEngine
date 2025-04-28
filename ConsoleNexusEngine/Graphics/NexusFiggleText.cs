@@ -109,7 +109,7 @@ public sealed record NexusFiggleText : INexusSprite
 
     private static NexusSpriteMap CreateSprite(in ReadOnlySpan<string> text, in NexusColorIndex foreground, in NexusColorIndex background, in NexusSize size)
     {
-        Span<CHARINFO> sprite = stackalloc CHARINFO[size.Dimensions];
+        Span<CHARINFO> sprite = StackAlloc.Allow<CHARINFO>(size.Dimensions) ? stackalloc CHARINFO[size.Dimensions] : new CHARINFO[size.Dimensions];
 
         for (int x = 0; x < size.Width; x++)
         {

@@ -60,7 +60,7 @@ public sealed class NexusCompoundSpriteBuilder
             var prevSize = currentSize;
             currentSize = new NexusSize(Math.Max(currentSize.Width, coordinate.X + spriteMap.Size.Width), Math.Max(currentSize.Height, coordinate.Y + spriteMap.Size.Height));
 
-            Span<CHARINFO> newMap = stackalloc CHARINFO[currentMap.Length];
+            Span<CHARINFO> newMap = StackAlloc.Allow<CHARINFO>(currentMap.Length) ? stackalloc CHARINFO[currentMap.Length] : new CHARINFO[currentMap.Length];
             currentMap.AsSpan().CopyTo(newMap);
 
             Array.Resize(ref currentMap, currentSize.Dimensions);
@@ -89,8 +89,8 @@ public sealed class NexusCompoundSpriteBuilder
     }
 
     /// <summary>
-    /// Builds the sprite
+    /// Finalizes the sprite and returns it
     /// </summary>
-    /// <returns><see cref="NexusCompoundSprite"/></returns>
-    public NexusCompoundSprite Build() => new NexusCompoundSprite(new NexusSpriteMap(currentMap, currentSize));
+    /// <returns><see cref="NexusSimpleSprite"/></returns>
+    public NexusSimpleSprite Build() => new NexusSimpleSprite(new NexusSpriteMap(currentMap, currentSize));
 }

@@ -324,7 +324,8 @@ public sealed class NexusConsoleGraphic
         ThrowIfOutOfBounds(coordinate.X + sprite.Map.Size.Width - 1, coordinate.Y + sprite.Map.Size.Height - 1);
 
         var spriteWidth = sprite.Map.Size.Width;
-        Span<CHARINFO> spriteSpan = stackalloc CHARINFO[sprite.Map._spriteMap.Length];
+        Span<CHARINFO> spriteSpan = StackAlloc.Allow<CHARINFO>(sprite.Map._spriteMap.Length)
+            ? stackalloc CHARINFO[sprite.Map._spriteMap.Length] : new CHARINFO[sprite.Map._spriteMap.Length];
 
         for (int y = 0; y < sprite.Map.Size.Height; y++)
         {

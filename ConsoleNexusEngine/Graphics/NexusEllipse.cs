@@ -47,7 +47,7 @@ public readonly struct NexusEllipse : INexusSprite
     {
         var size = new NexusSize(bitmap.Width, bitmap.Height);
 
-        Span<CHARINFO> sprite = stackalloc CHARINFO[size.Dimensions];
+        Span<CHARINFO> sprite = StackAlloc.Allow<CHARINFO>(size.Dimensions) ? stackalloc CHARINFO[size.Dimensions] : new CHARINFO[size.Dimensions];
         var charInfo = NativeConverter.ToCharInfo(character);
 
         unsafe

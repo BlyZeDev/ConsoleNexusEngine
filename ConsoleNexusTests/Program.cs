@@ -27,7 +27,7 @@ sealed class Program
 public sealed class Game : NexusConsoleGame
 {
     private int counter;
-    private NexusCompoundSprite sprite;
+    private NexusSimpleSprite sprite;
 
     public Game()
     {

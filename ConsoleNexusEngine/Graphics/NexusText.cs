@@ -82,7 +82,7 @@ public sealed record NexusText : INexusSprite
         var isHorizontal = direction is NexusTextDirection.Horizontal or NexusTextDirection.HorizontalRightToLeft;
 
         var size = new NexusSize(isHorizontal ? value.Length : 1, isHorizontal ? 1 : value.Length);
-        Span<CHARINFO> sprite = stackalloc CHARINFO[size.Dimensions];
+        Span<CHARINFO> sprite = StackAlloc.Allow<CHARINFO>(size.Dimensions) ? stackalloc CHARINFO[size.Dimensions] : new CHARINFO[size.Dimensions];
 
         var text = direction is NexusTextDirection.HorizontalRightToLeft or NexusTextDirection.VerticalRightToLeft ? value.Reverse() : value;
 
