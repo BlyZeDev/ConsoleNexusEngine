@@ -48,7 +48,6 @@ public sealed class NexusCompoundSpriteBuilder
     /// <summary>
     /// Get the <see cref="NexusSpriteMap"/> from the specified <paramref name="layer"/>
     /// </summary>
-    /// <remarks>Throws a <see cref="KeyNotFoundException"/> if no sprite is found at that layer</remarks>
     /// <param name="layer">The layer of the sprite</param>
     /// <exception cref="KeyNotFoundException"/>
     /// <returns><see cref="NexusSpriteMap"/></returns>
@@ -89,7 +88,146 @@ public sealed class NexusCompoundSpriteBuilder
     }
 
     /// <summary>
-    /// Adds a sprite on top of the current map
+    /// Adds a pixel as sprite to the current map
+    /// </summary>
+    /// <param name="coordinate">The coordinate of the pixel</param>
+    /// <param name="character">The character of the pixel</param>
+    /// <param name="layer">The layer the sprite map should be added. Adds to the top, if <paramref name="layer"/> is -1.<br/>If the layer is already present it will be overriden</param>
+    /// <returns><see cref="NexusCompoundSpriteBuilder"/></returns>
+    public NexusCompoundSpriteBuilder AddPixel(in NexusCoord coordinate, in NexusChar character, int layer = -1)
+    {
+        var mapSize = new NexusSize(coordinate.X + 1, coordinate.Y + 1);
+        Span<CHARINFO> map = StackAlloc.Allow<CHARINFO>(mapSize.Dimensions) ? stackalloc CHARINFO[mapSize.Dimensions] : new CHARINFO[mapSize.Dimensions];
+
+        map[IndexDimensions.Get1D(coordinate.X, coordinate.Y, mapSize.Width)] = NativeConverter.ToCharInfo(character);
+        return AddSpriteMap(new NexusSpriteMap(map, mapSize), layer);
+    }
+
+    /// <summary>
+    /// Adds multiple pixels as sprite to the current map
+    /// </summary>
+    /// <param name="character">The character of the pixels</param>
+    /// <param name="layer">The layer the sprite map should be added. Adds to the top, if <paramref name="layer"/> is -1.<br/>If the layer is already present it will be overriden</param>
+    /// <param name="coordinates">The coordinates of the pixels</param>
+    /// <returns><see cref="NexusCompoundSpriteBuilder"/></returns>
+    public NexusCompoundSpriteBuilder AddPixels(in NexusChar character, int layer = -1, params ReadOnlySpan<NexusCoord> coordinates)
+    {
+        if (coordinates.IsEmpty) return this;
+        if (coordinates.Length == 1) return AddPixel(coordinates[0], character, layer);
+
+        var mapSize = NexusSize.MinValue;
+        foreach (var coordinate in coordinates)
+        {
+            mapSize = new NexusSize(Math.Max(mapSize.Width, coordinate.X) + 1, Math.Max(mapSize.Height, coordinate.Y) + 1);
+        }
+
+        Span<CHARINFO> map = StackAlloc.Allow<CHARINFO>(mapSize.Dimensions) ? stackalloc CHARINFO[mapSize.Dimensions] : new CHARINFO[mapSize.Dimensions];
+
+        var nativeChar = NativeConverter.ToCharInfo(character);
+        foreach (var coordinate in coordinates)
+        {
+            map[IndexDimensions.Get1D(coordinate.X, coordinate.Y, mapSize.Width)] = nativeChar;
+        }
+
+        return AddSpriteMap(new NexusSpriteMap(map, mapSize), layer);
+    }
+
+    /// <summary>
+    /// Adds a line as sprite to the current map
+    /// </summary>
+    /// <param name="start">The start coordinate of the line</param>
+    /// <param name="end">The end coordinate of the line</param>
+    /// <param name="character">The character of the line</param>
+    /// <param name="layer">The layer the sprite map should be added. Adds to the top, if <paramref name="layer"/> is -1.<br/>If the layer is already present it will be overriden</param>
+    /// <returns><see cref="NexusCompoundSpriteBuilder"/></returns>
+    public NexusCompoundSpriteBuilder AddLine(in NexusCoord start, in NexusCoord end, in NexusChar character, int layer = -1)
+    {
+        var nativeChar = NativeConverter.ToCharInfo(character);
+        var mapSize = new NexusSize(start.X + end.X + 1, start.Y + end.Y + 1);
+        Span<CHARINFO> map = StackAlloc.Allow<CHARINFO>(mapSize.Dimensions) ? stackalloc CHARINFO[mapSize.Dimensions] : new CHARINFO[mapSize.Dimensions];
+
+        var startX = start.X;
+        var startY = start.Y;
+        var endX = end.X;
+        var endY = end.Y;
+
+        if (startX == endX)
+        {
+            var startCoord = Math.Min(startY, endY);
+            var endCoord = Math.Max(startY, endY);
+
+            for (int y = startCoord; y <= endCoord; y++)
+            {
+                map[IndexDimensions.Get1D(startX, y, mapSize.Width)] = nativeChar;
+            }
+        }
+        else if (startY == endY)
+        {
+            var startCoord = Math.Min(startX, endX);
+            var endCoord = Math.Max(startX, endX);
+
+            for (int x = startCoord; x <= endCoord; x++)
+            {
+                map[IndexDimensions.Get1D(x, startY, mapSize.Width)] = nativeChar;
+            }
+        }
+        else
+        {
+            var width = endX - startX;
+            var height = endY - startY;
+
+            int dx1 = 0, dy1 = 0, dx2 = 0, dy2 = 0;
+
+            if (width < 0) dx1 = -1;
+            else if (width > 0) dx1 = 1;
+
+            if (height < 0) dy1 = -1;
+            else if (height > 0) dy1 = 1;
+
+            if (width < 0) dx2 = -1;
+            else if (width > 0) dx2 = 1;
+
+            var longest = Math.Abs(width);
+            var shortest = Math.Abs(height);
+
+            if (!(longest > shortest))
+            {
+                longest = Math.Abs(height);
+                shortest = Math.Abs(width);
+
+                if (height < 0) dy2 = -1;
+                else if (height > 0) dy2 = 1;
+
+                dx2 = 0;
+            }
+
+            var numerator = longest >> 1;
+
+            for (int i = 0; i <= longest; i++)
+            {
+                map[IndexDimensions.Get1D(startX, startY, mapSize.Width)] = nativeChar;
+
+                numerator += shortest;
+
+                if (!(numerator < longest))
+                {
+                    numerator -= longest;
+                    startX += dx1;
+                    startY += dy1;
+                }
+                else
+                {
+                    startX += dx2;
+                    startY += dy2;
+                }
+            }
+        }
+
+        return AddSpriteMap(new NexusSpriteMap(map, mapSize), layer);
+    }
+
+    /// <summary>
+    /// Adds a sprite to the current map
     /// </summary>
     /// <param name="sprite">The sprite to add</param>
     /// <param name="layer">The layer the sprite map should be added. Adds to the top, if <paramref name="layer"/> is -1.<br/>If the layer is already present it will be overriden</param>
@@ -97,7 +235,7 @@ public sealed class NexusCompoundSpriteBuilder
     public NexusCompoundSpriteBuilder AddSprite(INexusSprite sprite, int layer = -1) => AddSpriteMap(sprite.Map, layer);
 
     /// <summary>
-    /// Adds a sprite on top of the current map at a specific position
+    /// Adds a sprite to the current map at a specific position
     /// </summary>
     /// <param name="coordinate">The top-left coordinate to start from</param>
     /// <param name="sprite">The sprite to add</param>
@@ -106,7 +244,7 @@ public sealed class NexusCompoundSpriteBuilder
     public NexusCompoundSpriteBuilder AddSprite(in NexusCoord coordinate, INexusSprite sprite, int layer = -1) => AddSpriteMap(coordinate, sprite.Map, layer);
 
     /// <summary>
-    /// Adds a sprite map on top of the current map
+    /// Adds a sprite to the current map
     /// </summary>
     /// <param name="spriteMap">The sprite map to add</param>
     /// <param name="layer">The layer the sprite map should be added. Adds to the top, if <paramref name="layer"/> is -1.<br/>If the layer is already present it will be overriden</param>
@@ -114,7 +252,7 @@ public sealed class NexusCompoundSpriteBuilder
     public NexusCompoundSpriteBuilder AddSpriteMap(in NexusSpriteMap spriteMap, int layer = -1) => AddSpriteMap(NexusCoord.MinValue, spriteMap, layer);
 
     /// <summary>
-    /// Adds a sprite map on top of the current map at a specific position
+    /// Adds a sprite to the current map at a specific position
     /// </summary>
     /// <param name="coordinate">The top-left coordinate to start from</param>
     /// <param name="spriteMap">The sprite map to add</param>
@@ -154,7 +292,7 @@ public sealed class NexusCompoundSpriteBuilder
     /// <returns><see cref="NexusSimpleSprite"/></returns>
     public NexusSimpleSprite Build()
     {
-        if (_spriteMaps.Count == 0) return new NexusSimpleSprite(new NexusSpriteMap(largestSprite));
+        if (_spriteMaps.Count == 0) return new NexusSimpleSprite(new NexusSpriteMap(NexusSize.MinValue));
         if (_spriteMaps.Count == 1) return new NexusSimpleSprite(_spriteMaps.Values.First());
 
         Span<CHARINFO> finishedMap = StackAlloc.Allow<CHARINFO>(largestSprite.Dimensions)
