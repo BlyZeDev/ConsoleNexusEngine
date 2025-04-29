@@ -8,7 +8,7 @@
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
     <Authors>BlyZe</Authors>
-    <Version>8.3.0</Version>
+    <Version>8.3.1</Version>
     <Title>$(AssemblyName)</Title>
     <Description>A powerful and easy to use engine to create console games</Description>
     <PackageProjectUrl>https://github.com/BlyZeYT/ConsoleNexus-Engine</PackageProjectUrl>
@@ -16,12 +16,15 @@
     <RepositoryUrl>https://github.com/BlyZeYT/ConsoleNexus-Engine</RepositoryUrl>
     <PackageTags>engine, console engine, blyze, console nexus, console nexus engine, nexus engine, console, console game</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageReleaseNotes>Improvements:
-- Added global sprite system for optimized rendering
+    <PackageReleaseNotes>Fixes
+- NexusEllipse off by one error
 
-Misc:
-- Code cleanup
-- Performance Improvements</PackageReleaseNotes>
+Added
+- CompoundSpriteBuilder to merge sprites together in layers
+
+Misc
+- Renamed INexusSpite.Sprite -&gt; INexusSprite.Map
+- Improved stability</PackageReleaseNotes>
     <PackAsTool>False</PackAsTool>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <IncludeSymbols>True</IncludeSymbols>
