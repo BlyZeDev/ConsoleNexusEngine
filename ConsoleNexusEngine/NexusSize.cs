@@ -31,7 +31,7 @@ public readonly record struct NexusSize
     public readonly int Height { get; }
 
     /// <summary>
-    /// The dimensions
+    /// The dimensions.
     /// </summary>
     /// <remarks><see cref="Width"/> * <see cref="Height"/></remarks>
     public readonly int Dimensions => Width * Height;
@@ -49,10 +49,11 @@ public readonly record struct NexusSize
     /// </remarks>
     /// <param name="width">The width</param>
     /// <param name="height">The height</param>
-    public NexusSize(int width, int height)
+    /// <param name="allowZeroSize"><see langword="false"/> if 0 should be clamped to 1</param>
+    public NexusSize(int width, int height, bool allowZeroSize = true)
     {
-        Width = Math.Clamp(width, 0, int.MaxValue);
-        Height = Math.Clamp(height, 0, int.MaxValue);
+        Width = Math.Clamp(width, allowZeroSize ? 0 : 1, int.MaxValue);
+        Height = Math.Clamp(height, allowZeroSize ? 0 : 1, int.MaxValue);
     }
 
     /// <summary>

@@ -96,11 +96,11 @@ public sealed class NexusCompoundSpriteBuilder
     /// <returns><see cref="NexusCompoundSpriteBuilder"/></returns>
     public NexusCompoundSpriteBuilder AddPixel(in NexusCoord coordinate, in NexusChar character, int layer = -1)
     {
-        var mapSize = new NexusSize(coordinate.X + 1, coordinate.Y + 1);
+        var mapSize = new NexusSize(1);
         Span<CHARINFO> map = StackAlloc.Allow<CHARINFO>(mapSize.Dimensions) ? stackalloc CHARINFO[mapSize.Dimensions] : new CHARINFO[mapSize.Dimensions];
 
-        map[IndexDimensions.Get1D(coordinate.X, coordinate.Y, mapSize.Width)] = NativeConverter.ToCharInfo(character);
-        return AddSpriteMap(new NexusSpriteMap(map, mapSize), layer);
+        map[0] = NativeConverter.ToCharInfo(character);
+        return AddSpriteMap(coordinate, new NexusSpriteMap(map, mapSize), layer);
     }
 
     /// <summary>
@@ -118,8 +118,9 @@ public sealed class NexusCompoundSpriteBuilder
         var mapSize = NexusSize.MinValue;
         foreach (var coordinate in coordinates)
         {
-            mapSize = new NexusSize(Math.Max(mapSize.Width, coordinate.X) + 1, Math.Max(mapSize.Height, coordinate.Y) + 1);
+            mapSize = new NexusSize(Math.Max(mapSize.Width, coordinate.X), Math.Max(mapSize.Height, coordinate.Y), false);
         }
+        mapSize += new NexusSize(1);
 
         Span<CHARINFO> map = StackAlloc.Allow<CHARINFO>(mapSize.Dimensions) ? stackalloc CHARINFO[mapSize.Dimensions] : new CHARINFO[mapSize.Dimensions];
 
@@ -143,13 +144,13 @@ public sealed class NexusCompoundSpriteBuilder
     public NexusCompoundSpriteBuilder AddLine(in NexusCoord start, in NexusCoord end, in NexusChar character, int layer = -1)
     {
         var nativeChar = NativeConverter.ToCharInfo(character);
-        var mapSize = new NexusSize(start.X + end.X + 1, start.Y + end.Y + 1);
+        var mapSize = new NexusSize(end.X - start.X + 1, end.Y - start.Y + 1);
         Span<CHARINFO> map = StackAlloc.Allow<CHARINFO>(mapSize.Dimensions) ? stackalloc CHARINFO[mapSize.Dimensions] : new CHARINFO[mapSize.Dimensions];
 
-        var startX = start.X;
-        var startY = start.Y;
-        var endX = end.X;
-        var endY = end.Y;
+        var startX = 0;
+        var startY = 0;
+        var endX = end.X - start.X;
+        var endY = end.Y - start.Y;
 
         if (startX == endX)
         {
@@ -173,30 +174,27 @@ public sealed class NexusCompoundSpriteBuilder
         }
         else
         {
-            var width = endX - startX;
-            var height = endY - startY;
-
             int dx1 = 0, dy1 = 0, dx2 = 0, dy2 = 0;
 
-            if (width < 0) dx1 = -1;
-            else if (width > 0) dx1 = 1;
+            if (endX < 0) dx1 = -1;
+            else if (endX > 0) dx1 = 1;
 
-            if (height < 0) dy1 = -1;
-            else if (height > 0) dy1 = 1;
+            if (endY < 0) dy1 = -1;
+            else if (endY > 0) dy1 = 1;
 
-            if (width < 0) dx2 = -1;
-            else if (width > 0) dx2 = 1;
+            if (endX < 0) dx2 = -1;
+            else if (endX > 0) dx2 = 1;
 
-            var longest = Math.Abs(width);
-            var shortest = Math.Abs(height);
+            var longest = Math.Abs(endX);
+            var shortest = Math.Abs(endY);
 
             if (!(longest > shortest))
             {
-                longest = Math.Abs(height);
-                shortest = Math.Abs(width);
+                longest = Math.Abs(endY);
+                shortest = Math.Abs(endX);
 
-                if (height < 0) dy2 = -1;
-                else if (height > 0) dy2 = 1;
+                if (endY < 0) dy2 = -1;
+                else if (endY > 0) dy2 = 1;
 
                 dx2 = 0;
             }
@@ -223,7 +221,7 @@ public sealed class NexusCompoundSpriteBuilder
             }
         }
 
-        return AddSpriteMap(new NexusSpriteMap(map, mapSize), layer);
+        return AddSpriteMap(start, new NexusSpriteMap(map, mapSize), layer);
     }
 
     /// <summary>
