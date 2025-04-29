@@ -26,8 +26,8 @@ public readonly struct NexusEllipse : INexusSprite
 
         using (var graphics = Graphics.FromImage(bitmap))
         {
-            graphics.DrawEllipse(Pens.Red, 0, 0, size.Width, size.Height);
-            if (fill) graphics.FillEllipse(Pens.Red.Brush, 0, 0, size.Width, size.Height);
+            graphics.DrawEllipse(Pens.Red, 0, 0, size.Width - 1, size.Height - 1);
+            if (fill) graphics.FillEllipse(Pens.Red.Brush, 0, 0, size.Width - 1, size.Height - 1);
         }
 
         Map = CreateSprite(bitmap, character);
