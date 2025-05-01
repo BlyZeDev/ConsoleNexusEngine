@@ -37,13 +37,22 @@ public sealed class Game : NexusConsoleGame
 
     protected override void Load()
     {
-        sprite = new NexusCompoundSpriteBuilder(new NexusText("Width: " + BufferSize.Width, NexusColorIndex.Color3), '\0', '-')
+        sprite = new NexusCompoundSpriteBuilder(new NexusText("Width: " + BufferSize.Width, NexusColorIndex.Color3), 0)
             .AddSprite(new NexusCoord(0, 1), new NexusText("Height: " + BufferSize.Height, NexusColorIndex.Color3))
             .AddSprite(new NexusCoord(5, 2), new NexusText("Lol Test", NexusColorIndex.Color3))
             .AddSprite(new NexusCoord(25, 20), new NexusText("Lol Test", NexusColorIndex.Color3))
             .AddSprite(new NexusCoord(25, 1), new NexusText("Height: " + BufferSize.Height, NexusColorIndex.Color3))
+            .AddSprite(new NexusEllipse(new NexusSize(68, 66), new NexusChar('-', NexusColorIndex.Color9), true))
             .AddSprite(new NexusCoord(0, 0), new NexusText("-\0+----------", NexusColorIndex.Color4))
+            .AddLine(new NexusCoord(70, 70), new NexusCoord(71, 71), new NexusChar('+', NexusColorIndex.Color7))
+            .AddPixel(new NexusCoord(21, 11), new NexusChar('8', NexusColorIndex.Color9))
+            .AddPixel(new NexusCoord(71, 71), new NexusChar('7', NexusColorIndex.Color4))
+            .AddPixels(new NexusChar('9', NexusColorIndex.Color4), -1, new NexusCoord(0, 0), new NexusCoord(71, 71), new NexusCoord(30, 30), new NexusCoord(31, 31), new NexusCoord(32, 32), new NexusCoord(33, 34))
             .Build();
+
+        var first = NexusSpriteExporter.Export(@"C:\Users\leons\Downloads", "Test", sprite, false);
+
+        sprite = new NexusSimpleSprite(NexusSpriteImporter.Import(first));
     }
 
     protected override void Update()

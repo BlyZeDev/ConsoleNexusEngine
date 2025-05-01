@@ -15,19 +15,19 @@ public sealed record ImageColorPalette : NexusColorPalette
     /// Initializes a new <see cref="ImageColorPalette"/> from an image
     /// </summary>
     /// <param name="filepath">The path to the image</param>
-    public ImageColorPalette(string filepath) : base(FromImage(filepath)) { }
+    public ImageColorPalette(string filepath) => Colors = FromImage(filepath);
 
     /// <summary>
     /// Initializes a new <see cref="ImageColorPalette"/> from an image
     /// </summary>
     /// <param name="url">The url of the image</param>
-    public ImageColorPalette(Uri url) : base(FromImage(url)) { }
+    public ImageColorPalette(Uri url) => Colors = FromImage(url);
 
     /// <summary>
     /// Initializes a new <see cref="ImageColorPalette"/> from an image
     /// </summary>
     /// <param name="bitmap">The image itself</param>
-    public ImageColorPalette(Bitmap bitmap) : base(FromImage(bitmap)) { }
+    public ImageColorPalette(Bitmap bitmap) => Colors = FromImage(bitmap);
 
     private static ImmutableArray<NexusColor> FromImage(string filepath) => FromImage((Bitmap)Image.FromFile(filepath));
 
