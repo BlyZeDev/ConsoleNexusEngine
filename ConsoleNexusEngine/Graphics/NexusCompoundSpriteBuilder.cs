@@ -144,84 +144,36 @@ public sealed class NexusCompoundSpriteBuilder
     public NexusCompoundSpriteBuilder AddLine(in NexusCoord start, in NexusCoord end, in NexusChar character, int layer = -1)
     {
         var nativeChar = NativeConverter.ToCharInfo(character);
-        var mapSize = new NexusSize(end.X - start.X + 1, end.Y - start.Y + 1);
+
+        var offsetX = Math.Min(start.X, end.X);
+        var offsetY = Math.Min(start.Y, end.Y);
+
+        var mapSize = new NexusSize(Math.Abs(end.X - start.X) + 1, Math.Abs(end.Y - start.Y) + 1);
         Span<CHARINFO> map = StackAlloc.Allow<CHARINFO>(mapSize.Dimensions) ? stackalloc CHARINFO[mapSize.Dimensions] : new CHARINFO[mapSize.Dimensions];
 
-        var startX = 0;
-        var startY = 0;
-        var endX = end.X - start.X;
-        var endY = end.Y - start.Y;
+        var x0 = start.X - offsetX;
+        var y0 = start.Y - offsetY;
+        var x1 = end.X - offsetX;
+        var y1 = end.Y - offsetY;
 
-        if (startX == endX)
+        var dx = Math.Abs(x1 - x0);
+        var sx = x0 < x1 ? 1 : -1;
+        var dy = -Math.Abs(y1 - y0);
+        var sy = y0 < y1 ? 1 : -1;
+        var error = dx + dy;
+
+        while (true)
         {
-            var startCoord = Math.Min(startY, endY);
-            var endCoord = Math.Max(startY, endY);
+            var index = IndexDimensions.Get1D(x0, y0, mapSize.Width);
+            map[index] = nativeChar;
 
-            for (int y = startCoord; y <= endCoord; y++)
-            {
-                map[IndexDimensions.Get1D(startX, y, mapSize.Width)] = nativeChar;
-            }
-        }
-        else if (startY == endY)
-        {
-            var startCoord = Math.Min(startX, endX);
-            var endCoord = Math.Max(startX, endX);
-
-            for (int x = startCoord; x <= endCoord; x++)
-            {
-                map[IndexDimensions.Get1D(x, startY, mapSize.Width)] = nativeChar;
-            }
-        }
-        else
-        {
-            int dx1 = 0, dy1 = 0, dx2 = 0, dy2 = 0;
-
-            if (endX < 0) dx1 = -1;
-            else if (endX > 0) dx1 = 1;
-
-            if (endY < 0) dy1 = -1;
-            else if (endY > 0) dy1 = 1;
-
-            if (endX < 0) dx2 = -1;
-            else if (endX > 0) dx2 = 1;
-
-            var longest = Math.Abs(endX);
-            var shortest = Math.Abs(endY);
-
-            if (!(longest > shortest))
-            {
-                longest = Math.Abs(endY);
-                shortest = Math.Abs(endX);
-
-                if (endY < 0) dy2 = -1;
-                else if (endY > 0) dy2 = 1;
-
-                dx2 = 0;
-            }
-
-            var numerator = longest >> 1;
-
-            for (int i = 0; i <= longest; i++)
-            {
-                map[IndexDimensions.Get1D(startX, startY, mapSize.Width)] = nativeChar;
-
-                numerator += shortest;
-
-                if (!(numerator < longest))
-                {
-                    numerator -= longest;
-                    startX += dx1;
-                    startY += dy1;
-                }
-                else
-                {
-                    startX += dx2;
-                    startY += dy2;
-                }
-            }
+            if (x0 == x1 && y0 == y1) break;
+            var e2 = 2 * error;
+            if (e2 >= dy) { error += dy; x0 += sx; }
+            if (e2 <= dx) { error += dx; y0 += sy; }
         }
 
-        return AddSpriteMap(start, new NexusSpriteMap(map, mapSize), layer);
+        return AddSpriteMap(new NexusCoord(offsetX, offsetY), new NexusSpriteMap(map, mapSize), layer);
     }
 
     /// <summary>
