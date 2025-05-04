@@ -237,13 +237,13 @@ public sealed class NexusCompoundSpriteBuilder
     }
 
     /// <summary>
-    /// Finalizes the sprite and returns it
+    /// Finalizes the sprite and returns it as a <see cref="NexusSpriteMap"/>
     /// </summary>
-    /// <returns><see cref="NexusSimpleSprite"/></returns>
-    public NexusSimpleSprite Build()
+    /// <returns><see cref="NexusSpriteMap"/></returns>
+    public NexusSpriteMap BuildMap()
     {
-        if (_spriteMaps.Count == 0) return new NexusSimpleSprite(new NexusSpriteMap(NexusSize.MinValue));
-        if (_spriteMaps.Count == 1) return new NexusSimpleSprite(_spriteMaps.Values.First());
+        if (_spriteMaps.Count == 0) return new NexusSpriteMap(NexusSize.MinValue);
+        if (_spriteMaps.Count == 1) return _spriteMaps.Values.First();
 
         Span<CHARINFO> finishedMap = StackAlloc.Allow<CHARINFO>(largestSprite.Dimensions)
             ? stackalloc CHARINFO[largestSprite.Dimensions] : new CHARINFO[largestSprite.Dimensions];
@@ -264,6 +264,12 @@ public sealed class NexusCompoundSpriteBuilder
             }
         }
 
-        return new NexusSimpleSprite(new NexusSpriteMap(finishedMap, largestSprite));
+        return new NexusSpriteMap(finishedMap, largestSprite);
     }
+
+    /// <summary>
+    /// Finalizes the sprite and returns it as a <see cref="NexusSimpleSprite"/>
+    /// </summary>
+    /// <returns><see cref="NexusSimpleSprite"/></returns>
+    public NexusSimpleSprite Build() => new NexusSimpleSprite(BuildMap());
 }
