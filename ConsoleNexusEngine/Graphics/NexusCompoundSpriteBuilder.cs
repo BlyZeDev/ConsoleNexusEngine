@@ -229,7 +229,7 @@ public sealed class NexusCompoundSpriteBuilder
 
         largestSprite = new NexusSize(Math.Max(largestSprite.Width, layeredMap.Size.Width), Math.Max(largestSprite.Height, layeredMap.Size.Height));
 
-        layer = layer == -1 ? _spriteMaps.Last().Key + 1 : layer;
+        layer = layer == -1 ? _spriteMaps.Keys.LastOrDefault(-1) + 1 : layer;
         _spriteMaps.Remove(layer);
         _spriteMaps.Add(layer, layeredMap);
 
