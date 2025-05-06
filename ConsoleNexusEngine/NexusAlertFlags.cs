@@ -10,6 +10,10 @@
 public enum NexusAlertFlags
 {
     /// <summary>
+    /// No flags provided
+    /// </summary>
+    None = 0x00000000,
+    /// <summary>
     /// The text is right-justified
     /// </summary>
     Right = 0x00080000,
