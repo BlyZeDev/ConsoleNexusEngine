@@ -179,6 +179,8 @@ public sealed class NexusConsoleGameUtil
     /// <param name="caption">The title of the message box</param>
     /// <param name="message">The title of the message box</param>
     /// <param name="alertIcon">The icon that should be displayed</param>
-    public void ShowAlert(string caption, string message, NexusAlertIcon alertIcon)
-        => _console.MessageBox(caption, message, (uint)alertIcon);
+    /// <param name="alertType">The buttons that should be displayed</param>
+    /// <param name="alertFlags">Additional flags of the alert</param>
+    public NexusAlertResult ShowAlert(string caption, string message, NexusAlertIcon alertIcon, NexusAlertType alertType, NexusAlertFlags alertFlags)
+        => (NexusAlertResult)_console.MessageBox(caption, message, (uint)alertIcon | (uint)alertType | (uint)alertFlags);
 }

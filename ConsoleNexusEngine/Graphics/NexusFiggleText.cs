@@ -111,9 +111,9 @@ public sealed record NexusFiggleText : INexusSprite
     {
         Span<CHARINFO> sprite = StackAlloc.Allow<CHARINFO>(size.Dimensions) ? stackalloc CHARINFO[size.Dimensions] : new CHARINFO[size.Dimensions];
 
-        for (int x = 0; x < size.Width; x++)
+        for (int y = 0; y < size.Height; y++)
         {
-            for (int y = 0; y < size.Height; y++)
+            for (int x = 0; x < size.Width; x++)
             {
                 sprite[IndexDimensions.Get1D(x, y, size.Width)] = NativeConverter.ToCharInfo(text[y][x], foreground, background);
             }

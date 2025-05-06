@@ -3,6 +3,7 @@
 using ConsoleNexusEngine;
 using ConsoleNexusEngine.Graphics;
 using ConsoleNexusEngine.Helpers;
+using Figgle;
 
 sealed class Program
 {
@@ -48,11 +49,12 @@ public sealed class Game : NexusConsoleGame
             .AddPixel(new NexusCoord(71, 71), new NexusChar('7', NexusColorIndex.Color4))
             .AddPixels(new NexusChar('9', NexusColorIndex.Color4), -1, new NexusCoord(0, 0), new NexusCoord(71, 71), new NexusCoord(30, 30), new NexusCoord(31, 31), new NexusCoord(32, 32), new NexusCoord(33, 34))
             .AddLine(new NexusCoord(BufferSize.Width - 1, 0), new NexusCoord(0, BufferSize.Height - 1), new NexusChar('+', NexusColorIndex.Color7))
+            .AddSprite(new NexusFiggleText("Test", FiggleFonts.Banner3D, NexusColorIndex.Color7))
             .Build();
 
-        var first = NexusSpriteExporter.Export(@"C:\Users\leons\Downloads", "Test", sprite, false);
+        //var first = NexusSpriteExporter.Export(@"C:\Users\leons\Downloads", "Test", sprite, false);
 
-        sprite = new NexusSimpleSprite(NexusSpriteImporter.Import(first));
+        //sprite = new NexusSimpleSprite(NexusSpriteImporter.Import(first));
     }
 
     protected override void Update()
@@ -64,13 +66,14 @@ public sealed class Game : NexusConsoleGame
 
         //DebugView();
         Graphic.DrawSprite(NexusCoord.MinValue, sprite);
+        Graphic.DrawText(NexusCoord.MinValue, new NexusFiggleText("Settings", FiggleFonts.Banner, NexusColorIndex.Color14, NexusColorIndex.Background));
 
-        Graphic.Render();
+        Graphic.Render(); throw new Exception();
     }
 
     protected override void OnCrash(Exception exception)
     {
-        Utility.ShowAlert(exception.Message, exception.StackTrace ?? "", NexusAlertIcon.Error);
+        Utility.ShowAlert(exception.Message, exception.StackTrace ?? "", NexusAlertIcon.Error, NexusAlertType.Ok, NexusAlertFlags.TopMost);
     }
 
     protected override void CleanUp()

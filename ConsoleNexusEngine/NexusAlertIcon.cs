@@ -8,7 +8,7 @@ public enum NexusAlertIcon : uint
     /// <summary>
     /// No icon is used
     /// </summary>
-    None = 0x0,
+    None = 0x00000000,
     /// <summary>
     /// A stop-sign icon that indicates an error
     /// </summary>
