@@ -36,6 +36,11 @@ public abstract class NexusConsoleGame : IDisposable
     protected NexusConsoleGraphic Graphic { get; }
 
     /// <summary>
+    /// Plays all audio
+    /// </summary>
+    protected NexusConsoleAudio Audio { get; }
+
+    /// <summary>
     /// Contains all input information
     /// </summary>
     protected NexusConsoleInput Input { get; }
@@ -94,6 +99,7 @@ public abstract class NexusConsoleGame : IDisposable
 
         Settings = NexusConsoleGameSettings.Default;
         Graphic = new NexusConsoleGraphic(_console);
+        Audio = new NexusConsoleAudio();
         Input = new NexusConsoleInput(_console);
         Utility = new NexusConsoleGameUtil(_console, Settings);
 

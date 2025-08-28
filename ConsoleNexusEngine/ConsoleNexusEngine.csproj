@@ -48,6 +48,7 @@
   <ItemGroup>
     <PackageReference Include="Figgle" Version="0.6.5" />
     <PackageReference Include="Figgle.Fonts" Version="0.6.5" />
+    <PackageReference Include="SoundFlow" Version="1.2.1" />
     <PackageReference Include="System.Drawing.Common" Version="9.0.8" />
   </ItemGroup>
 
