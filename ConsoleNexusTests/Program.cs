@@ -3,7 +3,7 @@
 using ConsoleNexusEngine;
 using ConsoleNexusEngine.Graphics;
 using ConsoleNexusEngine.Helpers;
-using Figgle;
+using Figgle.Fonts;
 
 sealed class Program
 {
