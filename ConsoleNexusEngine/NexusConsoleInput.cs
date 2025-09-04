@@ -8,17 +8,15 @@ public sealed class NexusConsoleInput
     private readonly CmdConsole _console;
     private readonly NexusGamepad[] _gamepads;
 
-    private NexusCoord currentMousePos;
-
     /// <summary>
     /// The keyboard information at the last time <see cref="Update"/> was called
     /// </summary>
-    public NexusKeyCollection Keys { get; }
+    public NexusKeyCollection Keys => _console.Input.Keys;
 
     /// <summary>
     /// The position of the mouse at the last time <see cref="Update"/> was called
     /// </summary>
-    public NexusCoord MousePosition => currentMousePos;
+    public NexusCoord MousePosition => NativeConverter.ToNexusCoord(_console.Input.MousePosition);
 
     /// <summary>
     /// The input of gamepad 1 at the last time <see cref="UpdateGamepads"/> was called
@@ -44,13 +42,12 @@ public sealed class NexusConsoleInput
     {
         _console = console;
         _gamepads = new NexusGamepad[4];
-        Keys = new NexusKeyCollection();
     }
 
     /// <summary>
     /// Updates <see cref="Keys"/> and <see cref="MousePosition"/>
     /// </summary>
-    public void Update() => _console.ReadKeyboardMouseInput(Keys, ref currentMousePos);
+    public void Update() => _console.Input.ReadInput();
 
     /// <summary>
     /// Updates <see cref="Gamepad1"/>, <see cref="Gamepad2"/>, <see cref="Gamepad3"/>, <see cref="Gamepad4"/>

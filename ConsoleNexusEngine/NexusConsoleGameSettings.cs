@@ -64,7 +64,7 @@ public sealed record NexusConsoleGameSettings
         }
     }
 
-    internal event EventHandler<string>? Updated;
+    internal event Action<string>? Updated;
 
     private NexusConsoleGameSettings()
     {
@@ -74,5 +74,5 @@ public sealed record NexusConsoleGameSettings
         forceStopKey = NexusKey.Escape;
     }
 
-    private void Update(string propertyName) => Updated?.Invoke(this, propertyName);
+    private void Update(string propertyName) => Updated?.Invoke(propertyName);
 }

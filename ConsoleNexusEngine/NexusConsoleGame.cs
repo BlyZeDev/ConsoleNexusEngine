@@ -66,9 +66,9 @@ public abstract class NexusConsoleGame : IDisposable
     public double DeltaTime { get; private set; }
 
     /// <summary>
-    /// The current FPS count
+    /// The current frrames per second
     /// </summary>
-    public NexusFramerate FramesPerSecond { get; private set; }
+    public int FramesPerSecond { get; private set; }
 
     /// <summary>
     /// The time the game started, set in <see cref="Start()"/>
@@ -111,7 +111,7 @@ public abstract class NexusConsoleGame : IDisposable
     /// </summary>
     public void Start()
     {
-        if (_cts.IsCancellationRequested) throw new NexusEngineException("Can't restart a console game");
+        if (_cts.IsCancellationRequested) throw new NexusEngineException("Can't restart an instance that already ran");
 
         Load();
 
@@ -131,6 +131,8 @@ public abstract class NexusConsoleGame : IDisposable
         _console.ResetToDefault();
 
         _cts.Dispose();
+
+        Settings.Updated -= OnSettingsUpdated;
         GC.SuppressFinalize(this);
 
         hasInstance = false;
@@ -197,14 +199,13 @@ public abstract class NexusConsoleGame : IDisposable
         }
     }
 
-    private void OnSettingsUpdated(object? sender, string propertyName)
+    private void OnSettingsUpdated(string propertyName)
     {
         switch (propertyName)
         {
             case nameof(NexusConsoleGameSettings.Title): _console.UpdateTitle(Settings.Title); break;
             case nameof(NexusConsoleGameSettings.ColorPalette): _console.UpdateColorPalette(Settings.ColorPalette); break;
             case nameof(NexusConsoleGameSettings.Font): _console.UpdateFont(Settings.Font); break;
-            case nameof(NexusConsoleGameSettings.ForceStopKey): _console.StopGameKey = Settings.ForceStopKey; break;
         }
     }
 
@@ -216,5 +217,5 @@ public abstract class NexusConsoleGame : IDisposable
         return (double)timestamp / frequency;
     }
 
-    private static bool IsKeyPressed(in NexusKey key) => (Native.GetAsyncKeyState((int)key) & 0x8000) != 0;
+    private static bool IsKeyPressed(NexusKey key) => (Native.GetAsyncKeyState((int)key) & 0x8000) != 0;
 }

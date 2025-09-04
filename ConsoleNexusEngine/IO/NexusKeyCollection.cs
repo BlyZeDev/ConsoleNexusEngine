@@ -5,8 +5,24 @@
 /// </summary>
 public sealed class NexusKeyCollection
 {
-    internal readonly HashSet<NexusKey> _previousState;
-    internal readonly HashSet<NexusKey> _currentState;
+    private readonly HashSet<NexusKey> _previousState;
+    private readonly HashSet<NexusKey> _currentState;
+
+    /// <summary>
+    /// Contains all buttons pressed the update before the most recent update
+    /// </summary>
+    /// <remarks>
+    /// This is just for enumeration
+    /// </remarks>
+    public IEnumerable<NexusKey> PreviousState => _previousState;
+    
+    /// <summary>
+    /// Contains all buttons pressed at the most recent update
+    /// </summary>
+    /// <remarks>
+    /// This is just for enumeration. To check if a specific <see cref="NexusKey"/> is contained use <see cref="IsKeyDown(NexusKey)"/>
+    /// </remarks>
+    public IEnumerable<NexusKey> CurrentState => _currentState;
 
     internal NexusKeyCollection()
     {

@@ -17,12 +17,10 @@ internal sealed class CmdConsole
     private readonly nint _standardInput;
     private readonly nint _standardOutput;
 
-    private readonly ImmutableArray<NexusKey> _mouseWheels;
     private readonly DefaultConsole _defaultConsole;
 
     public ConsoleBuffer Buffer { get; }
-
-    public NexusKey StopGameKey { get; set; }
+    public ConsoleInput Input { get; }
 
     public CmdConsole(NexusConsoleGameSettings settings)
     {
@@ -39,105 +37,12 @@ internal sealed class CmdConsole
         _standardInput = Native.GetStdHandle(STD_INPUT);
         _standardOutput = Native.GetStdHandle(STD_OUTPUT);
 
-        _mouseWheels =
-        [
-            NexusKey.MouseWheelLeft,
-            NexusKey.MouseWheelRight,
-            NexusKey.MouseWheelDown,
-            NexusKey.MouseWheelUp
-        ];
-
         _defaultConsole = SaveDefaultConsole(needsAllocation);
 
         var size = Initialize(settings);
 
         Buffer = new ConsoleBuffer(_standardOutput, size.Width, size.Height);
-    }
-
-    public unsafe void ReadKeyboardMouseInput(NexusKeyCollection keys, ref NexusCoord currentMousePos)
-    {
-        keys._previousState.Clear();
-        keys._previousState.UnionWith(keys._currentState);
-
-        keys._currentState.Clear();
-
-        Native.GetNumberOfConsoleInputEvents(_standardInput, out var numEventsRead);
-        if (numEventsRead == 0) return;
-
-        var bufferPtr = stackalloc INPUT_RECORD[numEventsRead];
-        Native.ReadConsoleInputEx(_standardInput, bufferPtr, numEventsRead, out _, 0x02);
-
-        for (int i = 0; i < numEventsRead; i++)
-        {
-            ref readonly var current = ref bufferPtr[i];
-
-            if (current.EventType == 1)
-            {
-                System.IO.File.AppendAllText(@"C:\Users\leschi\Downloads\testlog.txt",
-                    $"""
-                    Timestamp: {Environment.TickCount64}
-                    ------------------------------------------------
-                    ---- Keyboard ----
-                    KeyDown: {current.KeyEvent.KeyDown}
-                    VirtualKeyCode: {current.KeyEvent.VirtualKeyCode}
-                    VirtualScanCode: {current.KeyEvent.VirtualScanCode}
-                    ControlKeyState: {current.KeyEvent.ControlKeyState}
-                    RepeatCount: {current.KeyEvent.RepeatCount}
-                    UnicodeChar: {current.KeyEvent.UnicodeChar}
-                    ------------------------------------------------
-
-                    """, Encoding.UTF8);
-
-                var key = (NexusKey)current.KeyEvent.VirtualKeyCode;
-
-                if (current.KeyEvent.KeyDown) keys._currentState.Add(key);
-                else keys._currentState.Remove(key);
-            }
-            else if (current.EventType == 2)
-            {
-                System.IO.File.AppendAllText(@"C:\Users\leschi\Downloads\testlog.txt",
-                    $"""
-                    Timestamp: {Environment.TickCount64}
-                    ------------------------------------------------
-                    ---- Mouse ----
-                    MousePos: {current.MouseEvent.MousePosition.X}|{current.MouseEvent.MousePosition.Y}
-                    ButtonState: {current.MouseEvent.ButtonState}
-                    EventFlags: {current.MouseEvent.EventFlags}
-                    ControlKeyState: {current.MouseEvent.ControlKeyState}
-                    ------------------------------------------------
-
-                    """, Encoding.UTF8);
-
-                currentMousePos = NativeConverter.ToNexusCoord(current.MouseEvent.MousePosition);
-
-                switch (current.MouseEvent.EventFlags)
-                {
-                    case MOUSE_MOVED: break;
-                    case MOUSE_WHEELED: keys._currentState.Add((current.MouseEvent.ButtonState & 0x80000000) == 0 ? NexusKey.MouseWheelUp : NexusKey.MouseWheelDown); break;
-                    case MOUSE_HWHEELED: keys._currentState.Add((current.MouseEvent.ButtonState & 0x80000000) == 0 ? NexusKey.MouseWheelRight : NexusKey.MouseWheelLeft); break;
-                    default:
-                        {
-                            var buttonState = current.MouseEvent.ButtonState;
-
-                            if ((buttonState & 0x01) == 0) keys._currentState.Remove(NexusKey.MouseLeft);
-                            else keys._currentState.Add(NexusKey.MouseLeft);
-
-                            if ((buttonState & 0x02) == 0) keys._currentState.Remove(NexusKey.MouseRight);
-                            else keys._currentState.Add(NexusKey.MouseRight);
-
-                            if ((buttonState & 0x04) == 0) keys._currentState.Remove(NexusKey.MouseMiddle);
-                            else keys._currentState.Add(NexusKey.MouseMiddle);
-
-                            if ((buttonState & 0x08) == 0) keys._currentState.Remove(NexusKey.XButton1);
-                            else keys._currentState.Add(NexusKey.XButton1);
-
-                            if ((buttonState & 0x10) == 0) keys._currentState.Remove(NexusKey.XButton2);
-                            else keys._currentState.Add(NexusKey.XButton2);
-                        }
-                        break;
-                }
-            }
-        }
+        Input = new ConsoleInput(_standardInput);
     }
 
     public void UpdateTitle(string title) => Native.SetWindowText(_handle, title);
@@ -188,7 +93,8 @@ internal sealed class CmdConsole
 
         Native.SetCurrentConsoleFontEx(_standardOutput, false, ref fontInfo);
 
-        AdjustBufferSize();
+        var csbe = new CONSOLE_SCREEN_BUFFER_INFO_EX();
+        AdjustBufferSize(ref csbe);
     }
 
     public void ResetToDefault()
@@ -337,12 +243,6 @@ internal sealed class CmdConsole
         Native.SetForegroundWindow(_handle);
 
         return new NexusSize(csbe.dwSize.X, csbe.dwSize.Y);
-    }
-
-    private void AdjustBufferSize()
-    {
-        var csbe = new CONSOLE_SCREEN_BUFFER_INFO_EX();
-        AdjustBufferSize(ref csbe);
     }
 
     private void AdjustBufferSize(ref CONSOLE_SCREEN_BUFFER_INFO_EX csbe)
