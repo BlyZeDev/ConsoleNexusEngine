@@ -1,7 +1,5 @@
 ﻿namespace ConsoleNexusEngine;
 
-using System.Collections.Immutable;
-
 /// <summary>
 /// The input handler for <see cref="NexusConsoleGame"/>
 /// </summary>
@@ -13,9 +11,9 @@ public sealed class NexusConsoleInput
     private NexusCoord currentMousePos;
 
     /// <summary>
-    /// The keys that were pressed at the last time <see cref="Update"/> was called
+    /// The keyboard information at the last time <see cref="Update"/> was called
     /// </summary>
-    public ImmutableArray<NexusKey> Keys { get; private set; }
+    public NexusKeyCollection Keys { get; }
 
     /// <summary>
     /// The position of the mouse at the last time <see cref="Update"/> was called
@@ -46,12 +44,13 @@ public sealed class NexusConsoleInput
     {
         _console = console;
         _gamepads = new NexusGamepad[4];
+        Keys = new NexusKeyCollection();
     }
 
     /// <summary>
     /// Updates <see cref="Keys"/> and <see cref="MousePosition"/>
     /// </summary>
-    public void Update() => Keys = _console.ReadKeyboardMouseInput(ref currentMousePos);
+    public void Update() => _console.ReadKeyboardMouseInput(Keys, ref currentMousePos);
 
     /// <summary>
     /// Updates <see cref="Gamepad1"/>, <see cref="Gamepad2"/>, <see cref="Gamepad3"/>, <see cref="Gamepad4"/>

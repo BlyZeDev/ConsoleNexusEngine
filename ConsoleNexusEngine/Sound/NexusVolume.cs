@@ -34,7 +34,7 @@ public readonly record struct NexusVolume
     /// <summary>
     /// Returns <see langword="true"/> if the volume is muted, otherwise <see langword="false"/>
     /// </summary>
-    public readonly bool IsMute => Value is 0;
+    public readonly bool IsMute => Value == 0;
 
     /// <summary>
     /// Initializes a Volume instance with <see cref="Value"/> 50
@@ -55,51 +55,43 @@ public readonly record struct NexusVolume
     public static explicit operator int(in NexusVolume volume) => volume.Value;
 
     /// <inheritdoc/>
-    public static explicit operator NexusVolume(int volume) => new(volume);
+    public static explicit operator NexusVolume(int volume) => new NexusVolume(volume);
 
     /// <inheritdoc/>
     public static explicit operator float(in NexusVolume volume) => volume._value;
 
     /// <inheritdoc/>
-    public static explicit operator NexusVolume(float volume) => new(volume);
+    public static explicit operator NexusVolume(float volume) => new NexusVolume(volume);
 
     /// <inheritdoc/>
-    public static NexusVolume operator +(NexusVolume left, NexusVolume right)
-        => new(left._value + right._value);
+    public static NexusVolume operator +(NexusVolume left, NexusVolume right) => new NexusVolume(left._value + right._value);
 
     /// <inheritdoc/>
-    public static NexusVolume operator -(NexusVolume left, NexusVolume right)
-        => new(left._value - right._value);
+    public static NexusVolume operator -(NexusVolume left, NexusVolume right) => new NexusVolume(left._value - right._value);
 
     /// <inheritdoc/>
-    public static NexusVolume operator *(NexusVolume left, NexusVolume right)
-        => new(left._value * right._value);
+    public static NexusVolume operator *(NexusVolume left, NexusVolume right) => new NexusVolume(left._value * right._value);
 
     /// <inheritdoc/>
-    public static NexusVolume operator /(NexusVolume left, NexusVolume right)
-        => new(left._value / right._value);
+    public static NexusVolume operator /(NexusVolume left, NexusVolume right) => new NexusVolume(left._value / right._value);
 
     /// <inheritdoc/>
-    public static NexusVolume operator +(NexusVolume left, int right)
-        => new(left.Value + right);
+    public static NexusVolume operator +(NexusVolume left, int right) => new NexusVolume(left.Value + right);
 
     /// <inheritdoc/>
-    public static NexusVolume operator -(NexusVolume left, int right)
-        => new(left.Value - right);
+    public static NexusVolume operator -(NexusVolume left, int right) => new NexusVolume(left.Value - right);
 
     /// <inheritdoc/>
-    public static NexusVolume operator *(NexusVolume left, int right)
-        => new(left.Value * right);
+    public static NexusVolume operator *(NexusVolume left, int right) => new NexusVolume(left.Value * right);
 
     /// <inheritdoc/>
-    public static NexusVolume operator /(NexusVolume left, int right)
-        => new(left.Value / right);
+    public static NexusVolume operator /(NexusVolume left, int right) => new NexusVolume(left.Value / right);
 
     /// <inheritdoc/>
-    public static NexusVolume operator ++(NexusVolume value) => new(value._value + 0.01f);
+    public static NexusVolume operator ++(NexusVolume value) => new NexusVolume(value._value + 0.01f);
 
     /// <inheritdoc/>
-    public static NexusVolume operator --(NexusVolume value) => new(value._value - 0.01f);
+    public static NexusVolume operator --(NexusVolume value) => new NexusVolume(value._value - 0.01f);
 
     /// <inheritdoc/>
     public override readonly string ToString() => Value.ToString();

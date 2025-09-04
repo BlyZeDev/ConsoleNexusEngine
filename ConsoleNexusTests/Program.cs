@@ -11,7 +11,7 @@ sealed class Program
     {
         if (!NexusEngineHelper.IsSupportedConsole())
         {
-            NexusEngineHelper.StartInSupportedConsole(true);
+            NexusEngineHelper.StartInSupportedConsole(false);
             return;
         }
 
@@ -20,7 +20,7 @@ sealed class Program
             game.Start();
         }
 
-        Console.Write("Test");
+        Console.Write("Ende");
         Console.Clear();
     }
 }
@@ -32,7 +32,7 @@ public sealed class Game : NexusConsoleGame
 
     public Game()
     {
-        Settings.Font = new NexusFont("Consolas", new NexusSize(20));
+        Settings.Font = new NexusFont("Consolas", new NexusSize(10));
         Settings.ColorPalette = new WindowsColorPalette();
     }
 
@@ -52,6 +52,8 @@ public sealed class Game : NexusConsoleGame
             .AddSprite(new NexusFiggleText("Test", FiggleFonts.Banner3D, NexusColorIndex.Color7))
             .Build();
 
+        //Audio.Play(new ConsoleNexusEngine.Sound.NexusSoundInfo(@"C:\Users\leschi\Downloads\Young Love - Discotech.wav"));
+
         //var first = NexusSpriteExporter.Export(@"C:\Users\leons\Downloads", "Test", sprite, false);
 
         //sprite = new NexusSimpleSprite(NexusSpriteImporter.Import(first));
@@ -63,12 +65,17 @@ public sealed class Game : NexusConsoleGame
         Input.UpdateGamepads();
 
         Graphic.Clear();
+        
+        if (Input.Keys.IsKeyJustDown(ConsoleNexusEngine.IO.NexusKey.F))
+        {
+            //Audio.Play(new ConsoleNexusEngine.Sound.NexusSoundInfo(@"C:\Users\leschi\Downloads\Mario Coin Sound - Sound Effect (HD).mp3"));
+        }
 
         //DebugView();
         Graphic.DrawSprite(NexusCoord.MinValue, sprite);
         Graphic.DrawText(NexusCoord.MinValue, new NexusFiggleText("Settings", FiggleFonts.Banner, NexusColorIndex.Color14, NexusColorIndex.Background));
 
-        Graphic.Render(); throw new Exception();
+        Graphic.Render();
     }
 
     protected override void OnCrash(Exception exception)

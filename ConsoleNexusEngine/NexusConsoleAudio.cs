@@ -3,6 +3,10 @@
 using SoundFlow.Backends.MiniAudio;
 using SoundFlow.Backends.MiniAudio.Devices;
 using SoundFlow.Backends.MiniAudio.Enums;
+using SoundFlow.Components;
+using SoundFlow.Providers;
+using System.IO;
+using System.Linq;
 
 /// <summary>
 /// The audio engine for <see cref="NexusConsoleGame"/>
@@ -41,9 +45,26 @@ public sealed class NexusConsoleAudio : IDisposable
         _audioEngine = new MiniAudioEngine();
     }
 
-    public void Play(NexusAudioDevice device)
+    public void Play(NexusSoundInfo soundInfo)
     {
-        using (var dev = _audioEngine.InitializePlaybackDevice(device._deviceInfo, new SoundFlow.Structs.AudioFormat { }))
+        var defaultDevice = AudioDevices.FirstOrDefault(x => x.IsDefault);
+
+        if (defaultDevice is null) return;
+
+        Play(defaultDevice, soundInfo);
+    }
+
+    public void Play(NexusAudioDevice device, NexusSoundInfo soundInfo)
+    {
+        if (!File.Exists(soundInfo.FilePath)) return;
+
+        var playbackDevice = _audioEngine.InitializePlaybackDevice(device._deviceInfo, soundInfo._audioFormat, _deviceConfig);
+        var dataProvider = new StreamDataProvider(_audioEngine, soundInfo._audioFormat, File.OpenRead(soundInfo.FilePath));
+        var player = new SurroundPlayer(_audioEngine, soundInfo._audioFormat, dataProvider);
+        
+        playbackDevice.MasterMixer.AddComponent(player);
+        playbackDevice.Start();
+        player.Play();
     }
 
     /// <inheritdoc/>

@@ -13,9 +13,5 @@ internal static unsafe partial class Native
 
     [DllImport(Kernel32)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static extern bool PeekConsoleInput(nint hConsoleInput, [Out] INPUT_RECORD* lpBuffer, int nLength, out int lpNumberOfEventsRead);
-
-    [LibraryImport(Kernel32)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool FlushConsoleInputBuffer(nint hConsoleInput);
+    public static extern bool ReadConsoleInputEx(nint hConsoleInput, [Out] INPUT_RECORD* lpBuffer, int nLength, out int lpNumberOfEventsRead, uint flags);
 }
