@@ -1,11 +1,11 @@
 ﻿namespace ConsoleNexusEngine.IO;
 
 /// <summary>
-/// Represents information about the keyboard
+/// Represents information about keyboard and mouse buttons
 /// </summary>
 public sealed class NexusKeyCollection
 {
-    internal readonly HashSet<NexusKey> _previousState;
+    private readonly HashSet<NexusKey> _previousState;
     internal readonly HashSet<NexusKey> _currentState;
 
     /// <summary>
