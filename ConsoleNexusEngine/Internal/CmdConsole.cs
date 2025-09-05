@@ -8,10 +8,6 @@ internal sealed class CmdConsole
     private const int STD_INPUT = -10;
     private const int STD_OUTPUT = -11;
 
-    private const int MOUSE_MOVED = 0x0001;
-    private const int MOUSE_WHEELED = 0x0004;
-    private const int MOUSE_HWHEELED = 0x0008;
-
     private readonly nint _handle;
     private readonly nint _standardInput;
     private readonly nint _standardOutput;

@@ -19,15 +19,13 @@ public sealed record NexusSoundInfo
     /// Initializes information to play a sound
     /// </summary>
     /// <param name="filepath">The path to the sound file</param>
-    /// <param name="sampleFormat">The sample format</param>
-    /// <param name="sampleRate">The sample rate in Hertz</param>
     /// <param name="channels">The amount of channels used. 1 = mono, 2 = stereo</param>
-    public NexusSoundInfo(string filepath, SampleFormat sampleFormat = SampleFormat.F32, int sampleRate = 48000, int channels = 2)
+    public NexusSoundInfo(string filepath, int channels = 2)
     {
         _audioFormat = new AudioFormat
         {
-            Format = sampleFormat,
-            SampleRate = sampleRate,
+            Format = SampleFormat.F32,
+            SampleRate = 48000,
             Channels = channels,
         };
 

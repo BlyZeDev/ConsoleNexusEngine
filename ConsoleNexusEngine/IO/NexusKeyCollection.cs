@@ -6,7 +6,7 @@
 public sealed class NexusKeyCollection
 {
     private readonly HashSet<NexusKey> _previousState;
-    internal readonly HashSet<NexusKey> _currentState;
+    private readonly HashSet<NexusKey> _currentState;
 
     /// <summary>
     /// Contains all buttons pressed the update before the most recent update
@@ -63,4 +63,8 @@ public sealed class NexusKeyCollection
         _previousState.Clear();
         _previousState.UnionWith(_currentState);
     }
+
+    internal void AddToCurrent(NexusKey key) => _currentState.Add(key);
+
+    internal void RemoveFromCurrent(NexusKey key) => _currentState.Remove(key);
 }

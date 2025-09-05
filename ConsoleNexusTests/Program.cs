@@ -53,7 +53,7 @@ public sealed class Game : NexusConsoleGame
             .AddSprite(new NexusFiggleText("Test", FiggleFonts.Banner3D, NexusColorIndex.Color7))
             .Build();
 
-        Audio.Play(new ConsoleNexusEngine.Sound.NexusSoundInfo(@"C:\Users\leschi\Downloads\Young Love - Discotech.wav"));
+        Audio.Play(new ConsoleNexusEngine.Sound.NexusSoundInfo(@"C:\Users\leons\Downloads\Young Love - Discotech.wav", SoundFlow.Enums.SampleFormat.F32, 48000, 4));
 
         //var first = NexusSpriteExporter.Export(@"C:\Users\leons\Downloads", "Test", sprite, false);
 
@@ -69,7 +69,7 @@ public sealed class Game : NexusConsoleGame
 
         if (Input.Keys.IsKeyJustDown(NexusKey.F))
         {
-            Audio.Play(new ConsoleNexusEngine.Sound.NexusSoundInfo(@"C:\Users\leschi\Downloads\Mario Coin Sound - Sound Effect (HD).mp3"));
+            Audio.Play(new ConsoleNexusEngine.Sound.NexusSoundInfo(@"C:\Users\leons\Downloads\unlock.wav"));
         }
 
         //DebugView();

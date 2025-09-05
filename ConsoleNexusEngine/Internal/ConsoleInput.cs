@@ -61,8 +61,8 @@ internal sealed class ConsoleInput
 
                 if (!_reservedKeys.Contains(key))
                 {
-                    if (current.KeyEvent.KeyDown) Keys._currentState.Add(key);
-                    else Keys._currentState.Remove(key);
+                    if (current.KeyEvent.KeyDown) Keys.AddToCurrent(key);
+                    else Keys.RemoveFromCurrent(key);
                 }
             }
             else if (current.EventType == MOUSE_EVENT)
@@ -73,27 +73,25 @@ internal sealed class ConsoleInput
                         {
                             var buttonState = current.MouseEvent.ButtonState;
 
-                            if ((buttonState & FROM_LEFT_1ST_BUTTON_PRESSED) == 0) Keys._currentState.Remove(NexusKey.MouseLeft);
-                            else Keys._currentState.Add(NexusKey.MouseLeft);
+                            if ((buttonState & FROM_LEFT_1ST_BUTTON_PRESSED) == 0) Keys.RemoveFromCurrent(NexusKey.MouseLeft);
+                            else Keys.AddToCurrent(NexusKey.MouseLeft);
 
-                            if ((buttonState & RIGHTMOST_BUTTON_PRESSED) == 0) Keys._currentState.Remove(NexusKey.MouseRight);
-                            else Keys._currentState.Add(NexusKey.MouseRight);
+                            if ((buttonState & RIGHTMOST_BUTTON_PRESSED) == 0) Keys.RemoveFromCurrent(NexusKey.MouseRight);
+                            else Keys.AddToCurrent(NexusKey.MouseRight);
 
-                            if ((buttonState & FROM_LEFT_2ND_BUTTON_PRESSED) == 0) Keys._currentState.Remove(NexusKey.MouseMiddle);
-                            else Keys._currentState.Add(NexusKey.MouseMiddle);
+                            if ((buttonState & FROM_LEFT_2ND_BUTTON_PRESSED) == 0) Keys.RemoveFromCurrent(NexusKey.MouseMiddle);
+                            else Keys.AddToCurrent(NexusKey.MouseMiddle);
 
-                            if ((buttonState & FROM_LEFT_3RD_BUTTON_PRESSED) == 0) Keys._currentState.Remove(NexusKey.XButton1);
-                            else Keys._currentState.Add(NexusKey.XButton1);
+                            if ((buttonState & FROM_LEFT_3RD_BUTTON_PRESSED) == 0) Keys.RemoveFromCurrent(NexusKey.XButton1);
+                            else Keys.AddToCurrent(NexusKey.XButton1);
 
-                            if ((buttonState & FROM_LEFT_4TH_BUTTON_PRESSED) == 0) Keys._currentState.Remove(NexusKey.XButton2);
-                            else Keys._currentState.Add(NexusKey.XButton2);
+                            if ((buttonState & FROM_LEFT_4TH_BUTTON_PRESSED) == 0) Keys.RemoveFromCurrent(NexusKey.XButton2);
+                            else Keys.AddToCurrent(NexusKey.XButton2);
                         }
                         break;
-
                     case MOUSE_MOVED: MousePosition = current.MouseEvent.MousePosition; break;
-
-                    case MOUSE_WHEELED: Keys._currentState.Add((current.MouseEvent.ButtonState & 0x80000000) == 0 ? NexusKey.MouseWheelUp : NexusKey.MouseWheelDown); break;
-                    case MOUSE_HWHEELED: Keys._currentState.Add((current.MouseEvent.ButtonState & 0x80000000) == 0 ? NexusKey.MouseWheelRight : NexusKey.MouseWheelLeft); break;
+                    case MOUSE_WHEELED: Keys.AddToCurrent((current.MouseEvent.ButtonState & 0x80000000) == 0 ? NexusKey.MouseWheelUp : NexusKey.MouseWheelDown); break;
+                    case MOUSE_HWHEELED: Keys.AddToCurrent((current.MouseEvent.ButtonState & 0x80000000) == 0 ? NexusKey.MouseWheelRight : NexusKey.MouseWheelLeft); break;
                 }
             }
         }
