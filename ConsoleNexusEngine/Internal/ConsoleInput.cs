@@ -1,13 +1,23 @@
 ﻿namespace ConsoleNexusEngine.Internal;
 
-using System.Text;
-
 internal sealed class ConsoleInput
 {
-    private const int KEY_EVENT = 0x0001;
-    private const int MOUSE_EVENT = 0x0002;
+    private const ushort KEY_EVENT = 0x0001;
+    private const ushort MOUSE_EVENT = 0x0002;
+
+    private const uint MOUSE_CLICKED = 0x0000;
+    private const uint MOUSE_MOVED = 0x0001;
+    private const uint MOUSE_WHEELED = 0x0004;
+    private const uint MOUSE_HWHEELED = 0x0008;
+
+    private const uint FROM_LEFT_1ST_BUTTON_PRESSED = 0x0001;
+    private const uint RIGHTMOST_BUTTON_PRESSED = 0x0002;
+    private const uint FROM_LEFT_2ND_BUTTON_PRESSED = 0x0004;
+    private const uint FROM_LEFT_3RD_BUTTON_PRESSED = 0x0008;
+    private const uint FROM_LEFT_4TH_BUTTON_PRESSED = 0x00010;
 
     private readonly nint _standardInput;
+    private readonly HashSet<NexusKey> _reservedKeys;
 
     public NexusKeyCollection Keys { get; }
 
@@ -16,6 +26,12 @@ internal sealed class ConsoleInput
     public ConsoleInput(nint standardInput)
     {
         _standardInput = standardInput;
+        _reservedKeys =
+        [
+            NexusKey.LeftWindows,
+            NexusKey.RightWindows,
+            NexusKey.Applications
+        ];
 
         Keys = new NexusKeyCollection();
         MousePosition = new COORD
@@ -27,60 +43,59 @@ internal sealed class ConsoleInput
 
     public unsafe void ReadInput()
     {
+        Keys.InvalidateCurrent();
+
         Native.GetNumberOfConsoleInputEvents(_standardInput, out var numEventsRead);
         if (numEventsRead == 0) return;
-
+        
         var bufferPtr = stackalloc INPUT_RECORD[numEventsRead];
         Native.ReadConsoleInputEx(_standardInput, bufferPtr, numEventsRead, out _, 0x02);
 
         for (int i = 0; i < numEventsRead; i++)
         {
             ref readonly var current = ref bufferPtr[i];
-
+            
             if (current.EventType == KEY_EVENT)
             {
-                //TODO: https://learn.microsoft.com/de-de/windows/console/key-event-record-str
+                var key = (NexusKey)current.KeyEvent.VirtualKeyCode;
+
+                if (!_reservedKeys.Contains(key))
+                {
+                    if (current.KeyEvent.KeyDown) Keys._currentState.Add(key);
+                    else Keys._currentState.Remove(key);
+                }
             }
             else if (current.EventType == MOUSE_EVENT)
             {
-                MousePosition = current.MouseEvent.MousePosition;
+                switch (current.MouseEvent.EventFlags)
+                {
+                    case MOUSE_CLICKED:
+                        {
+                            var buttonState = current.MouseEvent.ButtonState;
 
-                //TODO: https://learn.microsoft.com/de-de/windows/console/mouse-event-record-str
+                            if ((buttonState & FROM_LEFT_1ST_BUTTON_PRESSED) == 0) Keys._currentState.Remove(NexusKey.MouseLeft);
+                            else Keys._currentState.Add(NexusKey.MouseLeft);
+
+                            if ((buttonState & RIGHTMOST_BUTTON_PRESSED) == 0) Keys._currentState.Remove(NexusKey.MouseRight);
+                            else Keys._currentState.Add(NexusKey.MouseRight);
+
+                            if ((buttonState & FROM_LEFT_2ND_BUTTON_PRESSED) == 0) Keys._currentState.Remove(NexusKey.MouseMiddle);
+                            else Keys._currentState.Add(NexusKey.MouseMiddle);
+
+                            if ((buttonState & FROM_LEFT_3RD_BUTTON_PRESSED) == 0) Keys._currentState.Remove(NexusKey.XButton1);
+                            else Keys._currentState.Add(NexusKey.XButton1);
+
+                            if ((buttonState & FROM_LEFT_4TH_BUTTON_PRESSED) == 0) Keys._currentState.Remove(NexusKey.XButton2);
+                            else Keys._currentState.Add(NexusKey.XButton2);
+                        }
+                        break;
+
+                    case MOUSE_MOVED: MousePosition = current.MouseEvent.MousePosition; break;
+
+                    case MOUSE_WHEELED: Keys._currentState.Add((current.MouseEvent.ButtonState & 0x80000000) == 0 ? NexusKey.MouseWheelUp : NexusKey.MouseWheelDown); break;
+                    case MOUSE_HWHEELED: Keys._currentState.Add((current.MouseEvent.ButtonState & 0x80000000) == 0 ? NexusKey.MouseWheelRight : NexusKey.MouseWheelLeft); break;
+                }
             }
         }
-    }
-
-    private static void DebugKeyboard(INPUT_RECORD current)
-    {
-        System.IO.File.AppendAllText(@"C:\Users\leons\Downloads\testlog.txt",
-            $"""
-            Timestamp: {Environment.TickCount64}
-            ------------------------------------------------
-            ---- Keyboard ----
-            KeyDown: {current.KeyEvent.KeyDown}
-            VirtualKeyCode: {current.KeyEvent.VirtualKeyCode}
-            VirtualScanCode: {current.KeyEvent.VirtualScanCode}
-            ControlKeyState: {current.KeyEvent.ControlKeyState}
-            RepeatCount: {current.KeyEvent.RepeatCount}
-            UnicodeChar: {current.KeyEvent.UnicodeChar}
-            ------------------------------------------------
-
-            """, Encoding.UTF8);
-    }
-
-    private static void DebugMouse(INPUT_RECORD current)
-    {
-        System.IO.File.AppendAllText(@"C:\Users\leons\Downloads\testlog.txt",
-            $"""
-            Timestamp: {Environment.TickCount64}
-            ------------------------------------------------
-            ---- Mouse ----
-            MousePos: {current.MouseEvent.MousePosition.X}|{current.MouseEvent.MousePosition.Y}
-            ButtonState: {current.MouseEvent.ButtonState}
-            EventFlags: {current.MouseEvent.EventFlags}
-            ControlKeyState: {current.MouseEvent.ControlKeyState}
-            ------------------------------------------------
-
-            """, Encoding.UTF8);
     }
 }

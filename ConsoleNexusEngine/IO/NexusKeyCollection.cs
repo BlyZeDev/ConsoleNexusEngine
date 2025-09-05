@@ -5,8 +5,8 @@
 /// </summary>
 public sealed class NexusKeyCollection
 {
-    private readonly HashSet<NexusKey> _previousState;
-    private readonly HashSet<NexusKey> _currentState;
+    internal readonly HashSet<NexusKey> _previousState;
+    internal readonly HashSet<NexusKey> _currentState;
 
     /// <summary>
     /// Contains all buttons pressed the update before the most recent update
@@ -14,7 +14,7 @@ public sealed class NexusKeyCollection
     /// <remarks>
     /// This is just for enumeration
     /// </remarks>
-    public IEnumerable<NexusKey> PreviousState => _previousState;
+    public IReadOnlySet<NexusKey> PreviousState => _previousState;
     
     /// <summary>
     /// Contains all buttons pressed at the most recent update
@@ -22,7 +22,7 @@ public sealed class NexusKeyCollection
     /// <remarks>
     /// This is just for enumeration. To check if a specific <see cref="NexusKey"/> is contained use <see cref="IsKeyDown(NexusKey)"/>
     /// </remarks>
-    public IEnumerable<NexusKey> CurrentState => _currentState;
+    public IReadOnlySet<NexusKey> CurrentState => _currentState;
 
     internal NexusKeyCollection()
     {
@@ -57,4 +57,10 @@ public sealed class NexusKeyCollection
     /// <param name="key">The key to check for</param>
     /// <returns><see cref="bool"/></returns>
     public bool IsKeyJustUp(NexusKey key) => _previousState.Contains(key) && !_currentState.Contains(key);
+
+    internal void InvalidateCurrent()
+    {
+        _previousState.Clear();
+        _previousState.UnionWith(_currentState);
+    }
 }

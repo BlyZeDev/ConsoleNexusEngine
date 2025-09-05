@@ -3,6 +3,7 @@
 using ConsoleNexusEngine;
 using ConsoleNexusEngine.Graphics;
 using ConsoleNexusEngine.Helpers;
+using ConsoleNexusEngine.IO;
 using Figgle.Fonts;
 
 sealed class Program
@@ -65,8 +66,8 @@ public sealed class Game : NexusConsoleGame
         Input.UpdateGamepads();
 
         Graphic.Clear();
-        
-        if (Input.Keys.IsKeyJustDown(ConsoleNexusEngine.IO.NexusKey.F))
+
+        if (Input.Keys.IsKeyJustDown(NexusKey.F))
         {
             //Audio.Play(new ConsoleNexusEngine.Sound.NexusSoundInfo(@"C:\Users\leschi\Downloads\Mario Coin Sound - Sound Effect (HD).mp3"));
         }
