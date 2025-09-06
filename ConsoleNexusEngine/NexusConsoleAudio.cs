@@ -1,14 +1,16 @@
 ﻿namespace ConsoleNexusEngine;
 
+using SoundFlow.Abstracts.Devices;
 using SoundFlow.Backends.MiniAudio;
 using SoundFlow.Backends.MiniAudio.Devices;
 using SoundFlow.Backends.MiniAudio.Enums;
 using SoundFlow.Components;
+using SoundFlow.Enums;
 using SoundFlow.Providers;
 using SoundFlow.Structs;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 
 /// <summary>
 /// The audio engine for <see cref="NexusConsoleGame"/>
@@ -23,8 +25,16 @@ public sealed class NexusConsoleAudio : IDisposable
             Usage = WasapiUsage.Games
         }
     };
+    private static readonly AudioFormat _audioFormat = new AudioFormat
+    {
+        Channels = 2,
+        Format = SampleFormat.F32,
+        SampleRate = 48000
+    };
 
     private readonly MiniAudioEngine _audioEngine;
+    private readonly Dictionary<DeviceInfo, AudioPlaybackDevice> _playbackDevices;
+    private readonly Dictionary<NexusAudioId, SoundPlayer> _playingAudio;
 
     /// <summary>
     /// Enumeration of all available playback audio devices
@@ -45,34 +55,100 @@ public sealed class NexusConsoleAudio : IDisposable
     internal NexusConsoleAudio()
     {
         _audioEngine = new MiniAudioEngine();
+        _playbackDevices = new Dictionary<DeviceInfo, AudioPlaybackDevice>(new DeviceInfoEqualityComparer());
+        _playingAudio = [];
     }
 
-    public void Play(NexusSoundInfo soundInfo)
+    /// <summary>
+    /// Plays audio from a file
+    /// </summary>
+    /// <param name="filepath">The path to the audio file</param>
+    /// <remarks>
+    /// Returns a valid <see cref="NexusAudioId"/> if playback is successful, otherwise <see cref="NexusAudioId.Invalid"/>
+    /// </remarks>
+    /// <returns><see cref="NexusAudioId"/></returns>
+    public NexusAudioId Play(string filepath)
     {
         var defaultDevice = AudioDevices.FirstOrDefault(x => x.IsDefault);
 
-        if (defaultDevice is null) return;
-
-        Play(defaultDevice, soundInfo);
+        return defaultDevice is null ? NexusAudioId.Invalid : Play(defaultDevice, filepath);
     }
 
-    public void Play(NexusAudioDevice device, NexusSoundInfo soundInfo)
+    /// <summary>
+    /// Plays audio from a file with the specified audio device
+    /// </summary>
+    /// <param name="device">The audio device to play on</param>
+    /// <param name="filepath">The path to the audio file</param>
+    /// <remarks>
+    /// Returns a valid <see cref="NexusAudioId"/> if playback is successful, otherwise <see cref="NexusAudioId.Invalid"/>
+    /// </remarks>
+    /// <returns><see cref="NexusAudioId"/></returns>
+    public NexusAudioId Play(NexusAudioDevice device, string filepath)
     {
-        if (!File.Exists(soundInfo.FilePath)) return;
+        if (!File.Exists(filepath)) return NexusAudioId.Invalid;
 
-        var playbackDevice = _audioEngine.InitializePlaybackDevice(device._deviceInfo, soundInfo._audioFormat, _deviceConfig);
-        var dataProvider = new StreamDataProvider(_audioEngine, soundInfo._audioFormat, File.OpenRead(soundInfo.FilePath));
-        var player = new SoundPlayer(_audioEngine, soundInfo._audioFormat, dataProvider);
+        if (!_playbackDevices.TryGetValue(device._deviceInfo, out var playbackDevice))
+        {
+            playbackDevice = _audioEngine.InitializePlaybackDevice(device._deviceInfo, _audioFormat, _deviceConfig);
+
+            if (!playbackDevice.Capability.HasFlag(Capability.Playback))
+            {
+                playbackDevice.Dispose();
+                return NexusAudioId.Invalid;
+            }
+
+            _playbackDevices.Add(device._deviceInfo, playbackDevice);
+        }
+
+        var player = new SoundPlayer(_audioEngine, _audioFormat, new StreamDataProvider(_audioEngine, _audioFormat, File.OpenRead(filepath)));
 
         playbackDevice.MasterMixer.AddComponent(player);
         playbackDevice.Start();
+
+        var audioId = new NexusAudioId(Environment.TickCount64);
+
+        player.PlaybackEnded += OnPlaybackEndedLocal;
         player.Play();
+
+        _playingAudio.Add(audioId, player);
+
+        return audioId;
+
+        void OnPlaybackEndedLocal(object? sender, EventArgs args)
+        {
+            OnPlaybackEnded(device._deviceInfo, audioId);
+            player.PlaybackEnded -= OnPlaybackEndedLocal;
+        }
     }
 
     /// <inheritdoc/>
     public void Dispose()
     {
+        foreach (var player in _playingAudio.Values) player.Dispose();
+        foreach (var playbackDevice in _playbackDevices.Values) playbackDevice.Dispose();
+
         _audioEngine.Dispose();
         GC.SuppressFinalize(this);
+    }
+
+    private void OnPlaybackEnded(DeviceInfo deviceInfo, NexusAudioId audioId)
+    {
+        if (_playingAudio.TryGetValue(audioId, out var player))
+        {
+            player.Stop();
+        }
+
+        if (player is not null && _playbackDevices.TryGetValue(deviceInfo, out var playbackDevices))
+        {
+            playbackDevices.MasterMixer.RemoveComponent(player);
+        }
+
+        player?.Dispose();
+    }
+
+    private sealed class DeviceInfoEqualityComparer : IEqualityComparer<DeviceInfo>
+    {
+        public bool Equals(DeviceInfo x, DeviceInfo y) => x.Id == y.Id;
+        public int GetHashCode([DisallowNull] DeviceInfo obj) => obj.Id.GetHashCode();
     }
 }
