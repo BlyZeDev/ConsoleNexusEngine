@@ -34,7 +34,7 @@ public sealed class NexusConsoleAudio : IDisposable
 
     private readonly MiniAudioEngine _audioEngine;
     private readonly Dictionary<DeviceInfo, AudioPlaybackDevice> _playbackDevices;
-    private readonly Dictionary<NexusAudioId, SoundPlayer> _playingAudio;
+    private readonly Dictionary<NexusAudioId, PlayingSoundInfo> _playingAudio;
 
     /// <summary>
     /// Enumeration of all available playback audio devices
@@ -110,40 +110,126 @@ public sealed class NexusConsoleAudio : IDisposable
         player.PlaybackEnded += OnPlaybackEndedLocal;
         player.Play();
 
-        _playingAudio.Add(audioId, player);
+        _playingAudio.Add(audioId, new PlayingSoundInfo
+        {
+            DeviceInfo = device._deviceInfo,
+            Player = player
+        });
 
         return audioId;
 
         void OnPlaybackEndedLocal(object? sender, EventArgs args)
         {
-            OnPlaybackEnded(device._deviceInfo, audioId);
+            OnPlaybackEnded(audioId);
             player.PlaybackEnded -= OnPlaybackEndedLocal;
         }
+    }
+
+    /// <summary>
+    /// Pauses the specified sound
+    /// </summary>
+    /// <param name="id">The id of the sound</param>
+    /// <remarks>
+    /// This method has no effect if no sound is found or the sound is already paused
+    /// </remarks>
+    public void Pause(NexusAudioId id)
+    {
+        if (_playingAudio.TryGetValue(id, out var soundInfo)) soundInfo.Player.Pause();
+    }
+
+    /// <summary>
+    /// Resumes the specified sound
+    /// </summary>
+    /// <param name="id">The id of the sound</param>
+    /// <remarks>
+    /// This method has no effect if no sound is found or the sound is already playing
+    /// </remarks>
+    public void Resume(NexusAudioId id)
+    {
+        if (_playingAudio.TryGetValue(id, out var soundInfo))
+        {
+            if (soundInfo.Player.State is PlaybackState.Paused) soundInfo.Player.Play();
+        }
+    }
+
+    /// <summary>
+    /// Restarts the specified sound
+    /// </summary>
+    /// <param name="id">The id of the sound</param>
+    /// <remarks>
+    /// This method has no effect if no sound is found
+    /// </remarks>
+    public void Restart(NexusAudioId id)
+    {
+        if (_playingAudio.TryGetValue(id, out var soundInfo))
+        {
+            soundInfo.Player.Stop();
+            soundInfo.Player.Play();
+        }
+    }
+
+    /// <summary>
+    /// Stops and removes the specified sound
+    /// </summary>
+    /// <param name="id">The id of the sound</param>
+    /// <remarks>
+    /// The <see cref="NexusAudioId"/> is deprecated after calling this method.<br/>
+    /// If you want to restart the sound use <see cref="Restart"/>
+    /// </remarks>
+    public void Stop(NexusAudioId id) => OnPlaybackEnded(id);
+
+    /// <summary>
+    /// Gets the volume from the specified sound
+    /// </summary>
+    /// <param name="id">The id of the sound</param>
+    /// <remarks>
+    /// Returns the volume of the specified sound or <see cref="float.NaN"/> if the audio id is not found
+    /// </remarks>
+    /// <returns><see cref="float"/></returns>
+    public float GetVolume(NexusAudioId id) // !!! Will be removed if GetState(id) is added !!!
+    {
+        _playingAudio.TryGetValue(id, out var soundInfo);
+
+        return soundInfo?.Player.Volume ?? float.NaN;
+    }
+
+    /// <summary>
+    /// Gets the volume for the specified sound
+    /// </summary>
+    /// <param name="id">The id of the sound</param>
+    /// <param name="volume">The volume to set the sound to</param>
+    public void SetVolume(NexusAudioId id, float volume)
+    {
+        if (_playingAudio.TryGetValue(id, out var soundInfo)) soundInfo.Player.Volume = volume;
+    }
+
+    /// <summary>
+    /// Seeks the 
+    /// </summary>
+    /// <param name="id"></param>
+    public void Seek(NexusAudioId id) //Implement GetState(id) that returns state information about a playing sound by id
+    {
+
     }
 
     /// <inheritdoc/>
     public void Dispose()
     {
-        foreach (var player in _playingAudio.Values) player.Dispose();
+        foreach (var soundInfo in _playingAudio.Values) soundInfo.Player.Dispose();
         foreach (var playbackDevice in _playbackDevices.Values) playbackDevice.Dispose();
 
         _audioEngine.Dispose();
         GC.SuppressFinalize(this);
     }
 
-    private void OnPlaybackEnded(DeviceInfo deviceInfo, NexusAudioId audioId)
+    private void OnPlaybackEnded(NexusAudioId audioId)
     {
-        if (_playingAudio.TryGetValue(audioId, out var player))
-        {
-            player.Stop();
-        }
+        if (_playingAudio.TryGetValue(audioId, out var soundInfo)) soundInfo.Player.Stop();
 
-        if (player is not null && _playbackDevices.TryGetValue(deviceInfo, out var playbackDevices))
-        {
-            playbackDevices.MasterMixer.RemoveComponent(player);
-        }
+        if (soundInfo is not null && _playbackDevices.TryGetValue(soundInfo.DeviceInfo, out var playbackDevices))
+            playbackDevices.MasterMixer.RemoveComponent(soundInfo.Player);
 
-        player?.Dispose();
+        soundInfo?.Player.Dispose();
     }
 
     private sealed class DeviceInfoEqualityComparer : IEqualityComparer<DeviceInfo>
