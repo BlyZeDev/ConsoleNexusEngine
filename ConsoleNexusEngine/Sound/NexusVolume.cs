@@ -19,11 +19,11 @@ public readonly record struct NexusVolume
     IIncrementOperators<NexusVolume>
 {
     /// <inheritdoc/>
-    public static NexusVolume MinValue => (NexusVolume)0;
+    public static NexusVolume MinValue => new NexusVolume(0);
     /// <inheritdoc/>
-    public static NexusVolume MaxValue => (NexusVolume)100;
+    public static NexusVolume MaxValue => new NexusVolume(100);
 
-    internal readonly float _value;
+    private readonly float _value;
 
     /// <summary>
     /// The volume between 0 and 100
@@ -55,13 +55,7 @@ public readonly record struct NexusVolume
     public static explicit operator int(in NexusVolume volume) => volume.Value;
 
     /// <inheritdoc/>
-    public static explicit operator NexusVolume(int volume) => new NexusVolume(volume);
-
-    /// <inheritdoc/>
     public static explicit operator float(in NexusVolume volume) => volume._value;
-
-    /// <inheritdoc/>
-    public static explicit operator NexusVolume(float volume) => new NexusVolume(volume);
 
     /// <inheritdoc/>
     public static NexusVolume operator +(NexusVolume left, NexusVolume right) => new NexusVolume(left._value + right._value);

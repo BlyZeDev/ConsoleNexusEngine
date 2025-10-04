@@ -100,7 +100,7 @@ public sealed class NexusConsoleAudio : IDisposable
             _playbackDevices.Add(device._deviceInfo, playbackDevice);
         }
 
-        var player = new SoundPlayer(_audioEngine, _audioFormat, new StreamDataProvider(_audioEngine, _audioFormat, File.OpenRead(filepath)));
+        var player = new SoundPlayer(_audioEngine, _audioFormat, new ChunkedDataProvider(_audioEngine, _audioFormat, filepath));
 
         playbackDevice.MasterMixer.AddComponent(player);
         playbackDevice.Start();
@@ -179,37 +179,85 @@ public sealed class NexusConsoleAudio : IDisposable
     public void Stop(NexusAudioId id) => OnPlaybackEnded(id);
 
     /// <summary>
-    /// Gets the volume from the specified sound
+    /// Returns the current state of the specified sound
     /// </summary>
     /// <param name="id">The id of the sound</param>
     /// <remarks>
-    /// Returns the volume of the specified sound or <see cref="float.NaN"/> if the audio id is not found
+    /// Returns <see cref="NexusAudioState.Empty"/> if no sound is found.<br/>
+    /// To ensure a valid state was returned use <see cref="NexusAudioState.IsEmpty"/>
     /// </remarks>
-    /// <returns><see cref="float"/></returns>
-    public float GetVolume(NexusAudioId id) // !!! Will be removed if GetState(id) is added !!!
+    /// <returns><see cref="NexusAudioState"/></returns>
+    public NexusAudioState GetState(NexusAudioId id)
     {
-        _playingAudio.TryGetValue(id, out var soundInfo);
+        if (_playingAudio.TryGetValue(id, out var soundInfo))
+        {
+            var player = soundInfo.Player;
 
-        return soundInfo?.Player.Volume ?? float.NaN;
+            return new NexusAudioState
+            {
+                Duration = TimeSpan.FromSeconds(player.Duration),
+                Position = TimeSpan.FromSeconds(player.Time),
+                PlaybackSpeed = player.PlaybackSpeed,
+                Volume = new NexusVolume(player.Volume),
+                PlaybackState = player.State is PlaybackState.Paused ? NexusPlaybackState.Paused : NexusPlaybackState.Playing,
+                IsLooping = player.IsLooping
+            };
+        }
+
+        return NexusAudioState.Empty;
     }
 
     /// <summary>
-    /// Gets the volume for the specified sound
+    /// Sets the volume for the specified sound
     /// </summary>
     /// <param name="id">The id of the sound</param>
     /// <param name="volume">The volume to set the sound to</param>
-    public void SetVolume(NexusAudioId id, float volume)
+    /// <remarks>
+    /// This method has no effect if no sound is found
+    /// </remarks>
+    public void SetVolume(NexusAudioId id, NexusVolume volume)
     {
-        if (_playingAudio.TryGetValue(id, out var soundInfo)) soundInfo.Player.Volume = volume;
+        if (_playingAudio.TryGetValue(id, out var soundInfo)) soundInfo.Player.Volume = (float)volume;
     }
 
     /// <summary>
-    /// Seeks the 
+    /// Sets the playback speed for the specified sound
     /// </summary>
-    /// <param name="id"></param>
-    public void Seek(NexusAudioId id) //Implement GetState(id) that returns state information about a playing sound by id
+    /// <param name="id">The id of the sound</param>
+    /// <param name="playbackSpeed">The normal speed is 1.0f, lower values decrease the speed and higher values increase it</param>
+    /// <remarks>
+    /// This method has no effect if no sound is found
+    /// </remarks>
+    public void SetPlaybackSpeed(NexusAudioId id, float playbackSpeed)
     {
+        if (_playingAudio.TryGetValue(id, out var soundInfo)) soundInfo.Player.PlaybackSpeed = playbackSpeed;
+    }
 
+    /// <summary>
+    /// Seeks the specified sound to the specified position
+    /// </summary>
+    /// <param name="id">The id of the sound</param>
+    /// <param name="position">The position to seek to</param>
+    /// <remarks>
+    /// Returns <see langword="true"/> if the sound was found and seeking was successful, otherwise <see langword="false"/>
+    /// </remarks>
+    /// <returns><see cref="bool"/></returns>
+    public bool Seek(NexusAudioId id, in TimeSpan position) => _playingAudio.TryGetValue(id, out var soundInfo) && soundInfo.Player.Seek(position);
+
+    /// <summary>
+    /// Turns the loop for the specified sound on or off
+    /// </summary>
+    /// <param name="id">The id of the sound</param>
+    /// <param name="shouldLoop"><see langword="true"/> if the sound should loop, otherwise <see langword="false"/></param>
+    /// <param name="startTime">The time where the loop should start, or <see langword="null"/> if the natural start of the sound should be used</param>
+    /// <param name="endTime">The time where the loop should end, or <see langword="null"/> if the natural end of the sound should be used</param>
+    public void SetLoop(NexusAudioId id, bool shouldLoop, TimeSpan? startTime = null, TimeSpan? endTime = null)
+    {
+        if (_playingAudio.TryGetValue(id, out var soundInfo))
+        {
+            soundInfo.Player.IsLooping = shouldLoop;
+            soundInfo.Player.SetLoopPoints(startTime ?? TimeSpan.Zero, endTime);
+        }
     }
 
     /// <inheritdoc/>
