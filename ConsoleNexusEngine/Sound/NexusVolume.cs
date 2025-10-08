@@ -21,15 +21,15 @@ public readonly record struct NexusVolume
     /// <inheritdoc/>
     public static NexusVolume MinValue => new NexusVolume(0);
     /// <inheritdoc/>
-    public static NexusVolume MaxValue => new NexusVolume(100);
+    public static NexusVolume MaxValue => new NexusVolume(200);
 
-    private readonly float _value;
+    internal readonly float _value;
 
     /// <summary>
-    /// The volume between 0 and 100
+    /// The volume between 0 and 200
     /// </summary>
-    /// <remarks>Value is clamped between 0 and 100</remarks>
-    public readonly int Value => (int)(_value * 100);
+    /// <remarks>Value is clamped between 0 and 200</remarks>
+    public readonly int Value => (int)(_value * 100f);
 
     /// <summary>
     /// Returns <see langword="true"/> if the volume is muted, otherwise <see langword="false"/>
@@ -37,25 +37,16 @@ public readonly record struct NexusVolume
     public readonly bool IsMute => Value == 0;
 
     /// <summary>
-    /// Initializes a Volume instance with <see cref="Value"/> 50
+    /// Initializes a <see cref="NexusVolume"/> instance with a <see cref="Value"/> of 100
     /// </summary>
-    public NexusVolume() : this(0.5f) { }
+    public NexusVolume() : this(100) { }
 
     /// <summary>
-    /// Initializes a Volume instance
+    /// Initializes a <see cref="NexusVolume"/> instance
     /// </summary>
     public NexusVolume(int volume) : this(volume / 100f) { }
 
-    /// <summary>
-    /// Initializes a Volume instance
-    /// </summary>
-    public NexusVolume(float volume) => _value = Math.Clamp(volume, 0, 1);
-
-    /// <inheritdoc/>
-    public static explicit operator int(in NexusVolume volume) => volume.Value;
-
-    /// <inheritdoc/>
-    public static explicit operator float(in NexusVolume volume) => volume._value;
+    internal NexusVolume(float volume) => _value = Math.Clamp(volume, 0f, 2f);
 
     /// <inheritdoc/>
     public static NexusVolume operator +(NexusVolume left, NexusVolume right) => new NexusVolume(left._value + right._value);

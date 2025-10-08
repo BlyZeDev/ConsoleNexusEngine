@@ -6,5 +6,5 @@ using SoundFlow.Structs;
 internal sealed record PlayingSoundInfo
 {
     public required DeviceInfo DeviceInfo { get; init; }
-    public required SoundPlayer Player { get; init; }
+    public required SurroundPlayer Player { get; init; }
 }

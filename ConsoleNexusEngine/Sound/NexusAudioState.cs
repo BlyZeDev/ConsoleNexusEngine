@@ -1,7 +1,5 @@
 ﻿namespace ConsoleNexusEngine.Sound;
 
-using System.Diagnostics.CodeAnalysis;
-
 /// <summary>
 /// Represents the current state of a playing sound
 /// </summary>
@@ -10,32 +8,32 @@ public readonly record struct NexusAudioState
     /// <summary>
     /// Represents an empty audio state
     /// </summary>
-    public static readonly NexusAudioState Empty = new NexusAudioState(true);
+    public static readonly NexusAudioState Empty = default;
 
     /// <summary>
     /// The total length of the sound
     /// </summary>
-    public required TimeSpan Duration { get; init; }
+    public TimeSpan Duration { get; }
 
     /// <summary>
     /// The current position of the sound
     /// </summary>
-    public required TimeSpan Position { get; init; }
+    public TimeSpan Position { get; }
 
     /// <summary>
     /// The volume of the sound
     /// </summary>
-    public required NexusVolume Volume { get; init; }
+    public NexusVolume Volume { get; }
 
     /// <summary>
     /// The current playback state of the sound
     /// </summary>
-    public required NexusPlaybackState PlaybackState { get; init; }
+    public NexusPlaybackState PlaybackState { get; }
 
     /// <summary>
     /// <see langword="true"/> if the sound is currently looping, otherwise <see langword="false"/>
     /// </summary>
-    public required bool IsLooping { get; init; }
+    public bool IsLooping { get; }
 
     /// <summary>
     /// The playback speed of the sound
@@ -43,13 +41,27 @@ public readonly record struct NexusAudioState
     /// <remarks>
     /// The normal speed is 1.0f, lower values decrease the speed and higher values increase it
     /// </remarks>
-    public required float PlaybackSpeed { get; init; }
+    public float PlaybackSpeed { get; }
 
     /// <summary>
     /// <see langword="true"/> if the state is empty, otherwise <see langword="false"/>
     /// </summary>
     public bool IsEmpty { get; }
 
-    [SetsRequiredMembers]
-    private NexusAudioState(bool isEmpty) => IsEmpty = isEmpty;
+    /// <summary>
+    /// Initializes an empty <see cref="NexusAudioState"/>
+    /// </summary>
+    public NexusAudioState() => IsEmpty = true;
+
+    internal NexusAudioState(TimeSpan duration, TimeSpan position, NexusVolume volume, NexusPlaybackState playbackState, bool isLooping, float playbackSpeed)
+    {
+        IsEmpty = false;
+
+        Duration = duration;
+        Position = position;
+        Volume = volume;
+        PlaybackState = playbackState;
+        IsLooping = isLooping;
+        PlaybackSpeed = playbackSpeed;
+    }
 }

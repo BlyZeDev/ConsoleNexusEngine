@@ -22,7 +22,7 @@ public sealed class NexusConsoleAudio : IDisposable
         NoFixedSizedCallback = true,
         Wasapi = new WasapiSettings
         {
-            Usage = WasapiUsage.Games
+            Usage = WasapiUsage.ProAudio
         }
     };
     private static readonly AudioFormat _audioFormat = new AudioFormat
@@ -100,7 +100,8 @@ public sealed class NexusConsoleAudio : IDisposable
             _playbackDevices.Add(device._deviceInfo, playbackDevice);
         }
 
-        var player = new SoundPlayer(_audioEngine, _audioFormat, new ChunkedDataProvider(_audioEngine, _audioFormat, filepath));
+        var player = new SurroundPlayer(_audioEngine, _audioFormat, new ChunkedDataProvider(_audioEngine, _audioFormat, filepath));
+        player.SetSpeakerConfiguration(SurroundPlayer.SpeakerConfiguration.Stereo);
 
         playbackDevice.MasterMixer.AddComponent(player);
         playbackDevice.Start();
@@ -193,15 +194,13 @@ public sealed class NexusConsoleAudio : IDisposable
         {
             var player = soundInfo.Player;
 
-            return new NexusAudioState
-            {
-                Duration = TimeSpan.FromSeconds(player.Duration),
-                Position = TimeSpan.FromSeconds(player.Time),
-                PlaybackSpeed = player.PlaybackSpeed,
-                Volume = new NexusVolume(player.Volume),
-                PlaybackState = player.State is PlaybackState.Paused ? NexusPlaybackState.Paused : NexusPlaybackState.Playing,
-                IsLooping = player.IsLooping
-            };
+            return new NexusAudioState(
+                TimeSpan.FromSeconds(player.Duration),
+                TimeSpan.FromSeconds(player.Time),
+                new NexusVolume(player.Volume),
+                player.State is PlaybackState.Paused ? NexusPlaybackState.Paused : NexusPlaybackState.Playing,
+                player.IsLooping,
+                player.PlaybackSpeed);
         }
 
         return NexusAudioState.Empty;
@@ -217,7 +216,7 @@ public sealed class NexusConsoleAudio : IDisposable
     /// </remarks>
     public void SetVolume(NexusAudioId id, NexusVolume volume)
     {
-        if (_playingAudio.TryGetValue(id, out var soundInfo)) soundInfo.Player.Volume = (float)volume;
+        if (_playingAudio.TryGetValue(id, out var soundInfo)) soundInfo.Player.Volume = volume._value;
     }
 
     /// <summary>
