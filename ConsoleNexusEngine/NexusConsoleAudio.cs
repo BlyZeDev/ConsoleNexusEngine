@@ -197,7 +197,7 @@ public sealed class NexusConsoleAudio : IDisposable
             return new NexusAudioState(
                 TimeSpan.FromSeconds(player.Duration),
                 TimeSpan.FromSeconds(player.Time),
-                new NexusVolume(player.Volume),
+                player.Volume,
                 player.State is PlaybackState.Paused ? NexusPlaybackState.Paused : NexusPlaybackState.Playing,
                 player.IsLooping,
                 player.PlaybackSpeed);
@@ -214,9 +214,9 @@ public sealed class NexusConsoleAudio : IDisposable
     /// <remarks>
     /// This method has no effect if no sound is found
     /// </remarks>
-    public void SetVolume(NexusAudioId id, NexusVolume volume)
+    public void SetVolume(NexusAudioId id, float volume)
     {
-        if (_playingAudio.TryGetValue(id, out var soundInfo)) soundInfo.Player.Volume = volume._value;
+        if (_playingAudio.TryGetValue(id, out var soundInfo)) soundInfo.Player.Volume = volume;
     }
 
     /// <summary>
@@ -271,10 +271,12 @@ public sealed class NexusConsoleAudio : IDisposable
 
     private void OnPlaybackEnded(NexusAudioId audioId)
     {
-        if (_playingAudio.TryGetValue(audioId, out var soundInfo)) soundInfo.Player.Stop();
+        if (_playingAudio.TryGetValue(audioId, out var soundInfo))
+        {
+            soundInfo.Player.Stop();
 
-        if (soundInfo is not null && _playbackDevices.TryGetValue(soundInfo.DeviceInfo, out var playbackDevices))
-            playbackDevices.MasterMixer.RemoveComponent(soundInfo.Player);
+            if (_playbackDevices.TryGetValue(soundInfo.DeviceInfo, out var playbackDevices)) playbackDevices.MasterMixer.RemoveComponent(soundInfo.Player);
+        }
 
         soundInfo?.Player.Dispose();
     }

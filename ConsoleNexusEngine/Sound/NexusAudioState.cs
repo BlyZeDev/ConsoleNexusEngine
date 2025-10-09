@@ -23,7 +23,7 @@ public readonly record struct NexusAudioState
     /// <summary>
     /// The volume of the sound
     /// </summary>
-    public NexusVolume Volume { get; }
+    public float Volume { get; }
 
     /// <summary>
     /// The current playback state of the sound
@@ -53,7 +53,7 @@ public readonly record struct NexusAudioState
     /// </summary>
     public NexusAudioState() => IsEmpty = true;
 
-    internal NexusAudioState(TimeSpan duration, TimeSpan position, NexusVolume volume, NexusPlaybackState playbackState, bool isLooping, float playbackSpeed)
+    internal NexusAudioState(TimeSpan duration, TimeSpan position, float volume, NexusPlaybackState playbackState, bool isLooping, float playbackSpeed)
     {
         IsEmpty = false;
 
