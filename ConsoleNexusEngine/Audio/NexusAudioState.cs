@@ -1,4 +1,4 @@
-﻿namespace ConsoleNexusEngine.Sound;
+﻿namespace ConsoleNexusEngine.Audio;
 
 /// <summary>
 /// Represents the current state of a playing sound
@@ -8,7 +8,7 @@ public readonly record struct NexusAudioState
     /// <summary>
     /// Represents an empty audio state
     /// </summary>
-    public static readonly NexusAudioState Empty = default;
+    public static readonly NexusAudioState Empty = new NexusAudioState();
 
     /// <summary>
     /// The total length of the sound

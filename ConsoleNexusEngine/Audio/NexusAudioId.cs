@@ -1,4 +1,4 @@
-﻿namespace ConsoleNexusEngine.Sound;
+﻿namespace ConsoleNexusEngine.Audio;
 
 /// <summary>
 /// Represents information to identify a playing audio

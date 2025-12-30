@@ -43,7 +43,7 @@ public sealed class NexusConsoleAudio : IDisposable
     {
         get
         {
-            _audioEngine.UpdateDevicesInfo();
+            _audioEngine.UpdateAudioDevicesInfo();
 
             foreach (var device in _audioEngine.PlaybackDevices)
             {
@@ -100,7 +100,7 @@ public sealed class NexusConsoleAudio : IDisposable
             _playbackDevices.Add(device._deviceInfo, playbackDevice);
         }
 
-        var player = new SurroundPlayer(_audioEngine, _audioFormat, new ChunkedDataProvider(_audioEngine, _audioFormat, filepath));
+        var player = new SurroundPlayer(_audioEngine, _audioFormat, new ChunkedDataProvider(_audioEngine, _audioFormat, File.OpenRead(filepath)));
         player.SetSpeakerConfiguration(SurroundPlayer.SpeakerConfiguration.Stereo);
 
         playbackDevice.MasterMixer.AddComponent(player);

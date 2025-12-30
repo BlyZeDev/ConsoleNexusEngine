@@ -4,7 +4,7 @@ using ConsoleNexusEngine;
 using ConsoleNexusEngine.Graphics;
 using ConsoleNexusEngine.Helpers;
 using ConsoleNexusEngine.IO;
-using ConsoleNexusEngine.Sound;
+using ConsoleNexusEngine.Audio;
 using Figgle.Fonts;
 
 sealed class Program
@@ -55,7 +55,7 @@ public sealed class Game : NexusConsoleGame
             .AddSprite(new NexusFiggleText("Test", FiggleFonts.Banner3D, NexusColorIndex.Color7))
             .Build();
 
-        bgm = Audio.Play(@"C:\Users\leons\Downloads\BGM.wav");
+        //bgm = Audio.Play(@"C:\Users\leons\Downloads\BGM.wav");
 
         //var first = NexusSpriteExporter.Export(@"C:\Users\leons\Downloads", "Test", sprite, false);
 
@@ -85,6 +85,7 @@ public sealed class Game : NexusConsoleGame
         Graphic.DrawText(NexusCoord.MinValue, new NexusFiggleText("Settings", FiggleFonts.Banner, NexusColorIndex.Color14, NexusColorIndex.Background));
         Graphic.DrawText(new NexusCoord(5, 5), new NexusText("Volume: " + Audio.GetState(bgm).Volume, NexusColorIndex.Color14));
         Graphic.DrawText(new NexusCoord(5, 6), new NexusText("Speed: " + Audio.GetState(bgm).PlaybackSpeed, NexusColorIndex.Color14));
+        Graphic.DrawText(new NexusCoord(5, 7), new NexusText("IsEmpty: " + Audio.GetState(bgm).IsEmpty, NexusColorIndex.Color14));
 
         Graphic.Render();
     }

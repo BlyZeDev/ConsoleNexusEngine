@@ -1,4 +1,4 @@
-﻿namespace ConsoleNexusEngine.Sound;
+﻿namespace ConsoleNexusEngine.Audio;
 
 /// <summary>
 /// Represents the playback state of a playing sound

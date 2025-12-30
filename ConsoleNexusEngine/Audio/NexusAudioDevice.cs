@@ -1,4 +1,4 @@
-﻿namespace ConsoleNexusEngine.Sound;
+﻿namespace ConsoleNexusEngine.Audio;
 
 using SoundFlow.Structs;
 
