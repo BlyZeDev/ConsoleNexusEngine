@@ -80,13 +80,14 @@ public sealed class Game : NexusConsoleGame
         if (Input.Keys.IsKeyJustDown(NexusKey.A)) Audio.SetPlaybackSpeed(bgm, Audio.GetState(bgm).PlaybackSpeed - 0.1f);
         if (Input.Keys.IsKeyJustDown(NexusKey.D)) Audio.SetPlaybackSpeed(bgm, Audio.GetState(bgm).PlaybackSpeed + 0.1f);
 
-        //DebugView();
+        DebugView();
+        /*
         Graphic.DrawSprite(NexusCoord.MinValue, sprite);
         Graphic.DrawText(NexusCoord.MinValue, new NexusFiggleText("Settings", FiggleFonts.Banner, NexusColorIndex.Color14, NexusColorIndex.Background));
         Graphic.DrawText(new NexusCoord(5, 5), new NexusText("Volume: " + Audio.GetState(bgm).Volume, NexusColorIndex.Color14));
         Graphic.DrawText(new NexusCoord(5, 6), new NexusText("Speed: " + Audio.GetState(bgm).PlaybackSpeed, NexusColorIndex.Color14));
         Graphic.DrawText(new NexusCoord(5, 7), new NexusText("IsEmpty: " + Audio.GetState(bgm).IsEmpty, NexusColorIndex.Color14));
-
+        */
         Graphic.Render();
     }
 

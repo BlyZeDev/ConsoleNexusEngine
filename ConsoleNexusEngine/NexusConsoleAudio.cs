@@ -60,7 +60,7 @@ public sealed class NexusConsoleAudio : IDisposable
     }
 
     /// <summary>
-    /// Plays audio from a file
+    /// Plays audio from a file to the default audio device
     /// </summary>
     /// <param name="filepath">The path to the audio file</param>
     /// <remarks>
@@ -75,7 +75,7 @@ public sealed class NexusConsoleAudio : IDisposable
     }
 
     /// <summary>
-    /// Plays audio from a file with the specified audio device
+    /// Plays audio from a file to the specified audio device
     /// </summary>
     /// <param name="device">The audio device to play on</param>
     /// <param name="filepath">The path to the audio file</param>
@@ -127,11 +127,11 @@ public sealed class NexusConsoleAudio : IDisposable
     }
 
     /// <summary>
-    /// Pauses the specified sound
+    /// Pauses the specified audio
     /// </summary>
-    /// <param name="id">The id of the sound</param>
+    /// <param name="id">The id of the audio</param>
     /// <remarks>
-    /// This method has no effect if no sound is found or the sound is already paused
+    /// This method has no effect if no audio is found or already paused
     /// </remarks>
     public void Pause(NexusAudioId id)
     {
@@ -139,11 +139,11 @@ public sealed class NexusConsoleAudio : IDisposable
     }
 
     /// <summary>
-    /// Resumes the specified sound
+    /// Resumes the specified audio
     /// </summary>
-    /// <param name="id">The id of the sound</param>
+    /// <param name="id">The id of the audio</param>
     /// <remarks>
-    /// This method has no effect if no sound is found or the sound is already playing
+    /// This method has no effect if no audio is found or already playing
     /// </remarks>
     public void Resume(NexusAudioId id)
     {
@@ -154,11 +154,11 @@ public sealed class NexusConsoleAudio : IDisposable
     }
 
     /// <summary>
-    /// Restarts the specified sound
+    /// Restarts the specified audio
     /// </summary>
-    /// <param name="id">The id of the sound</param>
+    /// <param name="id">The id of the audio</param>
     /// <remarks>
-    /// This method has no effect if no sound is found
+    /// This method has no effect if no audio is found
     /// </remarks>
     public void Restart(NexusAudioId id)
     {
@@ -170,21 +170,21 @@ public sealed class NexusConsoleAudio : IDisposable
     }
 
     /// <summary>
-    /// Stops and removes the specified sound
+    /// Stops and removes the specified audio
     /// </summary>
-    /// <param name="id">The id of the sound</param>
+    /// <param name="id">The id of the audio</param>
     /// <remarks>
     /// The <see cref="NexusAudioId"/> is deprecated after calling this method.<br/>
-    /// If you want to restart the sound use <see cref="Restart"/>
+    /// If you want to restart the audio use <see cref="Restart"/>
     /// </remarks>
     public void Stop(NexusAudioId id) => OnPlaybackEnded(id);
 
     /// <summary>
-    /// Returns the current state of the specified sound
+    /// Returns the current state of the specified audio
     /// </summary>
-    /// <param name="id">The id of the sound</param>
+    /// <param name="id">The id of the audio</param>
     /// <remarks>
-    /// Returns <see cref="NexusAudioState.Empty"/> if no sound is found.<br/>
+    /// Returns <see cref="NexusAudioState.Empty"/> if no audio is found.<br/>
     /// To ensure a valid state was returned use <see cref="NexusAudioState.IsEmpty"/>
     /// </remarks>
     /// <returns><see cref="NexusAudioState"/></returns>
@@ -207,12 +207,12 @@ public sealed class NexusConsoleAudio : IDisposable
     }
 
     /// <summary>
-    /// Sets the volume for the specified sound
+    /// Sets the volume for the specified audio
     /// </summary>
-    /// <param name="id">The id of the sound</param>
-    /// <param name="volume">The volume to set the sound to</param>
+    /// <param name="id">The id of the audio</param>
+    /// <param name="volume">The volume to set the audio to</param>
     /// <remarks>
-    /// This method has no effect if no sound is found
+    /// This method has no effect if no audio is found
     /// </remarks>
     public void SetVolume(NexusAudioId id, float volume)
     {
@@ -220,12 +220,12 @@ public sealed class NexusConsoleAudio : IDisposable
     }
 
     /// <summary>
-    /// Sets the playback speed for the specified sound
+    /// Sets the playback speed for the specified audio
     /// </summary>
-    /// <param name="id">The id of the sound</param>
+    /// <param name="id">The id of the audio</param>
     /// <param name="playbackSpeed">The normal speed is 1.0f, lower values decrease the speed and higher values increase it</param>
     /// <remarks>
-    /// This method has no effect if no sound is found
+    /// This method has no effect if no audio is found
     /// </remarks>
     public void SetPlaybackSpeed(NexusAudioId id, float playbackSpeed)
     {
@@ -233,23 +233,23 @@ public sealed class NexusConsoleAudio : IDisposable
     }
 
     /// <summary>
-    /// Seeks the specified sound to the specified position
+    /// Seeks the specified audio to the specified position
     /// </summary>
-    /// <param name="id">The id of the sound</param>
+    /// <param name="id">The id of the audio</param>
     /// <param name="position">The position to seek to</param>
     /// <remarks>
-    /// Returns <see langword="true"/> if the sound was found and seeking was successful, otherwise <see langword="false"/>
+    /// Returns <see langword="true"/> if the audio was found and seeking was successful, otherwise <see langword="false"/>
     /// </remarks>
     /// <returns><see cref="bool"/></returns>
     public bool Seek(NexusAudioId id, in TimeSpan position) => _playingAudio.TryGetValue(id, out var soundInfo) && soundInfo.Player.Seek(position);
 
     /// <summary>
-    /// Turns the loop for the specified sound on or off
+    /// Turns the loop for the specified audio on or off
     /// </summary>
-    /// <param name="id">The id of the sound</param>
-    /// <param name="shouldLoop"><see langword="true"/> if the sound should loop, otherwise <see langword="false"/></param>
-    /// <param name="startTime">The time where the loop should start, or <see langword="null"/> if the natural start of the sound should be used</param>
-    /// <param name="endTime">The time where the loop should end, or <see langword="null"/> if the natural end of the sound should be used</param>
+    /// <param name="id">The id of the audio</param>
+    /// <param name="shouldLoop"><see langword="true"/> if the audio should loop, otherwise <see langword="false"/></param>
+    /// <param name="startTime">The time where the loop should start, or <see langword="null"/> if the natural start of the audio should be used</param>
+    /// <param name="endTime">The time where the loop should end, or <see langword="null"/> if the natural end of the audio should be used</param>
     public void SetLoop(NexusAudioId id, bool shouldLoop, TimeSpan? startTime = null, TimeSpan? endTime = null)
     {
         if (_playingAudio.TryGetValue(id, out var soundInfo))
