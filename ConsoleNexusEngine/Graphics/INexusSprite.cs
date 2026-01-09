@@ -5,6 +5,9 @@
 /// </summary>
 public interface INexusSprite
 {
+    internal const string FileExtension = ".nxs";
+    internal const string FileExtensionCompressed = ".nxsc";
+
     /// <summary>
     /// The sprite data that is rendered
     /// </summary>

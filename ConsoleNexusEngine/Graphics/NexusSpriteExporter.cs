@@ -17,11 +17,11 @@ public static class NexusSpriteExporter
     /// <summary>
     /// The file extension of a uncompressed exported sprite
     /// </summary>
-    public const string Extension = Constants.Extension;
+    public const string Extension = INexusSprite.FileExtension;
     /// <summary>
     /// The file extension of a compressed exported sprite
     /// </summary>
-    public const string ExtensionCompressed = Constants.ExtensionCompressed;
+    public const string ExtensionCompressed = INexusSprite.FileExtensionCompressed;
 
     /// <summary>
     /// Exports the sprite to the specified <paramref name="directory"/> with the specified <paramref name="spriteName"/><br/>

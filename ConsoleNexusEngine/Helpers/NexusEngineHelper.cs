@@ -14,7 +14,7 @@ public static class NexusEngineHelper
     /// <see langword="true"/> if the console window is a supported console, otherwise <see langword="false"/>
     /// </summary>
     /// <returns><see cref="bool"/></returns>
-    public static bool IsSupportedConsole() => Native.GetWindowLong(Native.GetConsoleWindow(), -16) > 0;
+    public static bool IsSupportedConsole() => PInvoke.GetWindowLong(PInvoke.GetConsoleWindow(), -16) > 0;
 
     /// <summary>
     /// <see langword="true"/> if the program has administrator privileges, otherwise <see langword="false"/>

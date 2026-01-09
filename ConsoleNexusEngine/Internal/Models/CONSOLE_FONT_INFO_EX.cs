@@ -1,16 +1,16 @@
-﻿namespace ConsoleNexusEngine.Internal;
+﻿namespace ConsoleNexusEngine.Internal.Models;
 
 using System.Runtime.InteropServices;
 
 [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-internal struct CONSOLE_FONT_INFO_EX
+internal unsafe struct CONSOLE_FONT_INFO_EX
 {
+    public const int FACE_NAME_SIZE = 32;
+
     public uint cbSize;
     public uint nFont;
     public COORD dwFontSize;
     public int FontFamily;
     public int FontWeight;
-
-    [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
-    public string FaceName;
+    public fixed char FaceName[FACE_NAME_SIZE];
 }

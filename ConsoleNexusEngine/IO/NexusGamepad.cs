@@ -18,28 +18,28 @@ public readonly record struct NexusGamepad
     static NexusGamepad()
     {
         _vibrationTimers =
-            [
-                new Timer
-                {
-                    AutoReset = false,
-                    Interval = 1000
-                },
-                new Timer
-                {
-                    AutoReset = false,
-                    Interval = 1000
-                },
-                new Timer
-                {
-                    AutoReset = false,
-                    Interval = 1000
-                },
-                new Timer
-                {
-                    AutoReset = false,
-                    Interval = 1000
-                }
-            ];
+        [
+            new Timer
+            {
+                AutoReset = false,
+                Interval = 1000
+            },
+            new Timer
+            {
+                AutoReset = false,
+                Interval = 1000
+            },
+            new Timer
+            {
+                AutoReset = false,
+                Interval = 1000
+            },
+            new Timer
+            {
+                AutoReset = false,
+                Interval = 1000
+            }
+        ];
 
         _vibrationTimers[0].Elapsed += (sender, args) =>
         {
@@ -49,7 +49,7 @@ public readonly record struct NexusGamepad
                 wRightMotorSpeed = 0
             };
 
-            _ = Native.XInputSetState(0, ref vibration);
+            _ = PInvoke.XInputSetState(0, ref vibration);
         };
 
         _vibrationTimers[1].Elapsed += (sender, args) =>
@@ -60,7 +60,7 @@ public readonly record struct NexusGamepad
                 wRightMotorSpeed = 0
             };
 
-            _ = Native.XInputSetState(1, ref vibration);
+            _ = PInvoke.XInputSetState(1, ref vibration);
         };
 
         _vibrationTimers[2].Elapsed += (sender, args) =>
@@ -71,7 +71,7 @@ public readonly record struct NexusGamepad
                 wRightMotorSpeed = 0
             };
 
-            _ = Native.XInputSetState(2, ref vibration);
+            _ = PInvoke.XInputSetState(2, ref vibration);
         };
 
         _vibrationTimers[3].Elapsed += (sender, args) =>
@@ -82,7 +82,7 @@ public readonly record struct NexusGamepad
                 wRightMotorSpeed = 0
             };
 
-            _ = Native.XInputSetState(3, ref vibration);
+            _ = PInvoke.XInputSetState(3, ref vibration);
         };
     }
 
@@ -176,7 +176,7 @@ public readonly record struct NexusGamepad
             wRightMotorSpeed = (ushort)highFrequency
         };
 
-        _ = Native.XInputSetState(_id, ref vibration);
+        _ = PInvoke.XInputSetState(_id, ref vibration);
 
         _vibrationTimers[(int)_id].Start();
     }

@@ -68,7 +68,7 @@ internal sealed class ConsoleBuffer
 
         fixed (CHARINFO* arrayPtr = &charInfoBuffer[0])
         {
-            Native.WriteConsoleOutput(
+            PInvoke.WriteConsoleOutput(
                 _standardOutput,
                 arrayPtr,
                 bufferSize,

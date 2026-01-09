@@ -19,12 +19,12 @@ public static class NexusSpriteImporter
     public static NexusSpriteMap Import(string spritePath)
     {
         var extension = Path.GetExtension(spritePath);
-        if (extension is not (Constants.Extension or Constants.ExtensionCompressed))
-            throw new ArgumentException($"The file path is not a {Constants.Extension} or {Constants.ExtensionCompressed} file", nameof(spritePath));
+        if (extension is not (INexusSprite.FileExtension or INexusSprite.FileExtensionCompressed))
+            throw new ArgumentException($"The file path is not a {INexusSprite.FileExtension} or {INexusSprite.FileExtensionCompressed} file", nameof(spritePath));
 
         using (var fileStream = new FileStream(spritePath, FileMode.Open, FileAccess.Read))
         {
-            Stream stream = extension == Constants.Extension ? fileStream : new GZipStream(fileStream, CompressionMode.Decompress, false);
+            Stream stream = extension == INexusSprite.FileExtension ? fileStream : new GZipStream(fileStream, CompressionMode.Decompress, false);
 
             using (var reader = new BinaryReader(stream, Encoding.Unicode, false))
             {

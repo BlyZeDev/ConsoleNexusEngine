@@ -17,7 +17,7 @@ public abstract class NexusConsoleGame : IDisposable
 
     static NexusConsoleGame()
     {
-        ScreenSize = new NexusSize(Native.GetSystemMetrics(0), Native.GetSystemMetrics(1));
+        ScreenSize = new NexusSize(PInvoke.GetSystemMetrics(PInvoke.SM_CXSCREEN), PInvoke.GetSystemMetrics(PInvoke.SM_CYSCREEN));
 
         hasInstance = false;
     }
@@ -211,11 +211,11 @@ public abstract class NexusConsoleGame : IDisposable
 
     private static double GetHighResolutionTimestamp()
     {
-        Native.QueryPerformanceCounter(out long timestamp);
-        Native.QueryPerformanceFrequency(out long frequency);
+        PInvoke.QueryPerformanceCounter(out long timestamp);
+        PInvoke.QueryPerformanceFrequency(out long frequency);
 
         return (double)timestamp / frequency;
     }
 
-    private static bool IsKeyPressed(NexusKey key) => (Native.GetAsyncKeyState((int)key) & 0x8000) != 0;
+    private static bool IsKeyPressed(NexusKey key) => (PInvoke.GetAsyncKeyState((int)key) & 0x8000) != 0;
 }

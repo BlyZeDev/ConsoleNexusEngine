@@ -30,7 +30,7 @@ public sealed class NexusConsoleGraphic
     {
         ThrowIfOutOfBounds(coordinate);
 
-        SetChar(coordinate.X, coordinate.Y, character);
+        UnsafeSetChar(coordinate.X, coordinate.Y, character);
     }
 
     /// <summary>
@@ -74,7 +74,7 @@ public sealed class NexusConsoleGraphic
     {
         foreach (var coordinate in coordinates)
         {
-            DrawSprite(coordinate, character);
+            DrawPixel(coordinate, character);
         }
     }
 
@@ -109,7 +109,7 @@ public sealed class NexusConsoleGraphic
 
             for (int y = startCoord; y <= endCoord; y++)
             {
-                SetChar(startX, y, character);
+                UnsafeSetChar(startX, y, character);
             }
 
             return;
@@ -122,7 +122,7 @@ public sealed class NexusConsoleGraphic
 
             for (int x = startCoord; x <= endCoord; x++)
             {
-                SetChar(x, startY, character);
+                UnsafeSetChar(x, startY, character);
             }
 
             return;
@@ -160,7 +160,7 @@ public sealed class NexusConsoleGraphic
 
         for (int i = 0; i <= longest; i++)
         {
-            SetChar(startX, startY, character);
+            UnsafeSetChar(startX, startY, character);
 
             numerator += shortest;
 
@@ -343,10 +343,9 @@ public sealed class NexusConsoleGraphic
     /// </summary>
     public void Render() => _console.Buffer.RenderBuffer();
 
-    private void SetChar(int x, int y, NexusChar character) => _console.Buffer.SetChar(x, y, NativeConverter.ToCharInfo(character));
+    private void UnsafeSetChar(int x, int y, NexusChar character) => _console.Buffer.SetChar(x, y, NativeConverter.ToCharInfo(character));
 
-    private void ThrowIfOutOfBounds(in NexusCoord coord)
-        => ThrowIfOutOfBounds(coord.X, coord.Y);
+    private void ThrowIfOutOfBounds(in NexusCoord coord) => ThrowIfOutOfBounds(coord.X, coord.Y);
 
     private void ThrowIfOutOfBounds(int x, int y)
     {

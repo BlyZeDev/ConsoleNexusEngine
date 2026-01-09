@@ -1,4 +1,4 @@
-﻿namespace ConsoleNexusEngine.Internal;
+﻿namespace ConsoleNexusEngine.Internal.Models;
 
 using System.Runtime.InteropServices;
 
@@ -12,7 +12,7 @@ internal struct CONSOLE_SCREEN_BUFFER_INFO_EX
     public SMALL_RECT srWindow;
     public COORD dwMaximumWindowSize;
     public ushort wPopupAttributes;
-    public bool bFullscreenSupported;
+    public int bFullscreenSupported;
     public COLORREF black;
     public COLORREF darkBlue;
     public COLORREF darkGreen;

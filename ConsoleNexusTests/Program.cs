@@ -79,6 +79,8 @@ public sealed class Game : NexusConsoleGame
         if (Input.Keys.IsKeyJustDown(NexusKey.Right)) Audio.Seek(bgm, Audio.GetState(bgm).Position.Add(TimeSpan.FromSeconds(5)));
         if (Input.Keys.IsKeyJustDown(NexusKey.A)) Audio.SetPlaybackSpeed(bgm, Audio.GetState(bgm).PlaybackSpeed - 0.1f);
         if (Input.Keys.IsKeyJustDown(NexusKey.D)) Audio.SetPlaybackSpeed(bgm, Audio.GetState(bgm).PlaybackSpeed + 0.1f);
+        if (Input.Keys.IsKeyJustDown(NexusKey.M)) Utility.ShowAlert("Hello", "This is a Test", NexusAlertIcon.Error);
+        if (Input.Keys.IsKeyJustDown(NexusKey.F)) Settings.Font = new NexusFont("Consolas", Utility.GetRandomSize(new NexusSize(1), new NexusSize(10)));
 
         DebugView();
         /*

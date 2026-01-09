@@ -63,13 +63,13 @@ public sealed class NexusConsoleInput
     private static NexusGamepad GetGamepadState(uint index)
     {
         var state = new XINPUT_STATE();
-        if (Native.XInputGetState(index, ref state) != 0) return NexusGamepad.Empty;
+        if (PInvoke.XInputGetState(index, ref state) != 0) return NexusGamepad.Empty;
 
         var capabilites = new XINPUT_CAPABILITIES();
-        _ = Native.XInputGetCapabilities(index, 0, ref capabilites);
+        _ = PInvoke.XInputGetCapabilities(index, 0, ref capabilites);
 
         var battery = new XINPUT_BATTERY_INFORMATION();
-        _ = Native.XInputGetBatteryInformation(index, 0x00, ref battery);
+        _ = PInvoke.XInputGetBatteryInformation(index, PInvoke.BATTERY_DEVTYPE_GAMEPAD, ref battery);
 
         var gamepad = state.Gamepad;
 

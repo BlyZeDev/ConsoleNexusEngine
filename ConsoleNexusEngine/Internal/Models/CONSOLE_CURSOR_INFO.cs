@@ -1,4 +1,4 @@
-﻿namespace ConsoleNexusEngine.Internal;
+﻿namespace ConsoleNexusEngine.Internal.Models;
 
 using System.Runtime.InteropServices;
 
@@ -6,5 +6,5 @@ using System.Runtime.InteropServices;
 internal struct CONSOLE_CURSOR_INFO
 {
     public uint dwSize;
-    public bool bVisible;
+    public int bVisible;
 }

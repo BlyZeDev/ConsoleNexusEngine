@@ -1,13 +1,9 @@
 ﻿namespace ConsoleNexusEngine.Internal;
 
 using System.Runtime.InteropServices;
-using System.Text;
 
 internal sealed class CmdConsole
 {
-    private const int STD_INPUT = -10;
-    private const int STD_OUTPUT = -11;
-
     private readonly nint _handle;
     private readonly nint _standardInput;
     private readonly nint _standardOutput;
@@ -19,18 +15,18 @@ internal sealed class CmdConsole
 
     public CmdConsole(NexusConsoleGameSettings settings)
     {
-        _handle = Native.GetConsoleWindow();
+        _handle = PInvoke.GetConsoleWindow();
 
         var needsAllocation = _handle == nint.Zero;
         if (needsAllocation)
         {
-            Native.AllocConsole();
+            PInvoke.AllocConsole();
 
-            _handle = Native.GetConsoleWindow();
+            _handle = PInvoke.GetConsoleWindow();
         }
 
-        _standardInput = Native.GetStdHandle(STD_INPUT);
-        _standardOutput = Native.GetStdHandle(STD_OUTPUT);
+        _standardInput = PInvoke.GetStdHandle(PInvoke.STD_INPUT_HANDLE);
+        _standardOutput = PInvoke.GetStdHandle(PInvoke.STD_OUTPUT_HANDLE);
 
         _defaultConsole = SaveDefaultConsole(needsAllocation);
 
@@ -40,14 +36,14 @@ internal sealed class CmdConsole
         Input = new ConsoleInput(_standardInput);
     }
 
-    public void UpdateTitle(string title) => Native.SetWindowText(_handle, title);
+    public void UpdateTitle(string title) => PInvoke.SetWindowText(_handle, title);
 
     public void UpdateColorPalette(NexusColorPalette colorPalette)
     {
         var csbe = new CONSOLE_SCREEN_BUFFER_INFO_EX();
         csbe.cbSize = Marshal.SizeOf(csbe);
 
-        Native.GetConsoleScreenBufferInfoEx(_standardOutput, ref csbe);
+        PInvoke.GetConsoleScreenBufferInfoEx(_standardOutput, ref csbe);
 
         for (int i = 0; i < NexusColorPalette.MaxColorCount; i++)
         {
@@ -72,11 +68,11 @@ internal sealed class CmdConsole
             }
         }
 
-        Native.SetConsoleScreenBufferInfoEx(_standardOutput, ref csbe);
+        PInvoke.SetConsoleScreenBufferInfoEx(_standardOutput, ref csbe);
         AdjustBufferSize(ref csbe);
     }
 
-    public void UpdateFont(NexusFont font)
+    public unsafe void UpdateFont(NexusFont font)
     {
         var fontInfo = new CONSOLE_FONT_INFO_EX();
         fontInfo.cbSize = (uint)Marshal.SizeOf(fontInfo);
@@ -84,9 +80,15 @@ internal sealed class CmdConsole
         
         fontInfo.dwFontSize.X = (short)font.Size.Width;
         fontInfo.dwFontSize.Y = (short)font.Size.Height;
-        fontInfo.FaceName = font.Name;
 
-        Native.SetCurrentConsoleFontEx(_standardOutput, false, ref fontInfo);
+        fixed (char* namePtr = font.Name)
+        {
+            var length = Math.Min(font.Name.Length, CONSOLE_FONT_INFO_EX.FACE_NAME_SIZE - 1);
+            System.Buffer.MemoryCopy(namePtr, fontInfo.FaceName, CONSOLE_FONT_INFO_EX.FACE_NAME_SIZE * sizeof(char), length * sizeof(char));
+            fontInfo.FaceName[CONSOLE_FONT_INFO_EX.FACE_NAME_SIZE] = char.MinValue;
+        }
+
+        PInvoke.SetCurrentConsoleFontEx(_standardOutput, 0, ref fontInfo);
 
         var csbe = new CONSOLE_SCREEN_BUFFER_INFO_EX();
         AdjustBufferSize(ref csbe);
@@ -96,55 +98,56 @@ internal sealed class CmdConsole
     {
         if (_defaultConsole.NewlyAllocated)
         {
-            Native.FreeConsole();
-            _ = Native.ShowWindow(_handle, 0);
+            PInvoke.FreeConsole();
+            PInvoke.ShowWindow(_handle, PInvoke.SW_HIDE);
             return;
         }
         
         var cursorInfo = _defaultConsole.CursorInfo;
-        Native.SetConsoleCursorInfo(_standardOutput, ref cursorInfo);
+        PInvoke.SetConsoleCursorInfo(_standardOutput, ref cursorInfo);
 
         var fontInfo = _defaultConsole.FontInfo;
-        Native.SetCurrentConsoleFontEx(_standardOutput, false, ref fontInfo);
+        PInvoke.SetCurrentConsoleFontEx(_standardOutput, 0, ref fontInfo);
 
-        Native.SetConsoleMode(_standardInput, _defaultConsole.Mode);
+        PInvoke.SetConsoleMode(_standardInput, _defaultConsole.Mode);
 
-        _ = Native.SetWindowLong(_handle, -16, _defaultConsole.WindowLong);
+        PInvoke.SetWindowLong(_handle, PInvoke.GWL_STYLE, _defaultConsole.WindowLong);
 
         var csbe = _defaultConsole.BufferInfo;
-        Native.SetConsoleScreenBufferInfoEx(_standardOutput, ref csbe);
+        PInvoke.SetConsoleScreenBufferInfoEx(_standardOutput, ref csbe);
 
         var rect = _defaultConsole.WindowRect;
-        Native.SetWindowPos(
+        PInvoke.SetWindowPos(
             _handle,
-            -2,
+            PInvoke.HWND_NOTOPMOST,
             rect.Left, rect.Top,
             rect.Right - rect.Left, rect.Bottom - rect.Top,
-            0x0040);
+            PInvoke.SWP_SHOWWINDOW);
 
-        Native.SetWindowText(_handle, _defaultConsole.WindowTitle);
+        PInvoke.SetWindowText(_handle, _defaultConsole.WindowTitle);
 
         Console.Clear();
     }
 
-    public int MessageBox(string caption, string message, uint type) => Native.MessageBox(_handle, message, caption, type | 0x00001000);
+    public int MessageBox(string caption, string message, uint type) => PInvoke.MessageBox(_handle, message, caption, type | PInvoke.MB_TOPMOST);
 
-    private DefaultConsole SaveDefaultConsole(bool newlyAllocated)
+    private unsafe DefaultConsole SaveDefaultConsole(bool newlyAllocated)
     {
-        Native.GetConsoleCursorInfo(_standardOutput, out var cursorInfo);
-        Native.GetCurrentConsoleFontEx(_standardOutput, false, out var fontInfo);
-        Native.GetConsoleMode(_standardInput, out var mode);
-        var windowLong = Native.GetWindowLong(_handle, -16);
+        PInvoke.GetConsoleCursorInfo(_standardOutput, out var cursorInfo);
+        PInvoke.GetCurrentConsoleFontEx(_standardOutput, 0, out var fontInfo);
+        PInvoke.GetConsoleMode(_standardInput, out var mode);
+        var windowLong = PInvoke.GetWindowLong(_handle, PInvoke.GWL_STYLE);
 
         var csbe = new CONSOLE_SCREEN_BUFFER_INFO_EX();
         csbe.cbSize = Marshal.SizeOf(csbe);
-        Native.GetConsoleScreenBufferInfoEx(_standardOutput, ref csbe);
+        PInvoke.GetConsoleScreenBufferInfoEx(_standardOutput, ref csbe);
 
         var rect = new RECT();
-        Native.GetWindowRect(_handle, ref rect);
+        PInvoke.GetWindowRect(_handle, ref rect);
 
-        var titleBuilder = new StringBuilder(Native.GetWindowTextLength(_handle) + 1);
-        _ = Native.GetWindowText(_handle, titleBuilder, titleBuilder.Capacity);
+        var titleLength = PInvoke.GetWindowTextLength(_handle) + 1;
+        var titleBuffer = stackalloc char[titleLength];
+        titleLength = PInvoke.GetWindowText(_handle, titleBuffer, titleLength);
 
         return new DefaultConsole
         {
@@ -155,18 +158,18 @@ internal sealed class CmdConsole
             Mode = mode,
             WindowLong = windowLong,
             WindowRect = rect,
-            WindowTitle = titleBuilder.ToString()
+            WindowTitle = new string(titleBuffer, 0, titleLength)
         };
     }
 
-    private NexusSize Initialize(NexusConsoleGameSettings settings)
+    private unsafe NexusSize Initialize(NexusConsoleGameSettings settings)
     {
         var cursorInfo = new CONSOLE_CURSOR_INFO
         {
-            bVisible = false,
+            bVisible = 0,
             dwSize = 1
         };
-        Native.SetConsoleCursorInfo(_standardOutput, ref cursorInfo);
+        PInvoke.SetConsoleCursorInfo(_standardOutput, ref cursorInfo);
 
         var fontInfo = new CONSOLE_FONT_INFO_EX();
         fontInfo.cbSize = (uint)Marshal.SizeOf(fontInfo);
@@ -174,18 +177,24 @@ internal sealed class CmdConsole
 
         fontInfo.dwFontSize.X = (short)settings.Font.Size.Width;
         fontInfo.dwFontSize.Y = (short)settings.Font.Size.Height;
-        fontInfo.FaceName = settings.Font.Name;
 
-        Native.SetCurrentConsoleFontEx(_standardOutput, false, ref fontInfo);
+        fixed (char* namePtr = settings.Font.Name)
+        {
+            var length = Math.Min(settings.Font.Name.Length, CONSOLE_FONT_INFO_EX.FACE_NAME_SIZE - 1);
+            System.Buffer.MemoryCopy(namePtr, fontInfo.FaceName, CONSOLE_FONT_INFO_EX.FACE_NAME_SIZE * sizeof(char), length * sizeof(char));
+            fontInfo.FaceName[CONSOLE_FONT_INFO_EX.FACE_NAME_SIZE] = char.MinValue;
+        }
 
-        Native.SetConsoleMode(_standardInput, (0x0080 | 0x0010) & ~0x0004 & ~0x0040 & ~0x0008);
+        PInvoke.SetCurrentConsoleFontEx(_standardOutput, 0, ref fontInfo);
 
-        _ = Native.SetWindowLong(_handle, -16, 0x00080000 & ~0x00100000 & ~0x00200000);
+        PInvoke.SetConsoleMode(_standardInput, (PInvoke.ENABLE_EXTENDED_FLAGS | PInvoke.ENABLE_MOUSE_INPUT) & ~PInvoke.ENABLE_ECHO_INPUT & ~PInvoke.ENABLE_QUICK_EDIT_MODE & ~PInvoke.ENABLE_WINDOW_INPUT);
+
+        _ = PInvoke.SetWindowLong(_handle, PInvoke.GWL_STYLE, PInvoke.WS_BORDER & ~PInvoke.WS_MAXIMIZE & ~PInvoke.WS_MINIMIZE);
 
         var csbe = new CONSOLE_SCREEN_BUFFER_INFO_EX();
         csbe.cbSize = Marshal.SizeOf(csbe);
 
-        Native.GetConsoleScreenBufferInfoEx(_standardOutput, ref csbe);
+        PInvoke.GetConsoleScreenBufferInfoEx(_standardOutput, ref csbe);
 
         for (int i = 0; i < NexusColorPalette.MaxColorCount; i++)
         {
@@ -215,27 +224,27 @@ internal sealed class CmdConsole
         ++csbe.srWindow.Bottom;
         ++csbe.srWindow.Right;
 
-        Native.SetConsoleScreenBufferInfoEx(_standardOutput, ref csbe);
+        PInvoke.SetConsoleScreenBufferInfoEx(_standardOutput, ref csbe);
 
         var monitorInfo = new MONITORINFO
         {
             cbSize = Marshal.SizeOf<MONITORINFO>()
         };
-        Native.GetMonitorInfo(Native.MonitorFromWindow(_handle, 1), ref monitorInfo);
+        PInvoke.GetMonitorInfo(PInvoke.MonitorFromWindow(_handle, PInvoke.MONITOR_DEFAULTTONEAREST), ref monitorInfo);
 
-        Native.SetWindowPos(
+        PInvoke.SetWindowPos(
             _handle,
             nint.Zero,
             monitorInfo.rcWork.Left, monitorInfo.rcWork.Top,
             monitorInfo.rcWork.Right - monitorInfo.rcWork.Left,
             monitorInfo.rcWork.Bottom - monitorInfo.rcWork.Top,
-            0x0040 | 0x0020);
+            PInvoke.SWP_SHOWWINDOW | PInvoke.SWP_FRAMECHANGED);
 
-        Native.GetConsoleScreenBufferInfoEx(_standardOutput, ref csbe);
+        PInvoke.GetConsoleScreenBufferInfoEx(_standardOutput, ref csbe);
 
-        Native.SetWindowText(_handle, settings.Title);
+        PInvoke.SetWindowText(_handle, settings.Title);
 
-        Native.SetForegroundWindow(_handle);
+        PInvoke.SetForegroundWindow(_handle);
 
         return new NexusSize(csbe.dwSize.X, csbe.dwSize.Y);
     }
@@ -244,24 +253,30 @@ internal sealed class CmdConsole
     {
         csbe.cbSize = Marshal.SizeOf(csbe);
 
-        Native.GetConsoleScreenBufferInfoEx(_standardOutput, ref csbe);
+        PInvoke.GetConsoleScreenBufferInfoEx(_standardOutput, ref csbe);
 
         csbe.dwSize.X = 1;
         csbe.dwSize.Y = 1;
         ++csbe.srWindow.Bottom;
         ++csbe.srWindow.Right;
 
-        Native.SetConsoleScreenBufferInfoEx(_standardOutput, ref csbe);
+        PInvoke.SetConsoleScreenBufferInfoEx(_standardOutput, ref csbe);
 
-        Native.SetWindowPos(
+        var monitorInfo = new MONITORINFO
+        {
+            cbSize = Marshal.SizeOf<MONITORINFO>()
+        };
+        PInvoke.GetMonitorInfo(PInvoke.MonitorFromWindow(_handle, PInvoke.MONITOR_DEFAULTTONEAREST), ref monitorInfo);
+
+        PInvoke.SetWindowPos(
             _handle,
             nint.Zero,
-            0, 0,
-            Native.GetSystemMetrics(0),
-            Native.GetSystemMetrics(1),
-            0x0040);
+            monitorInfo.rcWork.Left, monitorInfo.rcWork.Top,
+            monitorInfo.rcWork.Right - monitorInfo.rcWork.Left,
+            monitorInfo.rcWork.Bottom - monitorInfo.rcWork.Top,
+            PInvoke.SWP_SHOWWINDOW);
 
-        Native.GetConsoleScreenBufferInfoEx(_standardOutput, ref csbe);
+        PInvoke.GetConsoleScreenBufferInfoEx(_standardOutput, ref csbe);
 
         Buffer.ChangeDimensions(csbe.dwSize.X, csbe.dwSize.Y);
     }
