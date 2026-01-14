@@ -1,10 +1,14 @@
-﻿namespace ConsoleNexusTests;
+﻿using System.Runtime.Versioning;
+
+[assembly: SupportedOSPlatform("Windows")]
+
+namespace ConsoleNexusTests;
 
 using ConsoleNexusEngine;
+using ConsoleNexusEngine.Audio;
 using ConsoleNexusEngine.Graphics;
 using ConsoleNexusEngine.Helpers;
 using ConsoleNexusEngine.IO;
-using ConsoleNexusEngine.Audio;
 using Figgle.Fonts;
 
 sealed class Program
@@ -35,7 +39,7 @@ public sealed class Game : NexusConsoleGame
 
     public Game()
     {
-        Settings.Font = new NexusFont("Consolas", new NexusSize(10));
+        Settings.Font = new NexusFont("Cascadia Code", new NexusSize(15));
         Settings.ColorPalette = new WindowsColorPalette();
     }
 
@@ -90,6 +94,7 @@ public sealed class Game : NexusConsoleGame
         Graphic.DrawText(new NexusCoord(5, 6), new NexusText("Speed: " + Audio.GetState(bgm).PlaybackSpeed, NexusColorIndex.Color14));
         Graphic.DrawText(new NexusCoord(5, 7), new NexusText("IsEmpty: " + Audio.GetState(bgm).IsEmpty, NexusColorIndex.Color14));
         */
+
         Graphic.Render();
     }
 
@@ -125,6 +130,7 @@ public sealed class Game : NexusConsoleGame
         Graphic.DrawText(new NexusCoord(10, 10), new NexusText("FPS: " + FramesPerSecond, NexusColorIndex.Color3));
         Graphic.DrawText(new NexusCoord(11, 11), new NexusText("Width: " + BufferSize.Width, NexusColorIndex.Color3));
         Graphic.DrawText(new NexusCoord(12, 12), new NexusText("Height: " + BufferSize.Height, NexusColorIndex.Color3));
+        Graphic.DrawText(new NexusCoord(13, 13), new NexusText("FontSize: " + Settings.Font.Size, NexusColorIndex.Color3));
 
         Graphic.DrawLine(new NexusCoord(BufferSize.Width - 5, 0), new NexusCoord(BufferSize.Width - 1, 4), new NexusChar(' ', NexusColorIndex.Color14, NexusColorIndex.Color14));
         Graphic.DrawLine(new NexusCoord(BufferSize.Width - 1, 0), new NexusCoord(BufferSize.Width - 5, 4), new NexusChar(' ', NexusColorIndex.Color14, NexusColorIndex.Color14));

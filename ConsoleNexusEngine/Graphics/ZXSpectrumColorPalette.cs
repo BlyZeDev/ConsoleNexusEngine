@@ -4,7 +4,6 @@
 /// The color palette of the ZX Spectrum computer series (only 15 colors)<br/>
 /// <see href="https://en.wikipedia.org/wiki/ZX_Spectrum"/>
 /// </summary>
-[IncludeColorPalette]
 public sealed record ZXSpectrumColorPalette : NexusColorPalette
 {
     /// <summary>

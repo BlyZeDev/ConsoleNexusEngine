@@ -3,7 +3,6 @@
 /// <summary>
 /// The default windows console color palette
 /// </summary>
-[IncludeColorPalette]
 public sealed record DefaultColorPalette : NexusColorPalette
 {
     /// <summary>

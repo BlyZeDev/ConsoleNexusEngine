@@ -2,9 +2,7 @@
 
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.Runtime.Versioning;
 
-[SupportedOSPlatform("windows")]
 internal static class ImageHelper
 {
     public static BitmapData LockBitsReadOnly(this Bitmap bitmap, PixelFormat format)

@@ -31,14 +31,14 @@ public static class NexusSpriteImporter
                 var version = reader.ReadInt32();
                 return version switch
                 {
-                    1 => ReadVer1(reader),
+                    1 => ReadVersion1(reader),
                     _ => throw new NotSupportedException($"This version ({version}) is not supported"),
                 };
             }
         }
     }
 
-    private static NexusSpriteMap ReadVer1(BinaryReader reader)
+    private static NexusSpriteMap ReadVersion1(BinaryReader reader)
     {
         var width = reader.ReadInt32();
         var height = reader.ReadInt32();

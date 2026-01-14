@@ -119,15 +119,15 @@ public abstract record NexusColorPalette : IEnumerable<NexusColor>
     protected NexusColorPalette() { }
 
     /// <summary>
-    /// Get the first index of the specified color or <see langword="default"/> if not found
+    /// Get the first index of the specified color or <see langword="null"/> if not found
     /// </summary>
     /// <param name="color">The color to check for</param>
     /// <returns><see cref="NexusColorIndex"/></returns>
     public NexusColorIndex? GetIndex(in NexusColor color)
     {
-        var index = GetKeys(color).First();
+        var index = GetKeys(color).FirstOrDefault(-1);
 
-        return new NexusColorIndex(index == -1 ? default : index);
+        return index == -1 ? null : new NexusColorIndex(index);
     }
 
     /// <summary>
@@ -166,8 +166,6 @@ public abstract record NexusColorPalette : IEnumerable<NexusColor>
         {
             if (_colors[i] == color) yield return i;
         }
-
-        yield return -1;
     }
 
     private static void ThrowIfPaletteInvalid(in ImmutableArray<NexusColor> colors)

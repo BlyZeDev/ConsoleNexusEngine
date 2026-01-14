@@ -4,7 +4,6 @@
 /// The color palette of the Atari ST<br/>
 /// <see href="https://en.wikipedia.org/wiki/Atari_ST"/>
 /// </summary>
-[IncludeColorPalette]
 public sealed record AtariSTColorPalette : NexusColorPalette
 {
     /// <summary>

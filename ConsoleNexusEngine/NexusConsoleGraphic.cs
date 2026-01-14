@@ -70,21 +70,13 @@ public sealed class NexusConsoleGraphic
     /// </summary>
     /// <param name="character">The character to draw</param>
     /// <param name="coordinates">The coordinates where the character should be drawn</param>
-    public void DrawPixels(in NexusChar character, in ReadOnlySpan<NexusCoord> coordinates)
+    public void DrawPixels(in NexusChar character, params ReadOnlySpan<NexusCoord> coordinates)
     {
-        foreach (var coordinate in coordinates)
+        foreach (ref readonly var coordinate in coordinates)
         {
             DrawPixel(coordinate, character);
         }
     }
-
-    /// <summary>
-    /// Draws a pixel in the console at specific positions
-    /// </summary>
-    /// <param name="character">The character to draw</param>
-    /// <param name="coordinates">The coordinates where the character should be drawn</param>
-    public void DrawPixels(in NexusChar character, params NexusCoord[] coordinates)
-        => DrawPixels(character, coordinates.AsSpan());
 
     /// <summary>
     /// Draws a line from one coordinate to the other
@@ -183,7 +175,7 @@ public sealed class NexusConsoleGraphic
     /// </summary>
     /// <param name="coordinate">The top left coordinates of the sprite</param>
     /// <param name="sprite">The sprite to draw</param>
-    public void DrawSprite(in NexusCoord coordinate, INexusSprite sprite)
+    public void DrawSprite<TSprite>(in NexusCoord coordinate, TSprite sprite) where TSprite : INexusSprite
     {
         ThrowIfOutOfBounds(coordinate);
         ThrowIfOutOfBounds(coordinate.X + sprite.Map.Size.Width - 1, coordinate.Y + sprite.Map.Size.Height - 1);
@@ -318,18 +310,17 @@ public sealed class NexusConsoleGraphic
     /// </summary>
     /// <param name="coordinate">The top left coordinates of the sprite</param>
     /// <param name="sprite">The sprite to clear</param>
-    public void ClearSprite(in NexusCoord coordinate, INexusSprite sprite)
+    public void ClearSprite<TSprite>(in NexusCoord coordinate, TSprite sprite) where TSprite : INexusSprite
     {
         ThrowIfOutOfBounds(coordinate);
         ThrowIfOutOfBounds(coordinate.X + sprite.Map.Size.Width - 1, coordinate.Y + sprite.Map.Size.Height - 1);
 
         var spriteWidth = sprite.Map.Size.Width;
-        Span<CHARINFO> spriteSpan = StackAlloc.Allow<CHARINFO>(sprite.Map._spriteMap.Length)
-            ? stackalloc CHARINFO[sprite.Map._spriteMap.Length] : new CHARINFO[sprite.Map._spriteMap.Length];
+        var spriteHeight = sprite.Map.Size.Height;
 
-        for (int y = 0; y < sprite.Map.Size.Height; y++)
+        for (int y = 0; y < spriteHeight; y++)
         {
-            _console.Buffer.BlockSetChar(spriteSpan, y * spriteWidth, (coordinate.Y + y) * _console.Buffer.Width + coordinate.X, spriteWidth);
+            _console.Buffer.ClearBlock((coordinate.Y + y) * _console.Buffer.Width + coordinate.X, spriteWidth);
         }
     }
 

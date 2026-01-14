@@ -1,8 +1,5 @@
 ﻿namespace ConsoleNexusEngine;
 
-using System.Collections.Immutable;
-using System.Linq;
-using System.Reflection;
 using System.Security.Cryptography;
 
 /// <summary>
@@ -10,23 +7,6 @@ using System.Security.Cryptography;
 /// </summary>
 public sealed class NexusConsoleGameUtil
 {
-    private static readonly ImmutableArray<NexusColorPalette> _colorPalettes;
-
-    static NexusConsoleGameUtil()
-    {
-        var colorPalettes = ImmutableArray.CreateBuilder<NexusColorPalette>();
-        var type = typeof(NexusColorPalette);
-
-        foreach (var colorPalette in AppDomain.CurrentDomain.GetAssemblies()
-            .SelectMany(x => x.GetTypes())
-            .Where(x => x.IsClass && !x.IsAbstract && x.IsSubclassOf(type) && x.GetCustomAttribute<IncludeColorPaletteAttribute>() is not null))
-        {
-            colorPalettes.Add((NexusColorPalette)Activator.CreateInstance(colorPalette)!);
-        }
-
-        _colorPalettes = colorPalettes.DrainToImmutable();
-    }
-
     private readonly CmdConsole _console;
     private readonly NexusConsoleGameSettings _settings;
 
@@ -164,14 +144,6 @@ public sealed class NexusConsoleGameUtil
     /// <returns><see cref="char"/></returns>
     public char GetRandomChar(bool pseudoRandom = true)
         => GetRandomChar(char.MinValue, char.MaxValue, pseudoRandom);
-
-    /// <summary>
-    /// Generate a pseudo or strong random color palette
-    /// </summary>
-    /// <param name="pseudoRandom"><see langword="false"/> if it should be generated as a strong random</param>
-    /// <returns><see cref="NexusColorPalette"/></returns>
-    public NexusColorPalette GetRandomColorPalette(bool pseudoRandom = true)
-        => _colorPalettes[GetRandomNumber(_colorPalettes.Length, pseudoRandom)];
 
     /// <summary>
     /// Displays a message box

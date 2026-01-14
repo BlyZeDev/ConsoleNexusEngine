@@ -3,6 +3,7 @@
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Net.Http;
+using System.Runtime.Versioning;
 
 /// <summary>
 /// Represents an animation that can be played in console

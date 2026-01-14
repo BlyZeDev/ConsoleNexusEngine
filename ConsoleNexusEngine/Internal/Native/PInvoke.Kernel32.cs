@@ -53,5 +53,5 @@ internal static partial class PInvoke
     public static partial int SetCurrentConsoleFontEx(nint hConsoleOutput, int bMaximumWindow, ref CONSOLE_FONT_INFO_EX lpConsoleCurrentFont);
 
     [LibraryImport(Kernel32, EntryPoint = "WriteConsoleOutputW", SetLastError = true)]
-    public static unsafe partial int WriteConsoleOutput(nint hConsoleOutput, CHARINFO* lpBuffer, COORD dwBufferSize, COORD dwBufferCoord, SMALL_RECT* lpWriteRegion);
+    public static unsafe partial int WriteConsoleOutput(nint hConsoleOutput, CHARINFO* lpBuffer, COORD dwBufferSize, COORD dwBufferCoord, ref SMALL_RECT lpWriteRegion);
 }

@@ -3,7 +3,6 @@
 /// <summary>
 /// A grayscale color palette
 /// </summary>
-[IncludeColorPalette]
 public sealed record GrayscaleColorPalette : NexusColorPalette
 {
     /// <summary>

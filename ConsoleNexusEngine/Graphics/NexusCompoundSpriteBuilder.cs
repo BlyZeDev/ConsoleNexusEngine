@@ -116,7 +116,7 @@ public sealed class NexusCompoundSpriteBuilder
         if (coordinates.Length == 1) return AddPixel(coordinates[0], character, layer);
 
         var mapSize = NexusSize.MinValue;
-        foreach (var coordinate in coordinates)
+        foreach (ref readonly var coordinate in coordinates)
         {
             mapSize = new NexusSize(Math.Max(mapSize.Width, coordinate.X), Math.Max(mapSize.Height, coordinate.Y), false);
         }
@@ -125,7 +125,7 @@ public sealed class NexusCompoundSpriteBuilder
         Span<CHARINFO> map = StackAlloc.Allow<CHARINFO>(mapSize.Dimensions) ? stackalloc CHARINFO[mapSize.Dimensions] : new CHARINFO[mapSize.Dimensions];
 
         var nativeChar = NativeConverter.ToCharInfo(character);
-        foreach (var coordinate in coordinates)
+        foreach (ref readonly var coordinate in coordinates)
         {
             map[IndexDimensions.Get1D(coordinate.X, coordinate.Y, mapSize.Width)] = nativeChar;
         }
@@ -182,7 +182,8 @@ public sealed class NexusCompoundSpriteBuilder
     /// <param name="sprite">The sprite to add</param>
     /// <param name="layer">The layer the sprite map should be added. Adds to the top, if <paramref name="layer"/> is -1.<br/>If the layer is already present it will be overriden</param>
     /// <returns><see cref="NexusCompoundSpriteBuilder"/></returns>
-    public NexusCompoundSpriteBuilder AddSprite(INexusSprite sprite, int layer = -1) => AddSpriteMap(sprite.Map, layer);
+    public NexusCompoundSpriteBuilder AddSprite<TSprite>(TSprite sprite, int layer = -1) where TSprite : INexusSprite
+        => AddSpriteMap(sprite.Map, layer);
 
     /// <summary>
     /// Adds a sprite to the current map at a specific position
@@ -191,7 +192,8 @@ public sealed class NexusCompoundSpriteBuilder
     /// <param name="sprite">The sprite to add</param>
     /// <param name="layer">The layer the sprite map should be added. Adds to the top, if <paramref name="layer"/> is -1.<br/>If the layer is already present it will be overriden</param>
     /// <returns><see cref="NexusCompoundSpriteBuilder"/></returns>
-    public NexusCompoundSpriteBuilder AddSprite(in NexusCoord coordinate, INexusSprite sprite, int layer = -1) => AddSpriteMap(coordinate, sprite.Map, layer);
+    public NexusCompoundSpriteBuilder AddSprite<TSprite>(in NexusCoord coordinate, TSprite sprite, int layer = -1) where TSprite : INexusSprite
+        => AddSpriteMap(coordinate, sprite.Map, layer);
 
     /// <summary>
     /// Adds a sprite to the current map
