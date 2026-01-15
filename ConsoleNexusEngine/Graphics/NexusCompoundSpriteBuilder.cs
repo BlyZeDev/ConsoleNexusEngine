@@ -182,8 +182,7 @@ public sealed class NexusCompoundSpriteBuilder
     /// <param name="sprite">The sprite to add</param>
     /// <param name="layer">The layer the sprite map should be added. Adds to the top, if <paramref name="layer"/> is -1.<br/>If the layer is already present it will be overriden</param>
     /// <returns><see cref="NexusCompoundSpriteBuilder"/></returns>
-    public NexusCompoundSpriteBuilder AddSprite(INexusSprite sprite, int layer = -1)
-        => AddSpriteMap(sprite.Map, layer);
+    public NexusCompoundSpriteBuilder AddSprite<TSprite>(TSprite sprite, int layer = -1) where TSprite : INexusSprite => AddSpriteMap(sprite.Map, layer);
 
     /// <summary>
     /// Adds a sprite to the current map at a specific position
@@ -192,8 +191,7 @@ public sealed class NexusCompoundSpriteBuilder
     /// <param name="sprite">The sprite to add</param>
     /// <param name="layer">The layer the sprite map should be added. Adds to the top, if <paramref name="layer"/> is -1.<br/>If the layer is already present it will be overriden</param>
     /// <returns><see cref="NexusCompoundSpriteBuilder"/></returns>
-    public NexusCompoundSpriteBuilder AddSprite(in NexusCoord coordinate, INexusSprite sprite, int layer = -1)
-        => AddSpriteMap(coordinate, sprite.Map, layer);
+    public NexusCompoundSpriteBuilder AddSprite<TSprite>(in NexusCoord coordinate, TSprite sprite, int layer = -1) where TSprite : INexusSprite => AddSpriteMap(coordinate, sprite.Map, layer);
 
     /// <summary>
     /// Adds a sprite to the current map
