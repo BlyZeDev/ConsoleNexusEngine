@@ -175,7 +175,7 @@ public sealed class NexusConsoleGraphic
     /// </summary>
     /// <param name="coordinate">The top left coordinates of the sprite</param>
     /// <param name="sprite">The sprite to draw</param>
-    public void DrawSprite<TSprite>(in NexusCoord coordinate, TSprite sprite) where TSprite : INexusSprite
+    public void DrawSprite(in NexusCoord coordinate, INexusSprite sprite)
     {
         ThrowIfOutOfBounds(coordinate);
         ThrowIfOutOfBounds(coordinate.X + sprite.Map.Size.Width - 1, coordinate.Y + sprite.Map.Size.Height - 1);
@@ -310,7 +310,7 @@ public sealed class NexusConsoleGraphic
     /// </summary>
     /// <param name="coordinate">The top left coordinates of the sprite</param>
     /// <param name="sprite">The sprite to clear</param>
-    public void ClearSprite<TSprite>(in NexusCoord coordinate, TSprite sprite) where TSprite : INexusSprite
+    public void ClearSprite(in NexusCoord coordinate, INexusSprite sprite)
     {
         ThrowIfOutOfBounds(coordinate);
         ThrowIfOutOfBounds(coordinate.X + sprite.Map.Size.Width - 1, coordinate.Y + sprite.Map.Size.Height - 1);

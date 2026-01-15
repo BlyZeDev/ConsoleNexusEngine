@@ -32,7 +32,7 @@ public static class NexusSpriteExporter
     /// <param name="sprite">The sprite to export</param>
     /// <param name="compressed"><see langword="false"/> for faster export but bigger file size.</param>
     /// <returns><see cref="string"/></returns>
-    public static string Export<TSprite>(string directory, string spriteName, TSprite sprite, bool compressed = true) where TSprite : INexusSprite
+    public static string Export(string directory, string spriteName, INexusSprite sprite, bool compressed = true)
         => Export(directory, spriteName, sprite.Map, compressed);
 
     /// <summary>
