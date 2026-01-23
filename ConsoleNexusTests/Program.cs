@@ -26,8 +26,8 @@ sealed class Program
             game.Start();
         }
 
-        Console.Write("Ende");
         Console.Clear();
+        Console.Write("Ende");
     }
 }
 

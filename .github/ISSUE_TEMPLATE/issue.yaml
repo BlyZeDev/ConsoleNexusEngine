@@ -1,5 +1,5 @@
 name: Bug Report
-description: Create a report to help me improve this Engine
+description: Report a bug
 labels: ["🐞 Bug"]
 assignees:
   - BlyZeDev
@@ -23,21 +23,8 @@ body:
   - type: input
     id: version
     attributes:
-      label: Engine Version
-      description: The version(s) of the engine
-    validations:
-      required: true
-  - type: checkboxes
-    id: windows
-    attributes:
-      label: Windows Version
-      description: On which windows version(s) do you have the problem?
-      options:
-        - label: Windows 11
-        - label: Windows 10
-        - label: Windows 8
-        - label: Windows 7
-        - label: Older
+      label: Version(s)
+      placeholder: Separate versions with ;
     validations:
       required: true
   - type: textarea
